@@ -62,6 +62,33 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     }
   }
 
+  Future<void> _editProduk(int index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TambahProdukPage(
+          produk: produkList[index], // Kirim produk yang akan di-edit
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        produkList[index] = result['nama']; // Update produk yang di-edit
+        filteredProdukList = produkList;
+      });
+      _saveProdukList(); // Simpan perubahan ke local storage
+    }
+  }
+
+  Future<void> _deleteProduk(int index) async {
+    setState(() {
+      produkList.removeAt(index);
+      filteredProdukList = produkList;
+    });
+    _saveProdukList(); // Simpan daftar produk setelah penghapusan
+  }
+
   Future<void> _saveProdukList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('produkList', json.encode(produkList));
@@ -153,6 +180,12 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(filteredProdukList[index]),
+                      onTap: () =>
+                          _editProduk(index), // Edit produk saat item ditekan
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _deleteProduk(index), // Hapus produk
+                      ),
                     );
                   },
                 )

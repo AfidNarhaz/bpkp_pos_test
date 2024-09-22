@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TambahProdukPage extends StatefulWidget {
-  const TambahProdukPage({super.key});
+  final String? produk; // Tambahkan parameter produk untuk edit
+
+  const TambahProdukPage({super.key, this.produk});
 
   @override
   TambahProdukPageState createState() => TambahProdukPageState();
@@ -16,6 +18,16 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
   // Placeholder untuk gambar
   String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set nilai default jika sedang edit produk
+    if (widget.produk != null) {
+      _namaController.text = widget.produk!;
+      // Setel nilai lainnya juga (misal: harga, merek, kategori) jika Anda punya data tersebut.
+    }
+  }
 
   @override
   void dispose() {
@@ -51,7 +63,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         'favorit': isFavorit,
       };
 
-      Navigator.pop(context, newProduk);
+      Navigator.pop(context,
+          newProduk); // Kembali ke halaman sebelumnya dengan data produk baru
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -65,13 +78,14 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Produk'),
+        title: const Text('Tambah/ Edit Produk'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Gambar produk
             Center(
               child: _imagePath != null
                   ? Column(
@@ -93,6 +107,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     ),
             ),
             const SizedBox(height: 20),
+            // Nama produk
             TextField(
               controller: _namaController,
               decoration: const InputDecoration(
@@ -101,6 +116,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
               ),
             ),
             const SizedBox(height: 20),
+            // Harga jual
             TextField(
               controller: _hargaController,
               keyboardType: TextInputType.number,
@@ -110,6 +126,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
               ),
             ),
             const SizedBox(height: 20),
+            // Merek
             TextField(
               controller: _merekController,
               decoration: const InputDecoration(
@@ -118,6 +135,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
               ),
             ),
             const SizedBox(height: 20),
+            // Kategori
             TextField(
               controller: _kategoriController,
               decoration: const InputDecoration(
