@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // Untuk encoding dan decoding JSON
-import 'tambah_produk_page.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:bpkp_pos_test/view/pegawai/tambah_pegawai_page.dart';
 
-class KelolaProdukPage extends StatefulWidget {
-  const KelolaProdukPage({super.key});
+// package:bpkp_pos_test/view/kelola_produk_page.dart
+
+class TransaksiPage extends StatefulWidget {
+  const TransaksiPage({super.key});
 
   @override
-  KelolaProdukPageState createState() => KelolaProdukPageState();
+  TransaksiPageState createState() => TransaksiPageState();
 }
 
-class KelolaProdukPageState extends State<KelolaProdukPage> {
-  List<String> produkList = [];
-  List<String> filteredProdukList = [];
+class TransaksiPageState extends State<TransaksiPage> {
+  List<Product> produkList = [];
+  List<Product> filteredProdukList = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
+
+  final dbHelper = DatabaseHelper();
 
   @override
   void initState() {
@@ -24,17 +28,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   }
 
   Future<void> _loadProdukAsync() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? produkData = prefs.getString('produkList');
-
-    if (produkData != null) {
-      setState(() {
-        produkList = List<String>.from(json.decode(produkData));
-        filteredProdukList = produkList;
-      });
-    }
+    List<Product> products = await dbHelper.getProducts();
     setState(() {
-      _isLoading = false; // Ubah status loading setelah data dimuat
+      produkList = products;
+      filteredProdukList = produkList;
+      _isLoading = false;
     });
   }
 
@@ -42,7 +40,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       filteredProdukList = produkList
-          .where((produk) => produk.toLowerCase().contains(query))
+          .where((produk) => produk.name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -50,15 +48,18 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   Future<void> _tambahProduk() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const TambahProdukPage()),
+      MaterialPageRoute(builder: (context) => const TambahPegawaiPage()),
     );
 
     if (result != null) {
-      setState(() {
-        produkList.add(result['nama']);
-        filteredProdukList = produkList;
-      });
-      _saveProdukList(); // Simpan daftar produk ke local storage
+      Product newProduct = Product(
+        name: result['nama'],
+        brand: result['brand'],
+        category: result['category'],
+        price: double.parse(result['price']),
+      );
+      await dbHelper.insertProduct(newProduct);
+      _loadProdukAsync(); // Refresh data
     }
   }
 
@@ -66,32 +67,28 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TambahProdukPage(
+        builder: (context) => TambahPegawaiPage(
           produk: produkList[index], // Kirim produk yang akan di-edit
         ),
       ),
     );
 
     if (result != null) {
-      setState(() {
-        produkList[index] = result['nama']; // Update produk yang di-edit
-        filteredProdukList = produkList;
-      });
-      _saveProdukList(); // Simpan perubahan ke local storage
+      Product updatedProduct = Product(
+        id: produkList[index].id,
+        name: result['nama'],
+        brand: result['brand'],
+        category: result['category'],
+        price: double.parse(result['price']),
+      );
+      await dbHelper.updateProduct(updatedProduct);
+      _loadProdukAsync(); // Refresh data
     }
   }
 
   Future<void> _deleteProduk(int index) async {
-    setState(() {
-      produkList.removeAt(index);
-      filteredProdukList = produkList;
-    });
-    _saveProdukList(); // Simpan daftar produk setelah penghapusan
-  }
-
-  Future<void> _saveProdukList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('produkList', json.encode(produkList));
+    await dbHelper.deleteProduct(produkList[index].id!);
+    _loadProdukAsync(); // Refresh data
   }
 
   @override
@@ -103,12 +100,12 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Jumlah tab (Produk, Stok, Penjualan)
+      length: 3,
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 186, 227, 236),
         appBar: AppBar(
           title: const Text(
-            'Kelola Produk',
+            'Transaksi',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           actions: [
@@ -119,22 +116,21 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           ],
           bottom: const TabBar(
             tabs: [
+              Tab(text: 'Manual'),
               Tab(text: 'Produk'),
-              Tab(text: 'Stok'),
-              Tab(text: 'Penjualan'),
+              Tab(text: 'Favorite'),
             ],
           ),
         ),
         body: _isLoading
             ? const Center(
-                child:
-                    CircularProgressIndicator(), // Tampilkan loading indicator
+                child: CircularProgressIndicator(),
               )
             : TabBarView(
                 children: [
-                  _buildProdukTab(), // Tab Produk
-                  _buildStokTab(), // Tab Stok
-                  _buildPenjualanTab(), // Tab Penjualan
+                  _buildProdukTab(),
+                  _buildStokTab(),
+                  _buildPenjualanTab(),
                 ],
               ),
         floatingActionButton: FloatingActionButton(
@@ -145,7 +141,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     );
   }
 
-  // Konten untuk Tab Produk
   Widget _buildProdukTab() {
     return Column(
       children: [
@@ -179,12 +174,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   itemCount: filteredProdukList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(filteredProdukList[index]),
-                      onTap: () =>
-                          _editProduk(index), // Edit produk saat item ditekan
+                      title: Text(filteredProdukList[index].name),
+                      onTap: () => _editProduk(index),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () => _deleteProduk(index), // Hapus produk
+                        onPressed: () => _deleteProduk(index),
                       ),
                     );
                   },
@@ -197,7 +191,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     );
   }
 
-  // Konten untuk Tab Stok
   Widget _buildStokTab() {
     return const Center(
       child: Text(
@@ -207,7 +200,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     );
   }
 
-  // Konten untuk Tab Penjualan
   Widget _buildPenjualanTab() {
     return const Center(
       child: Text(

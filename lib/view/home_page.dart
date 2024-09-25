@@ -1,6 +1,6 @@
-import 'package:bpkp_pos_test/view/kelola_produk_page.dart';
-import 'package:bpkp_pos_test/view/pegawai_page.dart';
-import 'package:bpkp_pos_test/view/transaksi_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
+import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
+import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,7 +28,13 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {},
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              _showLogoutConfirmation(context); // Menampilkan peringatan logout
+            },
+          ),
         ],
       ),
       body: Padding(
@@ -149,6 +155,34 @@ class _HomePageState extends State<HomePage> {
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ],
       ),
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Logout'),
+          content: const Text('Yakin ingin logout?'),
+          actions: [
+            TextButton(
+              child: const Text('Tidak'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Ya'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.pushReplacementNamed(
+                    context, '/login'); // Kembali ke halaman login
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -22,7 +22,7 @@ class Routers {
     ),
     GetPage(
       name: login,
-      page: () => const LoginPage(),
+      page: () => const Login(),
     ),
     GetPage(
       name: register,
