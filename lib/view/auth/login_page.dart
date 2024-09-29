@@ -3,14 +3,14 @@ import 'package:bpkp_pos_test/router/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<LoginPage> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -19,9 +19,9 @@ class _LoginState extends State<Login> {
     bool isUser = false;
     // User? userInfo;
 
-    if (userInput == 'admin' && passInput == 'admin') {
-      loginStatus = true;
-    }
+    // if (userInput == 'admin' && passInput == 'admin') {
+    //   loginStatus = true;
+    // }
 
     users.map((user) {
       if (user.username.toString() == userInput &&
@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: "username",
+                      hintText: "Username",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -100,7 +100,7 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: "password",
+                      hintText: "Password",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -119,7 +119,7 @@ class _LoginState extends State<Login> {
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor:
-                                const Color.fromARGB(255, 23, 117, 52),
+                                const Color.fromARGB(255, 11, 206, 131),
                             minimumSize: const Size(250, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),

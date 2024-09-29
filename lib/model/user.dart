@@ -10,5 +10,5 @@ class User {
 
 const users = [
   User(username: 'kasir', password: 'kasir123'),
-  User(username: 'ketua', password: 'ketua'),
+  User(username: 'ketua', password: 'ketua123'),
 ];
