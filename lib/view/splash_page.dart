@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        color: const Color.fromARGB(255, 186, 227, 236), // Warna latar belakang
+        color: AppColors.background, // Warna latar belakang
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
