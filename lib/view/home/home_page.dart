@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
@@ -27,7 +28,14 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
             icon: const Icon(Icons.notifications),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationPage(),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -46,7 +54,7 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildIconWithLabel(Icons.store, 'Kelola Produk'),
+                  _buildIconWithLabel(Icons.store, 'Produk'),
                   _buildIconWithLabel(Icons.people, 'Pegawai'),
                   _buildIconWithLabel(Icons.receipt, 'Transaksi'),
                   _buildIconWithLabel(Icons.help, 'Bantuan'),
@@ -95,7 +103,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildIconWithLabel(IconData icon, String label) {
     return GestureDetector(
       onTap: () {
-        if (label == 'Kelola Produk') {
+        if (label == 'Produk') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const KelolaProdukPage()),

@@ -1,0 +1,239 @@
+import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:flutter/material.dart';
+
+class TambahProdukPage extends StatefulWidget {
+  final Product? produk;
+  const TambahProdukPage({super.key, this.produk});
+
+  @override
+  TambahProdukPageState createState() => TambahProdukPageState();
+}
+
+class TambahProdukPageState extends State<TambahProdukPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _namaController = TextEditingController();
+  final TextEditingController _kodeController = TextEditingController();
+  final TextEditingController _hargaModalController = TextEditingController();
+  final TextEditingController _hargaJualController = TextEditingController();
+  bool isFavorit = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tambah Produk'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Gambar Produk
+                Center(
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.blue[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.camera_alt),
+                          onPressed: () {
+                            // Handle image picking
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Nama Produk
+                _buildCustomTextField('Nama Produk', _namaController),
+
+                // Pilih Kategori
+                _buildSelectableField('Pilih Kategori', Icons.arrow_forward_ios,
+                    () {
+                  // Handle kategori selection
+                }),
+
+                // Pilih Merek
+                _buildSelectableField('Pilih Merek', Icons.arrow_forward_ios,
+                    () {
+                  // Handle merek selection
+                }),
+
+                // Kode Produk/Barcode
+                _buildCustomTextFieldWithIcon(
+                  'Kode Produk/Barcode',
+                  _kodeController,
+                  icon: Icons.qr_code_scanner,
+                  onTapIcon: () {
+                    // Handle barcode scanning
+                  },
+                ),
+
+                // Harga Modal
+                _buildCustomTextField('Harga Modal', _hargaModalController,
+                    keyboardType: TextInputType.number),
+
+                // Tanggal Kadaluwarsa
+                _buildSelectableField(
+                    'Tanggal Kadaluwarsa', Icons.calendar_today, () {
+                  // Handle date picker
+                }),
+
+                // Harga Jual
+                _buildCustomTextField('Harga Jual', _hargaJualController,
+                    keyboardType: TextInputType.number),
+
+                const SizedBox(height: 10),
+
+                // Jadikan Favorit Switch
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Jadikan Favorit?'),
+                    Switch(
+                      value: isFavorit,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isFavorit = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Tombol Simpan
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Handle form submission
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text('Simpan'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget for a customizable TextField
+  Widget _buildCustomTextField(
+    String label,
+    TextEditingController controller, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          filled: true,
+          fillColor: Colors.blue[100],
+        ),
+        keyboardType: keyboardType,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Masukkan $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  // Widget for text fields with selectable icons like dropdowns or date pickers
+  Widget _buildSelectableField(
+    String label,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            filled: true,
+            fillColor: Colors.blue[100],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label),
+              Icon(icon),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget for text fields with an action icon like barcode scanner
+  Widget _buildCustomTextFieldWithIcon(
+    String label,
+    TextEditingController controller, {
+    required IconData icon,
+    required VoidCallback onTapIcon,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          filled: true,
+          fillColor: Colors.blue[100],
+          suffixIcon: IconButton(
+            icon: Icon(icon),
+            onPressed: onTapIcon,
+          ),
+        ),
+        keyboardType: keyboardType,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Masukkan $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+}

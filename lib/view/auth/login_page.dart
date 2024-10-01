@@ -53,7 +53,7 @@ class _LoginState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Koperasi BPKP",
+                    "P.O.S BPKP",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28.0,
@@ -103,51 +103,54 @@ class _LoginState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 16.0),
                   // Field untuk password dengan ikon show/hide vvv
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText:
-                        _isObscure, // Menentukan apakah password tersembunyi
-                    // style: const TextStyle(
-                    //     fontWeight: FontWeight.bold), // Membuat teks yang dimasukkan bold
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: AppColors.secondary,
-                      hintText: "Password",
-                      hintStyle: const TextStyle(
-                          fontWeight:
-                              FontWeight.normal), // Membuat teks hint bold
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Colors.black, // Warna outline
-                          width: 2.0, // Ketebalan outline
+                  SizedBox(
+                    width: 300,
+                    height: 40,
+                    child: TextFormField(
+                      controller: passwordController,
+                      obscureText:
+                          _isObscure, // Menentukan apakah password tersembunyi
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: AppColors.secondary,
+                        hintText: "Password",
+                        hintStyle: const TextStyle(
+                          fontWeight: FontWeight.normal, // Berat huruf normal
+                          fontSize: 13, // Atur ukuran huruf hintText
                         ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color: Colors.black, // Warna outline ketika enabled
-                          width: 2.0,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Colors.black, // Warna outline
+                            width: 2.0, // Ketebalan outline
+                          ),
                         ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(
-                          color:
-                              AppColors.accent, // Warna outline ketika focused
-                          width: 2.0,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: Colors.black, // Warna outline ketika enabled
+                            width: 2.0,
+                          ),
                         ),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(_isObscure
-                            ? Icons.visibility
-                            : Icons.visibility_off), // Ikon untuk show/hide
-                        onPressed: () {
-                          setState(() {
-                            _isObscure =
-                                !_isObscure; // Toggle antara true/false
-                          });
-                        },
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: const BorderSide(
+                            color: AppColors
+                                .accent, // Warna outline ketika focused
+                            width: 2.0,
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(_isObscure
+                              ? Icons.visibility
+                              : Icons.visibility_off), // Ikon untuk show/hide
+                          onPressed: () {
+                            setState(() {
+                              _isObscure =
+                                  !_isObscure; // Toggle antara true/false
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),

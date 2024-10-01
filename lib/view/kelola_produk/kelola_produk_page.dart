@@ -108,12 +108,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             'Kelola Produk',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {},
-            )
-          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Produk'),
