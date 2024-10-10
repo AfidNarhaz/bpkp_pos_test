@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
@@ -15,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 186, 227, 236),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Beranda',
@@ -23,11 +24,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications_none_rounded),
             onPressed: () {
               Navigator.push(
                 context,
@@ -54,10 +51,11 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildIconWithLabel(Icons.store, 'Produk'),
-                  _buildIconWithLabel(Icons.people, 'Pegawai'),
-                  _buildIconWithLabel(Icons.receipt, 'Transaksi'),
-                  _buildIconWithLabel(Icons.help, 'Bantuan'),
+                  _buildIconWithLabel(Icons.inventory_2_outlined, 'Produk'),
+                  _buildIconWithLabel(Icons.badge_outlined, 'Pegawai'),
+                  _buildIconWithLabel(
+                      Icons.point_of_sale_outlined, 'Transaksi'),
+                  _buildIconWithLabel(Icons.help_center_outlined, 'Bantuan'),
                 ],
               ),
             ),
@@ -143,7 +141,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.secondary,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(

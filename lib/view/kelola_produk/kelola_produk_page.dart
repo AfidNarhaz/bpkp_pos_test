@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'tambah_produk_page.dart';
+import 'package:logging/logging.dart';
 
-// package:bpkp_pos_test/view/kelola_produk_page.dart
+final Logger _logger = Logger('KelolaProdukLogger');
 
 class KelolaProdukPage extends StatefulWidget {
   const KelolaProdukPage({super.key});
@@ -28,28 +29,43 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   }
 
   Future<void> _loadProdukAsync() async {
-    List<Product> products = await dbHelper.getProducts();
     setState(() {
-      produkList = products;
-      filteredProdukList = produkList;
-      _isLoading = false;
+      _isLoading = true; // Tampilkan loading
     });
+
+    try {
+      List<Product> products = await dbHelper.getProducts();
+      setState(() {
+        produkList = products;
+        filteredProdukList = produkList;
+      });
+    } catch (e) {
+      _logger.severe('Error loading products: $e');
+    } finally {
+      setState(() {
+        _isLoading = false; // Sembunyikan loading setelah selesai
+      });
+    }
   }
 
   void _filterProduk() {
+    _logger.info('Filtering produk...');
     final query = _searchController.text.toLowerCase();
     setState(() {
       filteredProdukList = produkList
           .where((produk) => produk.name.toLowerCase().contains(query))
           .toList();
     });
+    _logger.info('Filter selesai.');
   }
 
   Future<void> _tambahProduk() async {
+    _logger.info('Navigating to TambahProdukPage...');
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const TambahProdukPage()),
     );
+    _logger.info('Navigasi selesai, hasil: $result');
 
     if (result != null) {
       Product newProduct = Product(
@@ -100,7 +116,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 186, 227, 236),
         appBar: AppBar(
@@ -111,8 +127,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Produk'),
-              Tab(text: 'Stok'),
-              Tab(text: 'Penjualan'),
+              Tab(text: 'Kategori'),
             ],
           ),
         ),
@@ -123,8 +138,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             : TabBarView(
                 children: [
                   _buildProdukTab(),
-                  _buildStokTab(),
-                  _buildPenjualanTab(),
+                  _buildKategoriTab(),
                 ],
               ),
         floatingActionButton: FloatingActionButton(
@@ -185,16 +199,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     );
   }
 
-  Widget _buildStokTab() {
-    return const Center(
-      child: Text(
-        'Konten Stok',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-
-  Widget _buildPenjualanTab() {
+  Widget _buildKategoriTab() {
     return const Center(
       child: Text(
         'Konten Penjualan',

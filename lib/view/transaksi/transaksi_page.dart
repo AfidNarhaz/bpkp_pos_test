@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -102,18 +103,12 @@ class TransaksiPageState extends State<TransaksiPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 186, 227, 236),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text(
             'Transaksi',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {},
-            )
-          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Manual'),
