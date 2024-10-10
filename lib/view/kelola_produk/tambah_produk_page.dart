@@ -2,6 +2,7 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/pop_up_kategori.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/pop_up_merek.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -15,6 +16,7 @@ class TambahProdukPage extends StatefulWidget {
 
 class TambahProdukPageState extends State<TambahProdukPage> {
   List<Map<String, dynamic>> _listKategori = [];
+  List<Map<String, dynamic>> _listMerek = [];
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
@@ -29,7 +31,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   @override
   void initState() {
     super.initState();
-    _loadKategori();
+    _loadKategori(); // Memuat kategori dari database
+    _loadMerek(); // Memuat merek dari database
   }
 
   void _loadKategori() async {
@@ -37,6 +40,13 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         await DatabaseHelper().getKategori();
     setState(() {
       _listKategori = kategoriList;
+    });
+  }
+
+  void _loadMerek() async {
+    List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
+    setState(() {
+      _listMerek = merekList;
     });
   }
 
@@ -125,8 +135,32 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   label: 'Pilih Merek',
                   suffixIcon: Icons.arrow_forward_ios,
                   readOnly: true,
-                  onTap: () {
-                    // Logika untuk memilih merek
+                  onTap: () async {
+                    MerekDialog.showMerekDialog(
+                      context,
+                      _listMerek,
+                      (newMerek) async {
+                        if (newMerek.isNotEmpty) {
+                          await DatabaseHelper().insertMerek(newMerek);
+                          _loadMerek();
+                        }
+                      },
+                      (id, updatedMerek) async {
+                        if (updatedMerek.isNotEmpty) {
+                          await DatabaseHelper().updateMerek(id, updatedMerek);
+                          _loadMerek();
+                        }
+                      },
+                      (id) async {
+                        await DatabaseHelper().deleteMerek(id);
+                        _loadMerek();
+                      },
+                      (selectedMerek) {
+                        setState(() {
+                          _merekController.text = selectedMerek;
+                        });
+                      },
+                    );
                   },
                 ),
 

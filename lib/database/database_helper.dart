@@ -47,11 +47,18 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-    CREATE TABLE kategori(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
-    )
-  ''');
+      CREATE TABLE kategori(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE merek(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      )
+    ''');
   }
 
   // Ambil semua produk
@@ -159,6 +166,55 @@ class DatabaseHelper {
       );
     } catch (e) {
       throw Exception("Error deleting kategori: $e");
+    }
+  }
+
+  // Fungsi untuk mengambil semua merek dari database
+  Future<List<Map<String, dynamic>>> getMerek() async {
+    try {
+      Database db = await database;
+      return await db.query('merek');
+    } catch (e) {
+      throw Exception("Error fetching merek: $e");
+    }
+  }
+
+// Fungsi untuk menambahkan merek baru
+  Future<int> insertMerek(String namaMerek) async {
+    try {
+      Database db = await database;
+      return await db.insert('merek', {'name': namaMerek});
+    } catch (e) {
+      throw Exception("Error inserting merek: $e");
+    }
+  }
+
+// Fungsi untuk mengedit merek
+  Future<int> updateMerek(int id, String name) async {
+    try {
+      Database db = await database;
+      return await db.update(
+        'merek',
+        {'name': name},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error updating merek: $e");
+    }
+  }
+
+// Fungsi untuk menghapus merek
+  Future<int> deleteMerek(int id) async {
+    try {
+      Database db = await database;
+      return await db.delete(
+        'merek',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error deleting merek: $e");
     }
   }
 
