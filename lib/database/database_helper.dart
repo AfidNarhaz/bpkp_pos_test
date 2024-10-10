@@ -45,8 +45,16 @@ class DatabaseHelper {
         price REAL NOT NULL
       )
     ''');
+
+    await db.execute('''
+    CREATE TABLE kategori(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    )
+  ''');
   }
 
+  // Ambil semua produk
   Future<List<Product>> getProducts({int limit = 50, int offset = 0}) async {
     try {
       Database db = await database;
@@ -63,6 +71,7 @@ class DatabaseHelper {
     }
   }
 
+  // Masukkan produk baru
   Future<int> insertProduct(Product product) async {
     try {
       Database db = await database;
@@ -72,6 +81,7 @@ class DatabaseHelper {
     }
   }
 
+  // Update produk
   Future<int> updateProduct(Product product) async {
     try {
       Database db = await database;
@@ -86,6 +96,7 @@ class DatabaseHelper {
     }
   }
 
+  // Hapus produk
   Future<int> deleteProduct(int id) async {
     try {
       Database db = await database;
@@ -96,6 +107,58 @@ class DatabaseHelper {
       );
     } catch (e) {
       throw Exception("Error deleting product: $e");
+    }
+  }
+
+  // Fungsi untuk mengambil kategori dari database
+  Future<List<Map<String, dynamic>>> getKategori() async {
+    try {
+      Database db = await database;
+      return await db.query('kategori');
+    } catch (e) {
+      throw Exception("Error fetching kategori: $e");
+    }
+  }
+
+  // Fungsi untuk menambahkan kategori baru
+  Future<int> insertKategori(String namaKategori) async {
+    try {
+      Database db = await database;
+      return await db.insert(
+        'kategori',
+        {'name': namaKategori},
+      );
+    } catch (e) {
+      throw Exception("Error inserting kategori: $e");
+    }
+  }
+
+  // Update kategori yang sudah ada
+  Future<int> updateKategori(int id, String name) async {
+    try {
+      Database db = await database;
+      return await db.update(
+        'kategori',
+        {'name': name},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error updating kategori: $e");
+    }
+  }
+
+  // Hapus kategori dari database
+  Future<int> deleteKategori(int id) async {
+    try {
+      Database db = await database;
+      return await db.delete(
+        'kategori',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error deleting kategori: $e");
     }
   }
 

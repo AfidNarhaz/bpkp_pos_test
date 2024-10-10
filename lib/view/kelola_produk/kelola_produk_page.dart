@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -118,14 +119,25 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 186, 227, 236),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text(
             'Kelola Produk',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          bottom: const TabBar(
-            tabs: [
+          bottom: TabBar(
+            indicatorSize:
+                TabBarIndicatorSize.tab, // Menyesuaikan panjang dengan tab
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 2.0,
+                color: AppColors.text, // Lebar dan warna garis
+              ),
+            ),
+            labelColor: AppColors.text, // Warna teks untuk tab yang dipilih
+            unselectedLabelColor:
+                AppColors.hidden, // Warna teks untuk tab yang tidak dipilih
+            tabs: const [
               Tab(text: 'Produk'),
               Tab(text: 'Kategori'),
             ],
@@ -160,7 +172,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Cari produk...',
+                    hintText: 'Cari Produk...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -170,7 +182,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
               ),
               const SizedBox(width: 10),
               IconButton(
-                icon: const Icon(Icons.filter_list),
+                icon: const Icon(Icons.tune_rounded),
                 onPressed: () {},
               ),
             ],

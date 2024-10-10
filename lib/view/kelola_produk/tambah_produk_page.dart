@@ -1,5 +1,7 @@
+import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/pop_up_kategori.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,6 +14,7 @@ class TambahProdukPage extends StatefulWidget {
 }
 
 class TambahProdukPageState extends State<TambahProdukPage> {
+  List<Map<String, dynamic>> _listKategori = [];
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
@@ -22,6 +25,20 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   final TextEditingController _tanggalController = TextEditingController();
 
   bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadKategori();
+  }
+
+  void _loadKategori() async {
+    List<Map<String, dynamic>> kategoriList =
+        await DatabaseHelper().getKategori();
+    setState(() {
+      _listKategori = kategoriList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +57,6 @@ class TambahProdukPageState extends State<TambahProdukPage> {
             key: _formKey,
             child: Column(
               children: [
-                // Upload Image
                 GestureDetector(
                   onTap: () {
                     // Tambahkan logika untuk mengambil gambar
@@ -74,7 +90,32 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   suffixIcon: Icons.arrow_forward_ios,
                   readOnly: true,
                   onTap: () {
-                    // Logika untuk memilih kategori
+                    KategoriDialog.showKategoriDialog(
+                      context,
+                      _listKategori,
+                      (newKategori) async {
+                        if (newKategori.isNotEmpty) {
+                          await DatabaseHelper().insertKategori(newKategori);
+                          _loadKategori();
+                        }
+                      },
+                      (id, updatedKategori) async {
+                        if (updatedKategori.isNotEmpty) {
+                          await DatabaseHelper()
+                              .updateKategori(id, updatedKategori);
+                          _loadKategori();
+                        }
+                      },
+                      (id) async {
+                        await DatabaseHelper().deleteKategori(id);
+                        _loadKategori();
+                      },
+                      (selectedKategori) {
+                        setState(() {
+                          _kategoriController.text = selectedKategori;
+                        });
+                      },
+                    );
                   },
                 ),
 
@@ -186,7 +227,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     TextInputType keyboardType = TextInputType.text,
     bool readOnly = false,
     List<TextInputFormatter>? inputFormatter,
-    void Function()? onTap,
+    Function()? onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
