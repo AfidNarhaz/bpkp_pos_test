@@ -1,6 +1,7 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/pop_up_merek.dart';
 import 'package:flutter/material.dart';
@@ -168,9 +169,21 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 _buildTextField(
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
-                  suffixIcon: Icons.qr_code_scanner,
+                  suffixIcon: Icons.barcode_reader,
                   onTap: () {
-                    // Logika untuk memindai kode barcode
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BarcodeScannerPage(
+                          onBarcodeScanned: (barcode) {
+                            setState(() {
+                              _kodeController.text =
+                                  barcode; // Set kode produk secara otomatis
+                            });
+                          },
+                        ),
+                      ),
+                    );
                   },
                 ),
 
