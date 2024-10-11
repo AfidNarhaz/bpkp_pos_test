@@ -4,8 +4,10 @@ import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/pop_up_merek.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/pop_up_expired.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class TambahProdukPage extends StatefulWidget {
   final Product? produk;
@@ -165,6 +167,28 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   },
                 ),
 
+                // Harga Jual
+                _buildTextField(
+                  controller: _hargaJualController,
+                  label: 'Harga Jual',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+
+                // Harga Modal
+                _buildTextField(
+                  controller: _hargaModalController,
+                  label: 'Harga Modal',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+
                 // Kode Produk / Barcode
                 _buildTextField(
                   controller: _kodeController,
@@ -187,14 +211,6 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   },
                 ),
 
-                // Harga Modal
-                _buildTextField(
-                  controller: _hargaModalController,
-                  label: 'Harga Modal',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [FilteringTextInputFormatter.digitsOnly],
-                ),
-
                 // Tanggal Kadaluwarsa
                 _buildTextField(
                   controller: _tanggalController,
@@ -202,16 +218,16 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   suffixIcon: Icons.calendar_today,
                   readOnly: true,
                   onTap: () {
-                    // Logika untuk memilih tanggal
+                    PopUpExpired.showPopUpExpired(
+                      context,
+                      (selectedDate) {
+                        setState(() {
+                          _tanggalController.text =
+                              selectedDate; // Mengisi field dengan tanggal yang dipilih
+                        });
+                      },
+                    );
                   },
-                ),
-
-                // Harga Jual
-                _buildTextField(
-                  controller: _hargaJualController,
-                  label: 'Harga Jual',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                 ),
 
                 // Jadikan Favorit Switch
@@ -300,6 +316,34 @@ class TambahProdukPageState extends State<TambahProdukPage> {
           return null;
         },
       ),
+    );
+  }
+}
+
+// Formatter untuk menambahkan pemisah ribuan (menggunakan titik)
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  final formatter = NumberFormat('#,###', 'en_US'); // Gunakan format titik
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    final newText = newValue.text
+        .replaceAll('.', '')
+        .replaceAll(',', ''); // Hilangkan koma dan titik
+    final number = int.parse(newText);
+    final newString = formatter
+        .format(number)
+        .replaceAll(',', '.'); // Ganti koma dengan titik
+
+    return newValue.copyWith(
+      text: newString,
+      selection: TextSelection.collapsed(offset: newString.length),
     );
   }
 }
