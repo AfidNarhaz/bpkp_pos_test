@@ -66,17 +66,19 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
       context,
       MaterialPageRoute(builder: (context) => const TambahProdukPage()),
     );
-    _logger.info('Navigasi selesai, hasil: $result');
 
     if (result != null) {
+      // Create new product object from the result
       Product newProduct = Product(
         name: result['nama'],
         brand: result['brand'],
         category: result['category'],
         price: double.parse(result['price']),
+        isFavorite: result['isFavorite'], // Add isFavorite field
       );
+      // Save product to the database
       await dbHelper.insertProduct(newProduct);
-      _loadProdukAsync(); // Refresh data
+      _loadProdukAsync(); // Refresh product list
     }
   }
 
@@ -194,6 +196,12 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   itemCount: filteredProdukList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue[100],
+                        child: filteredProdukList[index].isFavorite
+                            ? const Icon(Icons.star, color: Colors.yellow)
+                            : null, // Show star if favorite
+                      ),
                       title: Text(filteredProdukList[index].name),
                       onTap: () => _editProduk(index),
                       trailing: IconButton(

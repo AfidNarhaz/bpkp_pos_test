@@ -272,9 +272,15 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 OutlinedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Logika untuk menyimpan produk
-                      // Pastikan hanya pop ketika produk berhasil disimpan, bukan karena scan barcode.
-                      Navigator.pop(context);
+                      final newProduct = {
+                        'nama': _namaController.text,
+                        'brand': _merekController.text,
+                        'category': _kategoriController.text,
+                        'price': _hargaJualController.text,
+                        'isFavorite': isFavorite,
+                      };
+                      // Pop with product data
+                      Navigator.pop(context, newProduct);
                     }
                   },
                   style: OutlinedButton.styleFrom(
