@@ -32,6 +32,18 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   bool isFavorite = false;
 
   @override
+  void dispose() {
+    _namaController.dispose();
+    _kategoriController.dispose();
+    _merekController.dispose();
+    _kodeController.dispose();
+    _hargaModalController.dispose();
+    _hargaJualController.dispose();
+    _tanggalController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _loadKategori(); // Memuat kategori dari database
@@ -194,20 +206,25 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
                   suffixIcon: Icons.barcode_reader,
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    final barcode = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => BarcodeScannerPage(
                           onBarcodeScanned: (barcode) {
-                            setState(() {
-                              _kodeController.text =
-                                  barcode; // Set kode produk secara otomatis
-                            });
+                            // Kembalikan hasil scan barcode ke halaman ini
+                            Navigator.pop(context, barcode);
                           },
                         ),
                       ),
                     );
+
+                    // Setelah barcode di-scan, isi field kode produk hanya jika hasilnya tidak null dan tidak kosong
+                    if (barcode != null && barcode.isNotEmpty) {
+                      setState(() {
+                        _kodeController.text = barcode;
+                      });
+                    }
                   },
                 ),
 
@@ -256,6 +273,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Logika untuk menyimpan produk
+                      // Pastikan hanya pop ketika produk berhasil disimpan, bukan karena scan barcode.
+                      Navigator.pop(context);
                     }
                   },
                   style: OutlinedButton.styleFrom(
@@ -273,7 +292,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
