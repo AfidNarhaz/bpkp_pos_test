@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
@@ -8,6 +10,7 @@ import 'package:bpkp_pos_test/view/kelola_produk/pop_up_expired.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'image_service.dart'; // Import image_service
 
 class TambahProdukPage extends StatefulWidget {
   final Product? produk;
@@ -21,6 +24,11 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   List<Map<String, dynamic>> _listKategori = [];
   List<Map<String, dynamic>> _listMerek = [];
   final _formKey = GlobalKey<FormState>();
+
+  // Kontrol gambar dan service image
+  File? _image;
+  final ImageService _imageService = ImageService();
+
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _merekController = TextEditingController();
@@ -46,8 +54,18 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   @override
   void initState() {
     super.initState();
+    _imageService.initDb(); // Inisialisasi database gambar
     _loadKategori(); // Memuat kategori dari database
     _loadMerek(); // Memuat merek dari database
+  }
+
+  Future<void> _pickImage() async {
+    final image = await _imageService.pickAndSaveImage(); // Ambil gambar
+    if (image != null) {
+      setState(() {
+        _image = image; // Update nilai _image dan render ulang UI
+      });
+    }
   }
 
   void _loadKategori() async {
@@ -84,7 +102,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    // Tambahkan logika untuk mengambil gambar
+                    _pickImage(); // Pastikan _pickImage dipanggil dengan tanda kurung ()
                   },
                   child: Container(
                     height: 150,
@@ -92,14 +110,22 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     decoration: BoxDecoration(
                       color: Colors.blue[100],
                       borderRadius: BorderRadius.circular(10),
+                      // Gunakan _image untuk menampilkan gambar jika ada
+                      image: _image != null
+                          ? DecorationImage(
+                              image: FileImage(_image!), fit: BoxFit.cover)
+                          : null,
                     ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 50,
-                      color: Colors.black54,
-                    ),
+                    child: _image == null
+                        ? const Icon(
+                            Icons.camera_alt,
+                            size: 50,
+                            color: Colors.black54,
+                          )
+                        : null,
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
                 // Nama Produk
