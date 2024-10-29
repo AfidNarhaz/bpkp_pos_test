@@ -39,6 +39,16 @@ android {
     }
 }
 
+task renameApk(type: Copy) {
+    from 'build/outputs/apk/release/app-release.apk'
+    into 'build/outputs/apk/release/'
+    rename { String fileName ->
+        fileName.replace("app-release.apk", "bpkp_pos_test.apk")
+    }
+}
+
+build.dependsOn renameApk
+
 flutter {
     source = "../.."
 }

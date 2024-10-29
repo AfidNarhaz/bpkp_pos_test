@@ -1,6 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 import 'package:flutter/material.dart';

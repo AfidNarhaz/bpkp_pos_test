@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -46,6 +47,17 @@ class DatabaseHelper {
         isFavorite INTEGER NOT NULL DEFAULT 0
       )
     ''');
+
+    await db.execute('''
+              CREATE TABLE pegawai(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nama TEXT,
+                nik TEXT,
+                alamat TEXT,
+                tanggalLahir TEXT,
+                fotoPath TEXT
+              )
+            ''');
 
     await db.execute('''
       CREATE TABLE kategori(
@@ -217,6 +229,42 @@ class DatabaseHelper {
     } catch (e) {
       throw Exception("Error deleting merek: $e");
     }
+  }
+
+  //Fungsi untuk mengambil kategori dari database
+  Future<List<Map<String, dynamic>>> gatKategori() async {
+    try {
+      Database db = await database;
+      return await db.query('kategori');
+    } catch (e) {
+      throw Exception("Error fetching kategori: $e");
+    }
+  }
+
+  Future<List<Pegawai>> getAllPegawai() async {
+    final db = await database;
+    List<Map<String, dynamic>> maps = await db.query('pegawai');
+
+    return List.generate(maps.length, (i) {
+      return Pegawai(
+        nama: maps[i]['nama'] as String, // Memastikan nama sebagai String
+        nik: maps[i]['nik'] as String, // Memastikan nik sebagai String
+        alamat: maps[i]['alamat'] as String, // Memastikan alamat sebagai String
+        tanggalLahir: DateTime.parse(maps[i]['tanggalLahir']
+            as String), // Memastikan tanggalLahir sebagai String
+        fotoPath:
+            maps[i]['fotoPath'] as String, // Memastikan fotoPath sebagai String
+      );
+    });
+  }
+
+  Future<void> insertPegawai(Pegawai pegawai) async {
+    final db = await database;
+    await db.insert(
+      'pegawai',
+      pegawai.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> closeDatabase() async {
