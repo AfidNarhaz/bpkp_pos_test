@@ -1,7 +1,7 @@
-import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:bpkp_pos_test/model/model_pegawai.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -13,6 +13,16 @@ class DatabaseHelper {
 
   DatabaseHelper._internal();
 
+  // Nama database
+  static const String _dbName = 'produk.db';
+  static const int _dbVersion = 1;
+
+  // Nama tabel
+  static const String tableProducts = 'products';
+  static const String tablePegawai = 'pegawai';
+  static const String tableKategori = 'kategori';
+  static const String tableMerek = 'merek';
+
   Future<Database> get database async {
     if (_database != null) return _database!;
 
@@ -22,14 +32,11 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     try {
-      String path = join(await getDatabasesPath(), 'produk.db');
+      String path = join(await getDatabasesPath(), _dbName);
       return await openDatabase(
         path,
-        version: 1,
+        version: _dbVersion,
         onCreate: _onCreate,
-        onUpgrade: (db, oldVersion, newVersion) {
-          // Logic untuk migrasi database jika diperlukan
-        },
       );
     } catch (e) {
       throw Exception("Error opening database: $e");
@@ -38,36 +45,40 @@ class DatabaseHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE products(
+      CREATE TABLE $tableProducts(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        brand TEXT NOT NULL,
-        category TEXT NOT NULL,
-        price REAL NOT NULL,
+        imagePath TEXT,
+        nama TEXT NOT NULL,
+        kategori TEXT NOT NULL,
+        merek TEXT NOT NULL,
+        hargaJual REAL NOT NULL,
+        hargaModal REAL NOT NULL,
+        kode TEXT NOT NULL,
+        tanggalKadaluwarsa TEXT,
         isFavorite INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
     await db.execute('''
-              CREATE TABLE pegawai(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nama TEXT,
-                nik TEXT,
-                alamat TEXT,
-                tanggalLahir TEXT,
-                fotoPath TEXT
-              )
-            ''');
+      CREATE TABLE $tablePegawai(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nama TEXT,
+        nik TEXT,
+        alamat TEXT,
+        tanggalLahir TEXT,
+        fotoPath TEXT
+      )
+    ''');
 
     await db.execute('''
-      CREATE TABLE kategori(
+      CREATE TABLE $tableKategori(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
       )
     ''');
 
     await db.execute('''
-      CREATE TABLE merek(
+      CREATE TABLE $tableMerek(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL
       )
@@ -77,15 +88,13 @@ class DatabaseHelper {
   // Ambil semua produk
   Future<List<Product>> getProducts({int limit = 50, int offset = 0}) async {
     try {
-      Database db = await database;
+      final db = await database;
       final List<Map<String, dynamic>> maps = await db.query(
-        'products',
+        tableProducts,
         limit: limit,
         offset: offset,
       );
-      return List.generate(maps.length, (i) {
-        return Product.fromMap(maps[i]);
-      });
+      return maps.map((map) => Product.fromMap(map)).toList();
     } catch (e) {
       throw Exception("Error fetching products: $e");
     }
@@ -94,8 +103,8 @@ class DatabaseHelper {
   // Masukkan produk baru
   Future<int> insertProduct(Product product) async {
     try {
-      Database db = await database;
-      return await db.insert('products', product.toMap());
+      final db = await database;
+      return await db.insert(tableProducts, product.toMap());
     } catch (e) {
       throw Exception("Error inserting product: $e");
     }
@@ -104,9 +113,9 @@ class DatabaseHelper {
   // Update produk
   Future<int> updateProduct(Product product) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.update(
-        'products',
+        tableProducts,
         product.toMap(),
         where: 'id = ?',
         whereArgs: [product.id],
@@ -119,9 +128,9 @@ class DatabaseHelper {
   // Hapus produk
   Future<int> deleteProduct(int id) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.delete(
-        'products',
+        tableProducts,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -130,22 +139,21 @@ class DatabaseHelper {
     }
   }
 
-  // Fungsi untuk mengambil kategori dari database
+  // Fungsi kategori
   Future<List<Map<String, dynamic>>> getKategori() async {
     try {
-      Database db = await database;
-      return await db.query('kategori');
+      final db = await database;
+      return await db.query(tableKategori);
     } catch (e) {
       throw Exception("Error fetching kategori: $e");
     }
   }
 
-  // Fungsi untuk menambahkan kategori baru
   Future<int> insertKategori(String namaKategori) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.insert(
-        'kategori',
+        tableKategori,
         {'name': namaKategori},
       );
     } catch (e) {
@@ -153,12 +161,11 @@ class DatabaseHelper {
     }
   }
 
-  // Update kategori yang sudah ada
   Future<int> updateKategori(int id, String name) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.update(
-        'kategori',
+        tableKategori,
         {'name': name},
         where: 'id = ?',
         whereArgs: [id],
@@ -168,12 +175,11 @@ class DatabaseHelper {
     }
   }
 
-  // Hapus kategori dari database
   Future<int> deleteKategori(int id) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.delete(
-        'kategori',
+        tableKategori,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -185,29 +191,29 @@ class DatabaseHelper {
   // Fungsi untuk mengambil semua merek dari database
   Future<List<Map<String, dynamic>>> getMerek() async {
     try {
-      Database db = await database;
-      return await db.query('merek');
+      final db = await database;
+      return await db.query(tableMerek);
     } catch (e) {
       throw Exception("Error fetching merek: $e");
     }
   }
 
-// Fungsi untuk menambahkan merek baru
+  // Fungsi untuk menambahkan merek baru
   Future<int> insertMerek(String namaMerek) async {
     try {
-      Database db = await database;
-      return await db.insert('merek', {'name': namaMerek});
+      final db = await database;
+      return await db.insert(tableMerek, {'name': namaMerek});
     } catch (e) {
       throw Exception("Error inserting merek: $e");
     }
   }
 
-// Fungsi untuk mengedit merek
+  // Fungsi untuk mengedit merek
   Future<int> updateMerek(int id, String name) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.update(
-        'merek',
+        tableMerek,
         {'name': name},
         where: 'id = ?',
         whereArgs: [id],
@@ -217,12 +223,12 @@ class DatabaseHelper {
     }
   }
 
-// Fungsi untuk menghapus merek
+  // Fungsi untuk menghapus merek
   Future<int> deleteMerek(int id) async {
     try {
-      Database db = await database;
+      final db = await database;
       return await db.delete(
-        'merek',
+        tableMerek,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -231,37 +237,18 @@ class DatabaseHelper {
     }
   }
 
-  //Fungsi untuk mengambil kategori dari database
-  Future<List<Map<String, dynamic>>> gatKategori() async {
-    try {
-      Database db = await database;
-      return await db.query('kategori');
-    } catch (e) {
-      throw Exception("Error fetching kategori: $e");
-    }
-  }
-
+  // Fungsi pegawai
   Future<List<Pegawai>> getAllPegawai() async {
     final db = await database;
-    List<Map<String, dynamic>> maps = await db.query('pegawai');
+    List<Map<String, dynamic>> maps = await db.query(tablePegawai);
 
-    return List.generate(maps.length, (i) {
-      return Pegawai(
-        nama: maps[i]['nama'] as String, // Memastikan nama sebagai String
-        nik: maps[i]['nik'] as String, // Memastikan nik sebagai String
-        alamat: maps[i]['alamat'] as String, // Memastikan alamat sebagai String
-        tanggalLahir: DateTime.parse(maps[i]['tanggalLahir']
-            as String), // Memastikan tanggalLahir sebagai String
-        fotoPath:
-            maps[i]['fotoPath'] as String, // Memastikan fotoPath sebagai String
-      );
-    });
+    return maps.map((map) => Pegawai.fromMap(map)).toList();
   }
 
   Future<void> insertPegawai(Pegawai pegawai) async {
     final db = await database;
     await db.insert(
-      'pegawai',
+      tablePegawai,
       pegawai.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );

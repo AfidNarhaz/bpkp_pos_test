@@ -10,17 +10,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart'; // Import image_service
-import 'package:image_picker/image_picker.dart'; // Import image_picker package
 
-class TambahProdukPage extends StatefulWidget {
-  final Product? produk;
-  const TambahProdukPage({super.key, this.produk});
+class DetailProdukPage extends StatefulWidget {
+  final Product produk;
+
+  const DetailProdukPage({super.key, required this.produk});
 
   @override
-  TambahProdukPageState createState() => TambahProdukPageState();
+  DetailProdukPageState createState() => DetailProdukPageState();
 }
 
-class TambahProdukPageState extends State<TambahProdukPage> {
+class DetailProdukPageState extends State<DetailProdukPage> {
   List<Map<String, dynamic>> _listKategori = [];
   List<Map<String, dynamic>> _listMerek = [];
   final _formKey = GlobalKey<FormState>();
@@ -28,17 +28,37 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   // Kontrol gambar dan service image
   File? _image;
   final ImageService _imageService = ImageService();
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
 
-  final TextEditingController _namaController = TextEditingController();
-  final TextEditingController _kategoriController = TextEditingController();
-  final TextEditingController _merekController = TextEditingController();
-  final TextEditingController _kodeController = TextEditingController();
-  final TextEditingController _hargaModalController = TextEditingController();
-  final TextEditingController _hargaJualController = TextEditingController();
-  final TextEditingController _tanggalController = TextEditingController();
+  late TextEditingController _namaController;
+  late TextEditingController _kategoriController;
+  late TextEditingController _merekController;
+  late TextEditingController _kodeController;
+  late TextEditingController _hargaModalController;
+  late TextEditingController _hargaJualController;
+  late TextEditingController _tanggalKadaluwarsaController;
 
   bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _imageService.initDb(); // Inisialisasi database gambar
+    _loadKategori();
+    _loadMerek();
+
+    // Inisialisasi dengan nilai produk yang ada
+    _namaController = TextEditingController(text: widget.produk.nama);
+    _kategoriController = TextEditingController(text: widget.produk.kategori);
+    _merekController = TextEditingController(text: widget.produk.merek);
+    _kodeController = TextEditingController(text: widget.produk.kode);
+    _hargaModalController =
+        TextEditingController(text: widget.produk.hargaModal.toString());
+    _hargaJualController =
+        TextEditingController(text: widget.produk.hargaJual.toString());
+    _tanggalKadaluwarsaController =
+        TextEditingController(text: widget.produk.tanggalKadaluwarsa);
+    isFavorite = widget.produk.isFavorite;
+  }
 
   @override
   void dispose() {
@@ -48,97 +68,52 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     _kodeController.dispose();
     _hargaModalController.dispose();
     _hargaJualController.dispose();
-    _tanggalController.dispose();
+    _tanggalKadaluwarsaController.dispose();
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _imageService.initDb(); // Inisialisasi database gambar
-    _initializeServices();
-    _loadKategori(); // Memuat kategori dari database
-    _loadMerek(); // Memuat merek dari database
-  }
-
-  Future<void> _initializeServices() async {
-    try {
-      debugPrint("[INFO] Initializing ImageService and loading data...");
-      await _imageService.initDb();
-      await _loadKategori();
-      await _loadMerek();
-      debugPrint("[INFO] Initialization completed successfully.");
-    } catch (e) {
-      debugPrint("[ERROR] Failed to initialize services: $e");
-    }
-  }
-
   Future<void> _pickImage() async {
-    try {
-      debugPrint("[INFO] Attempting to pick an image...");
-      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
-        final image = File(pickedFile.path);
-        if (mounted) {
-          setState(() {
-            _image = image;
-            debugPrint(
-                "[INFO] Image picked and set successfully: ${image.path}");
-          });
-        }
-      } else {
-        debugPrint("[WARNING] No image was picked.");
-      }
-    } on PlatformException catch (e) {
-      debugPrint(
-          "[ERROR] PlatformException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick an image: ${e.message}')),
-        );
-      }
-    } on FileSystemException catch (e) {
-      debugPrint(
-          "[ERROR] FileSystemException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save the image: ${e.message}')),
-        );
-      }
-    } catch (e) {
-      debugPrint("[ERROR] Unexpected error while picking an image: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred: $e')),
-        );
-      }
+    final image = await _imageService.pickAndSaveImage(); // Ambil gambar
+    if (image != null) {
+      setState(() {
+        _image = image; // Update nilai _image dan render ulang UI
+      });
     }
   }
 
-  Future<void> _loadKategori() async {
-    try {
-      debugPrint("[INFO] Loading kategori from database...");
-      List<Map<String, dynamic>> kategoriList =
-          await DatabaseHelper().getKategori();
-      setState(() {
-        _listKategori = kategoriList;
-        debugPrint("[INFO] Loaded ${_listKategori.length} kategori items.");
-      });
-    } catch (e) {
-      debugPrint("[ERROR] Failed to load kategori: $e");
-    }
+  void _loadKategori() async {
+    List<Map<String, dynamic>> kategoriList =
+        await DatabaseHelper().getKategori();
+    setState(() {
+      _listKategori = kategoriList;
+    });
   }
 
-  Future<void> _loadMerek() async {
-    try {
-      debugPrint("[INFO] Loading merek from database...");
-      List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
-      setState(() {
-        _listMerek = merekList;
-        debugPrint("[INFO] Loaded ${_listMerek.length} merek items.");
-      });
-    } catch (e) {
-      debugPrint("[ERROR] Failed to load merek: $e");
+  void _loadMerek() async {
+    List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
+    setState(() {
+      _listMerek = merekList;
+    });
+  }
+
+  void _saveChanges() {
+    if (_formKey.currentState!.validate()) {
+      // Perbarui objek produk dengan nilai baru
+      Product updatedProduct = Product(
+        id: widget.produk.id,
+        nama: _namaController.text,
+        kategori: _kategoriController.text,
+        merek: _merekController.text,
+        kode: _kodeController.text,
+        hargaModal: double.tryParse(_hargaModalController.text) ?? 0.0,
+        hargaJual: double.tryParse(_hargaJualController.text) ?? 0.0,
+        tanggalKadaluwarsa: _tanggalKadaluwarsaController.text,
+        isFavorite: isFavorite,
+        imagePath: _image?.path ?? widget.produk.imagePath,
+      );
+
+      Navigator.pop(
+          context, updatedProduct); // Kembali dengan produk yang diperbarui
     }
   }
 
@@ -150,7 +125,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Tambah Produk'),
+        title: const Text('Detail Produk'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -160,19 +135,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () async {
-                    debugPrint("[INFO] Image picker triggered.");
-                    try {
-                      await _pickImage();
-                    } catch (e) {
-                      debugPrint("[ERROR] Error picking image: $e");
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error picking image: $e')),
-                        );
-                      }
-                    }
-                  },
+                  onTap: _pickImage,
                   child: Container(
                     height: 150,
                     width: 150,
@@ -182,9 +145,14 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       image: _image != null
                           ? DecorationImage(
                               image: FileImage(_image!), fit: BoxFit.cover)
-                          : null,
+                          : (widget.produk.imagePath != null
+                              ? DecorationImage(
+                                  image:
+                                      FileImage(File(widget.produk.imagePath!)),
+                                  fit: BoxFit.cover)
+                              : null),
                     ),
-                    child: _image == null
+                    child: (_image == null && widget.produk.imagePath == null)
                         ? const Icon(
                             Icons.camera_alt,
                             size: 50,
@@ -193,7 +161,6 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                         : null,
                   ),
                 ),
-
                 const SizedBox(height: 20),
 
                 // Nama Produk
@@ -306,14 +273,12 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       MaterialPageRoute(
                         builder: (context) => BarcodeScannerPage(
                           onBarcodeScanned: (barcode) {
-                            // Kembalikan hasil scan barcode ke halaman ini
                             Navigator.pop(context, barcode);
                           },
                         ),
                       ),
                     );
 
-                    // Setelah barcode di-scan, isi field kode produk hanya jika hasilnya tidak null dan tidak kosong
                     if (barcode != null && barcode.isNotEmpty) {
                       setState(() {
                         _kodeController.text = barcode;
@@ -324,7 +289,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
                 // Tanggal Kadaluwarsa
                 _buildTextField(
-                  controller: _tanggalController,
+                  controller: _tanggalKadaluwarsaController,
                   label: 'Tanggal Kadaluwarsa',
                   suffixIcon: Icons.calendar_today,
                   readOnly: true,
@@ -333,8 +298,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       context,
                       (selectedDate) {
                         setState(() {
-                          _tanggalController.text =
-                              selectedDate; // Mengisi field dengan tanggal yang dipilih
+                          _tanggalKadaluwarsaController.text = selectedDate;
                         });
                       },
                     );
@@ -345,10 +309,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Jadikan favorit?',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    const Text('Jadikan favorit?',
+                        style: TextStyle(fontSize: 16)),
                     Switch(
                       value: isFavorite,
                       onChanged: (value) {
@@ -359,26 +321,11 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
                 // Tombol Simpan
                 OutlinedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final newProduct = {
-                        'nama': _namaController.text,
-                        'brand': _merekController.text,
-                        'category': _kategoriController.text,
-                        'price': _hargaJualController.text,
-                        'hargaModal': _hargaModalController.text,
-                        'kode': _kodeController.text,
-                        'tanggalKadaluwarsa': _tanggalController.text,
-                        'isFavorite': isFavorite,
-                      };
-                      Navigator.pop(context, newProduct);
-                    }
-                  },
+                  onPressed: _saveChanges,
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     minimumSize: const Size(250, 50),
@@ -443,7 +390,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
 // Formatter untuk menambahkan pemisah ribuan (menggunakan titik)
 class ThousandsSeparatorInputFormatter extends TextInputFormatter {
-  final formatter = NumberFormat('#,###', 'en_US'); // Gunakan format titik
+  final formatter = NumberFormat('#,###', 'en_US');
 
   @override
   TextEditingValue formatEditUpdate(
@@ -454,13 +401,9 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    final newText = newValue.text
-        .replaceAll('.', '')
-        .replaceAll(',', ''); // Hilangkan koma dan titik
+    final newText = newValue.text.replaceAll('.', '').replaceAll(',', '');
     final number = int.parse(newText);
-    final newString = formatter
-        .format(number)
-        .replaceAll(',', '.'); // Ganti koma dengan titik
+    final newString = formatter.format(number).replaceAll(',', '.');
 
     return newValue.copyWith(
       text: newString,

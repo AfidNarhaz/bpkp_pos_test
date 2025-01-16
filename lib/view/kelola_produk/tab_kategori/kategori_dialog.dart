@@ -57,8 +57,9 @@ class KategoriDialog extends StatelessWidget {
       final kategoriId = listKategori[index]['id'];
       await dbHelper.updateKategori(kategoriId, newName);
       onUpdate(); // Memperbarui daftar kategori
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
       _logger.info('Kategori berhasil diperbarui');
     } catch (e) {
       _logger.severe('Error updating category: $e');
@@ -70,8 +71,9 @@ class KategoriDialog extends StatelessWidget {
       final kategoriId = listKategori[index]['id'];
       await dbHelper.deleteKategori(kategoriId);
       onUpdate(); // Memperbarui daftar kategori
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
       _logger.info('Kategori berhasil dihapus');
     } catch (e) {
       _logger.severe('Error deleting category: $e');

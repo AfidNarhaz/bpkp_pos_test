@@ -21,10 +21,10 @@ class TambahPegawaiPageState extends State<TambahPegawaiPage> {
   void initState() {
     super.initState();
     if (widget.produk != null) {
-      _namaController.text = widget.produk!.name;
-      _brandController.text = widget.produk!.brand;
-      _categoryController.text = widget.produk!.category;
-      _priceController.text = widget.produk!.price.toString();
+      _namaController.text = widget.produk!.nama;
+      _brandController.text = widget.produk!.merek;
+      _categoryController.text = widget.produk!.kategori;
+      _priceController.text = widget.produk!.hargaJual.toString();
     }
   }
 

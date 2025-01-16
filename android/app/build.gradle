@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.bpkp_pos_test"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34 // Pastikan compileSdk sesuai dengan versi Android terbaru
     ndkVersion = "25.1.8937393"
 
     compileOptions {
@@ -16,18 +16,20 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = 17
+        jvmTarget = "17"
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.bpkp_pos_test"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21 // Minimal versi Android (ubah sesuai kebutuhan)
+        targetSdk = 34 // Target SDK sesuai dengan compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Tambahkan konfigurasi untuk mendukung kamera dan penyimpanan
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -35,7 +37,17 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
+
+            // Optimalkan file release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
+    }
+
+    // Mengaktifkan view binding (opsional, jika diperlukan)
+    buildFeatures {
+        viewBinding true
     }
 }
 

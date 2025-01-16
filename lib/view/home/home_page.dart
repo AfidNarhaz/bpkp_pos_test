@@ -1,6 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/kelola_produk_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withAlpha(51), // 20% opacity
             spreadRadius: 2,
             blurRadius: 5,
           ),

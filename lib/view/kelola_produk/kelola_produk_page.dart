@@ -1,5 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori_dialog.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/detail_produk_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/tambah_produk_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
@@ -40,7 +41,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
       } else {
         // Filter produk berdasarkan kategori yang dipilih
         filteredProdukList = produkList
-            .where((product) => selectedCategories.contains(product.category))
+            .where((product) => selectedCategories.contains(product.kategori))
             .toList();
       }
     });
@@ -176,65 +177,45 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       filteredProdukList = produkList
-          .where((produk) => produk.name.toLowerCase().contains(query))
+          .where((produk) => produk.nama.toLowerCase().contains(query))
           .toList();
     });
     _logger.info('Filter selesai.');
   }
 
+  // Fungsi _parsePrice
+  double _parsePrice(String? price) {
+    // Hilangkan titik/koma jika ada, dan konversikan ke double
+    String cleanedPrice = price?.replaceAll('.', '').replaceAll(',', '') ?? '0';
+    return double.tryParse(cleanedPrice) ?? 0.0;
+  }
+
   Future<void> _tambahProduk() async {
-    _logger.info('Navigating to TambahProdukPage...');
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const TambahProdukPage()),
     );
 
-    if (result != null) {
+    // Logger(result); // Debug print untuk melihat nilai result
+
+    // Pastikan result adalah Map<String, dynamic> yang sesuai
+    if (result != null && result is Map<String, dynamic>) {
       Product newProduct = Product(
-        name: result['nama'],
-        brand: result['brand'],
-        category: result['category'],
-        price: _parsePrice(result['price']), // Call with a single argument
-        isFavorite: result['isFavorite'],
+        nama: result['nama'] as String? ?? '',
+        kategori: result['category'] as String? ?? '',
+        merek: result['brand'] as String? ?? '',
+        kode: result['kode'] as String? ?? '',
+        hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
+        hargaJual: _parsePrice(result['price'] as String? ?? '0'),
+        tanggalKadaluwarsa: result['tanggalKadaluwarsa'] as String? ?? '',
+        isFavorite: result['isFavorite'] as bool? ?? false,
       );
+
       await dbHelper.insertProduct(newProduct);
-      _loadProdukAsync();
+      if (mounted) {
+        _loadProdukAsync();
+      }
     }
-  }
-
-  Future<void> _editProduk(int index) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TambahProdukPage(
-          produk: produkList[index],
-        ),
-      ),
-    );
-
-    if (result != null) {
-      Product updatedProduct = Product(
-        id: produkList[index].id,
-        name: result['nama'],
-        brand: result['brand'],
-        category: result['category'],
-        price: _parsePrice(result['price']), // Call with a single argument
-      );
-      await dbHelper.updateProduct(updatedProduct);
-      _loadProdukAsync();
-    }
-  }
-
-  double _parsePrice(String priceString) {
-    // Remove any unwanted characters (e.g., commas, spaces) and parse the double
-    final sanitizedString = priceString
-        .replaceAll(
-            RegExp(
-              r'[.,]',
-            ),
-            '')
-        .replaceAll(' ', '');
-    return double.parse(sanitizedString) / 100; // Adjust division as needed
   }
 
   Future<void> _deleteProduk(int index) async {
@@ -353,8 +334,26 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                             ? const Icon(Icons.star, color: Colors.yellow)
                             : null,
                       ),
-                      title: Text(filteredProdukList[index].name),
-                      onTap: () => _editProduk(index),
+                      title: Text(filteredProdukList[index].nama),
+                      onTap: () async {
+                        // _editProduk(
+                        //     index); // Panggil fungsi _editProduk di sini
+                        // Navigasi ke DetailProdukPage dan tunggu hasilnya
+                        final updatedProduk = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailProdukPage(
+                                produk: filteredProdukList[index]),
+                          ),
+                        );
+
+                        // Update produk jika pengguna menyimpan perubahan
+                        if (updatedProduk != null) {
+                          setState(() {
+                            filteredProdukList[index] = updatedProduk;
+                          });
+                        }
+                      },
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () => _deleteProduk(index),

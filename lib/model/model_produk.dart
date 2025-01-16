@@ -1,43 +1,57 @@
 class Product {
   final int? id;
-  final String name;
-  final String brand;
-  final String category;
-  final double price;
-  final bool isFavorite; // Field untuk status favorit
+  final String? imagePath;
+  String nama;
+  String kategori;
+  String merek;
+  double hargaJual;
+  double hargaModal;
+  String kode;
+  String tanggalKadaluwarsa;
+  bool isFavorite;
 
   Product({
     this.id,
-    required this.name,
-    required this.brand,
-    required this.category,
-    required this.price,
-    this.isFavorite = false, // Default false jika tidak diset
+    this.imagePath,
+    required this.nama,
+    required this.kategori,
+    required this.merek,
+    required this.hargaJual,
+    required this.hargaModal,
+    required this.kode,
+    required this.tanggalKadaluwarsa,
+    this.isFavorite = false,
   });
 
-  // Menambahkan isFavorite ke dalam fromMap dan toMap
+  // Konversi dari map (Database ke Product)
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      id: map['id'],
-      name: map['name'],
-      brand: map['brand'],
-      category: map['category'],
-      price: map['price'],
-      isFavorite:
-          map['isFavorite'] == 1, // Konversi dari integer (1 atau 0) ke boolean
+      id: map['id'] as int?,
+      imagePath: map['imagePath'] as String?,
+      nama: map['nama'] as String? ?? '',
+      kategori: map['kategori'] as String? ?? '',
+      merek: map['merek'] as String? ?? '',
+      hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
+      hargaModal: (map['hargaModal'] as num?)?.toDouble() ?? 0.0,
+      kode: map['kode'] as String? ?? '',
+      tanggalKadaluwarsa: map['tanggalKadaluwarsa'] as String? ?? '',
+      isFavorite: map['isFavorite'] == 1, // 1 untuk true, 0 untuk false
     );
   }
 
+  // Konversi ke map (Product ke Database)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
-      'brand': brand,
-      'category': category,
-      'price': price,
-      'isFavorite': isFavorite
-          ? 1
-          : 0, // Simpan sebagai integer (1 untuk true, 0 untuk false)
+      'imagePath': imagePath,
+      'nama': nama,
+      'kategori': kategori,
+      'merek': merek,
+      'hargaJual': hargaJual,
+      'hargaModal': hargaModal,
+      'kode': kode,
+      'tanggalKadaluwarsa': tanggalKadaluwarsa,
+      'isFavorite': isFavorite ? 1 : 0,
     };
   }
 }

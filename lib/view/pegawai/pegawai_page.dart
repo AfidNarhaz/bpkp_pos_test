@@ -208,7 +208,7 @@ class PegawaiPageState extends State<PegawaiPage> {
                       borderRadius: BorderRadius.circular(8.0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withAlpha(51), // 20% opacity
                           spreadRadius: 1,
                           blurRadius: 5,
                         ),
