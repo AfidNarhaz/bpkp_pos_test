@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:logging/logging.dart';
+import 'dart:io';
 
 final Logger _logger = Logger('KelolaProdukLogger');
 
@@ -200,19 +201,20 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
 
     // Pastikan result adalah Map<String, dynamic> yang sesuai
     if (result != null && result is Map<String, dynamic>) {
-      Product newProduct = Product(
-        nama: result['nama'] as String? ?? '',
-        kategori: result['category'] as String? ?? '',
-        merek: result['brand'] as String? ?? '',
-        kode: result['kode'] as String? ?? '',
-        hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
-        hargaJual: _parsePrice(result['price'] as String? ?? '0'),
-        tanggalKadaluwarsa: result['tanggalKadaluwarsa'] as String? ?? '',
-        isFavorite: result['isFavorite'] as bool? ?? false,
-      );
-
-      await dbHelper.insertProduct(newProduct);
       if (mounted) {
+        Product newProduct = Product(
+          nama: result['nama'] as String? ?? '',
+          kategori: result['category'] as String? ?? '',
+          merek: result['brand'] as String? ?? '',
+          kode: result['kode'] as String? ?? '',
+          hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
+          hargaJual: _parsePrice(result['price'] as String? ?? '0'),
+          tanggalKadaluwarsa: result['tanggalKadaluwarsa'] as String? ?? '',
+          isFavorite: result['isFavorite'] as bool? ?? false,
+          imagePath: result['imagePath'] as String? ?? '',
+        );
+
+        await dbHelper.insertProduct(newProduct);
         _loadProdukAsync();
       }
     }
@@ -222,6 +224,8 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     await dbHelper.deleteProduct(produkList[index].id!);
     _loadProdukAsync();
   }
+
+  // Removed unused _navigateToDetailProdukPage method
 
   @override
   void dispose() {
@@ -329,6 +333,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       leading: CircleAvatar(
+                        backgroundImage:
+                            filteredProdukList[index].imagePath != null
+                                ? FileImage(
+                                    File(filteredProdukList[index].imagePath!))
+                                : null,
                         backgroundColor: Colors.blue[100],
                         child: filteredProdukList[index].isFavorite
                             ? const Icon(Icons.star, color: Colors.yellow)
@@ -336,9 +345,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                       ),
                       title: Text(filteredProdukList[index].nama),
                       onTap: () async {
-                        // _editProduk(
-                        //     index); // Panggil fungsi _editProduk di sini
-                        // Navigasi ke DetailProdukPage dan tunggu hasilnya
                         final updatedProduk = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -347,7 +353,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                           ),
                         );
 
-                        // Update produk jika pengguna menyimpan perubahan
                         if (updatedProduk != null) {
                           setState(() {
                             filteredProdukList[index] = updatedProduk;

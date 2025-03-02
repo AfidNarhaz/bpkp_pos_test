@@ -25,10 +25,9 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   List<Map<String, dynamic>> _listMerek = [];
   final _formKey = GlobalKey<FormState>();
 
-  // Kontrol gambar dan service image
   File? _image;
   final ImageService _imageService = ImageService();
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
+  final ImagePicker _picker = ImagePicker();
 
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
@@ -82,9 +81,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         if (mounted) {
           setState(() {
             _image = image;
-            debugPrint(
-                "[INFO] Image picked and set successfully: ${image.path}");
           });
+          debugPrint("[INFO] Image picked and set successfully: ${image.path}");
         }
       } else {
         debugPrint("[WARNING] No image was picked.");
@@ -117,28 +115,30 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
   Future<void> _loadKategori() async {
     try {
-      debugPrint("[INFO] Loading kategori from database...");
+      debugPrint("[INFO] Loading categories...");
       List<Map<String, dynamic>> kategoriList =
           await DatabaseHelper().getKategori();
+      if (!mounted) return;
       setState(() {
         _listKategori = kategoriList;
-        debugPrint("[INFO] Loaded ${_listKategori.length} kategori items.");
       });
+      debugPrint("[INFO] Loaded ${_listKategori.length} categories.");
     } catch (e) {
-      debugPrint("[ERROR] Failed to load kategori: $e");
+      debugPrint("[ERROR] Error loading categories: $e");
     }
   }
 
   Future<void> _loadMerek() async {
     try {
-      debugPrint("[INFO] Loading merek from database...");
+      debugPrint("[INFO] Loading brands...");
       List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
+      if (!mounted) return;
       setState(() {
         _listMerek = merekList;
-        debugPrint("[INFO] Loaded ${_listMerek.length} merek items.");
       });
+      debugPrint("[INFO] Loaded ${_listMerek.length} brands.");
     } catch (e) {
-      debugPrint("[ERROR] Failed to load merek: $e");
+      debugPrint("[ERROR] Error loading brands: $e");
     }
   }
 
@@ -164,9 +164,21 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     debugPrint("[INFO] Image picker triggered.");
                     try {
                       await _pickImage();
+                      if (!mounted) {
+                        return; // Cek apakah widget masih dalam tree
+                      }
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Image picked successfully')),
+                        );
+                      }
                     } catch (e) {
                       debugPrint("[ERROR] Error picking image: $e");
-                      if (mounted) {
+                      if (!mounted) return; // Cek sebelum menggunakan context
+
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Error picking image: $e')),
                         );
@@ -215,24 +227,32 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       (newKategori) async {
                         if (newKategori.isNotEmpty) {
                           await DatabaseHelper().insertKategori(newKategori);
-                          _loadKategori();
+                          if (mounted) {
+                            _loadKategori();
+                          }
                         }
                       },
                       (id, updatedKategori) async {
                         if (updatedKategori.isNotEmpty) {
                           await DatabaseHelper()
                               .updateKategori(id, updatedKategori);
-                          _loadKategori();
+                          if (mounted) {
+                            _loadKategori();
+                          }
                         }
                       },
                       (id) async {
                         await DatabaseHelper().deleteKategori(id);
-                        _loadKategori();
+                        if (mounted) {
+                          _loadKategori();
+                        }
                       },
                       (selectedKategori) {
-                        setState(() {
-                          _kategoriController.text = selectedKategori;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _kategoriController.text = selectedKategori;
+                          });
+                        }
                       },
                     );
                   },
@@ -251,23 +271,31 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       (newMerek) async {
                         if (newMerek.isNotEmpty) {
                           await DatabaseHelper().insertMerek(newMerek);
-                          _loadMerek();
+                          if (mounted) {
+                            _loadMerek();
+                          }
                         }
                       },
                       (id, updatedMerek) async {
                         if (updatedMerek.isNotEmpty) {
                           await DatabaseHelper().updateMerek(id, updatedMerek);
-                          _loadMerek();
+                          if (mounted) {
+                            _loadMerek();
+                          }
                         }
                       },
                       (id) async {
                         await DatabaseHelper().deleteMerek(id);
-                        _loadMerek();
+                        if (mounted) {
+                          _loadMerek();
+                        }
                       },
                       (selectedMerek) {
-                        setState(() {
-                          _merekController.text = selectedMerek;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _merekController.text = selectedMerek;
+                          });
+                        }
                       },
                     );
                   },
@@ -307,14 +335,16 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                         builder: (context) => BarcodeScannerPage(
                           onBarcodeScanned: (barcode) {
                             // Kembalikan hasil scan barcode ke halaman ini
-                            Navigator.pop(context, barcode);
+                            if (mounted) {
+                              Navigator.pop(context, barcode);
+                            }
                           },
                         ),
                       ),
                     );
 
                     // Setelah barcode di-scan, isi field kode produk hanya jika hasilnya tidak null dan tidak kosong
-                    if (barcode != null && barcode.isNotEmpty) {
+                    if (barcode != null && barcode.isNotEmpty && mounted) {
                       setState(() {
                         _kodeController.text = barcode;
                       });
@@ -332,10 +362,12 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     PopUpExpired.showPopUpExpired(
                       context,
                       (selectedDate) {
-                        setState(() {
-                          _tanggalController.text =
-                              selectedDate; // Mengisi field dengan tanggal yang dipilih
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _tanggalController.text =
+                                selectedDate; // Mengisi field dengan tanggal yang dipilih
+                          });
+                        }
                       },
                     );
                   },
@@ -352,9 +384,11 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     Switch(
                       value: isFavorite,
                       onChanged: (value) {
-                        setState(() {
-                          isFavorite = value;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            isFavorite = value;
+                          });
+                        }
                       },
                     ),
                   ],

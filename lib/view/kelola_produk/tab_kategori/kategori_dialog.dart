@@ -39,13 +39,17 @@ class KategoriDialog extends StatelessWidget {
         TextButton(
           child: const Text('Hapus'),
           onPressed: () async {
-            await _deleteKategori(context);
+            if (context.mounted) {
+              await _deleteKategori(context);
+            }
           },
         ),
         TextButton(
           child: const Text('Simpan'),
           onPressed: () async {
-            await _updateKategori(context, editController.text);
+            if (context.mounted) {
+              await _updateKategori(context, editController.text);
+            }
           },
         ),
       ],

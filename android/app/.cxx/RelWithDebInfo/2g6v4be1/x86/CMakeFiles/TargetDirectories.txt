@@ -1,0 +1,2 @@
+D:/Documents/1Tugas/Backup/bpkp_pos_test/android/app/.cxx/RelWithDebInfo/2g6v4be1/x86/CMakeFiles/edit_cache.dir
+D:/Documents/1Tugas/Backup/bpkp_pos_test/android/app/.cxx/RelWithDebInfo/2g6v4be1/x86/CMakeFiles/rebuild_cache.dir

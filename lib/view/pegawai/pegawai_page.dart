@@ -126,9 +126,11 @@ class PegawaiPageState extends State<PegawaiPage> {
                       lastDate: DateTime.now(),
                     );
                     if (pickedDate != null) {
-                      setState(() {
-                        _tanggalLahir = pickedDate;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _tanggalLahir = pickedDate;
+                        });
+                      }
                     }
                   },
                 ),

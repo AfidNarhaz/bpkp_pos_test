@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.bpkp_pos_test"
-    compileSdk = 34 // Pastikan compileSdk sesuai dengan versi Android terbaru
+    compileSdk = 35 // Pastikan compileSdk sesuai dengan versi Android terbaru
     ndkVersion = "25.1.8937393"
 
     compileOptions {

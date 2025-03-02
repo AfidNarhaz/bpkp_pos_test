@@ -175,15 +175,19 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               child: const Text('Tidak'),
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
+                if (context.mounted) {
+                  Navigator.of(context).pop(); // Tutup dialog
+                }
               },
             ),
             TextButton(
               child: const Text('Ya'),
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
-                Navigator.pushReplacementNamed(
-                    context, '/login'); // Kembali ke halaman login
+                if (context.mounted) {
+                  Navigator.of(context).pop(); // Tutup dialog
+                  Navigator.pushReplacementNamed(
+                      context, '/login'); // Kembali ke halaman login
+                }
               },
             ),
           ],

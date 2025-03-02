@@ -58,6 +58,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _tanggalKadaluwarsaController =
         TextEditingController(text: widget.produk.tanggalKadaluwarsa);
     isFavorite = widget.produk.isFavorite;
+    if (widget.produk.imagePath != null) {
+      _image = File(widget.produk.imagePath!);
+    }
   }
 
   @override
