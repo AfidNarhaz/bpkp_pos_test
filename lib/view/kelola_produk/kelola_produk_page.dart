@@ -191,6 +191,12 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     return double.tryParse(cleanedPrice) ?? 0.0;
   }
 
+  // Fungsi _formatCurrency
+  String _formatCurrency(double amount) {
+    return amount.toStringAsFixed(0).replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
+  }
+
   Future<void> _tambahProduk() async {
     final result = await Navigator.push(
       context,
@@ -358,10 +364,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                         children: [
                           if (filteredProdukList[index].isFavorite)
                             const Icon(Icons.star, color: Colors.yellow),
-                          const SizedBox(width: 8),
                           Text(filteredProdukList[index].nama),
                         ],
                       ),
+                      subtitle: Text(
+                          'Rp.${_formatCurrency(filteredProdukList[index].hargaJual)}'),
                       onTap: () async {
                         final updatedProduk = await Navigator.push(
                           context,

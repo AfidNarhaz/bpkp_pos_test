@@ -335,24 +335,51 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol Simpan
-                OutlinedButton(
-                  onPressed: _saveChanges,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
-                    minimumSize: const Size(250, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                // Tombol Hapus dan Simpan
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Tombol Hapus
+                    OutlinedButton(
+                      onPressed: () {
+                        // Tambahkan logika hapus di sini
+                      },
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.blue[100],
+                        minimumSize: const Size(150, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: const Text(
+                        'Hapus',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Simpan',
-                    style: TextStyle(
-                      color: AppColors.text,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                    // Tombol Simpan
+                    OutlinedButton(
+                      onPressed: _saveChanges,
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        minimumSize: const Size(150, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: const Text(
+                        'Simpan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 )
               ],
             ),
