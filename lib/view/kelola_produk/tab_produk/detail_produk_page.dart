@@ -379,10 +379,35 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         keyboardType: keyboardType,
         readOnly: readOnly,
         inputFormatters: inputFormatter,
-        onTap: onTap,
         decoration: InputDecoration(
           labelText: label,
-          suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+          suffixIcon: suffixIcon != null
+              ? GestureDetector(
+                  onTap: () async {
+                    if (label == 'Kode Produk/Barcode') {
+                      final barcode = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BarcodeScannerPage(
+                            onBarcodeScanned: (barcode) {
+                              Navigator.pop(context, barcode);
+                            },
+                          ),
+                        ),
+                      );
+
+                      if (barcode != null && barcode.isNotEmpty) {
+                        setState(() {
+                          controller.text = barcode;
+                        });
+                      }
+                    } else if (onTap != null) {
+                      onTap();
+                    }
+                  },
+                  child: Icon(suffixIcon),
+                )
+              : null,
           filled: true,
           fillColor: Colors.blue[100],
           border: OutlineInputBorder(

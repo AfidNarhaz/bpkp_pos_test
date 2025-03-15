@@ -49,7 +49,14 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
         onPressed: () async {
           final newProduct = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => TambahProdukPage()),
+            MaterialPageRoute(
+                builder: (context) => TambahProdukPage(
+                      onProductAdded: () {
+                        setState(() {
+                          _loadProduk();
+                        });
+                      },
+                    )),
           );
           if (newProduct != null) {
             setState(() {

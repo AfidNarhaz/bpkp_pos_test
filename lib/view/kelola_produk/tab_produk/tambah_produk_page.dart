@@ -14,7 +14,10 @@ import 'package:image_picker/image_picker.dart'; // Import image_picker package
 
 class TambahProdukPage extends StatefulWidget {
   final Product? produk;
-  const TambahProdukPage({super.key, this.produk});
+  final VoidCallback onProductAdded;
+
+  const TambahProdukPage(
+      {super.key, this.produk, required this.onProductAdded});
 
   @override
   TambahProdukPageState createState() => TambahProdukPageState();
@@ -162,6 +165,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
       await DatabaseHelper()
           .insertProduct(newProduct); // Simpan produk ke database
       if (mounted) {
+        widget.onProductAdded(); // Call the callback function
         Navigator.pop(context,
             newProduct); // Kembalikan produk baru untuk memuat ulang data
       }
@@ -363,14 +367,13 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
                   suffixIcon:
-                      Icons.qr_code_scanner, // Ganti dengan ikon yang benar
-                  onTap: () async {
+                      Icons.barcode_reader, // Ubah ikon menjadi barcode scanner
+                  onSuffixIconTap: () async {
                     final barcode = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => BarcodeScannerPage(
                           onBarcodeScanned: (barcode) {
-                            // Kembalikan hasil scan barcode ke halaman ini
                             if (mounted) {
                               Navigator.pop(context, barcode);
                             }
@@ -379,7 +382,6 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       ),
                     );
 
-                    // Setelah barcode di-scan, isi field kode produk hanya jika hasilnya tidak null dan tidak kosong
                     if (barcode != null && barcode.isNotEmpty && mounted) {
                       setState(() {
                         _kodeController.text = barcode;
@@ -469,6 +471,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     bool readOnly = false,
     List<TextInputFormatter>? inputFormatter,
     Function()? onTap,
+    Function()? onSuffixIconTap, // Add a new parameter for suffix icon tap
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -480,7 +483,12 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         onTap: onTap,
         decoration: InputDecoration(
           labelText: label,
-          suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+          suffixIcon: suffixIcon != null
+              ? GestureDetector(
+                  onTap: onSuffixIconTap, // Handle suffix icon tap
+                  child: Icon(suffixIcon),
+                )
+              : null,
           filled: true,
           fillColor: Colors.blue[100],
           border: OutlineInputBorder(

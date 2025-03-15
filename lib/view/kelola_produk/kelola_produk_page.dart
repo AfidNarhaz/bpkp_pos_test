@@ -194,7 +194,13 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   Future<void> _tambahProduk() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const TambahProdukPage()),
+      MaterialPageRoute(
+        builder: (context) => TambahProdukPage(
+          onProductAdded: () async {
+            await _loadProdukAsync(); // Reload the product list
+          },
+        ),
+      ),
     );
 
     // Logger(result); // Debug print untuk melihat nilai result
@@ -215,7 +221,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
         );
 
         await dbHelper.insertProduct(newProduct);
-        _loadProdukAsync();
+        await _loadProdukAsync(); // Ensure the product list is reloaded
       }
     }
   }
@@ -373,7 +379,50 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                       },
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () => _deleteProduk(index),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Yakin Ingin Menghapus Produk Ini?',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: const Text(
+                                      'Batal',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                    child: const Text(
+                                      'Yakin',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      _deleteProduk(index);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     );
                   },
