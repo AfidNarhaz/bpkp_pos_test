@@ -51,10 +51,14 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _kategoriController = TextEditingController(text: widget.produk.kategori);
     _merekController = TextEditingController(text: widget.produk.merek);
     _kodeController = TextEditingController(text: widget.produk.kode);
-    _hargaModalController =
-        TextEditingController(text: widget.produk.hargaModal.toString());
-    _hargaJualController =
-        TextEditingController(text: widget.produk.hargaJual.toString());
+    _hargaModalController = TextEditingController(
+        text: NumberFormat('#,###', 'en_US')
+            .format(widget.produk.hargaModal)
+            .replaceAll(',', '.'));
+    _hargaJualController = TextEditingController(
+        text: NumberFormat('#,###', 'en_US')
+            .format(widget.produk.hargaJual)
+            .replaceAll(',', '.'));
     _tanggalKadaluwarsaController =
         TextEditingController(text: widget.produk.tanggalKadaluwarsa);
     isFavorite = widget.produk.isFavorite;
@@ -108,8 +112,12 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         kategori: _kategoriController.text,
         merek: _merekController.text,
         kode: _kodeController.text,
-        hargaModal: double.tryParse(_hargaModalController.text) ?? 0.0,
-        hargaJual: double.tryParse(_hargaJualController.text) ?? 0.0,
+        hargaModal:
+            double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
+                0.0,
+        hargaJual:
+            double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
+                0.0,
         tanggalKadaluwarsa: _tanggalKadaluwarsaController.text,
         isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,

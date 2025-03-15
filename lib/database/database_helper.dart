@@ -110,8 +110,12 @@ class DatabaseHelper {
         nama: maps[i]['nama'],
         merek: maps[i]['merek'],
         kategori: maps[i]['kategori'],
-        hargaJual: maps[i]['hargaJual'],
-        hargaModal: maps[i]['hargaModal'],
+        hargaJual: maps[i]['hargaJual'] is int
+            ? maps[i]['hargaJual'].toDouble()
+            : maps[i]['hargaJual'],
+        hargaModal: maps[i]['hargaModal'] is int
+            ? maps[i]['hargaModal'].toDouble()
+            : maps[i]['hargaModal'],
         kode: maps[i]['kode'],
         tanggalKadaluwarsa: maps[i]['tanggalKadaluwarsa'],
         isFavorite: maps[i]['isFavorite'] == 1,

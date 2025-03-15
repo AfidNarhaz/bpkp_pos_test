@@ -148,8 +148,12 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         nama: _namaController.text,
         merek: _merekController.text,
         kategori: _kategoriController.text,
-        hargaJual: double.tryParse(_hargaJualController.text) ?? 0.0,
-        hargaModal: double.tryParse(_hargaModalController.text) ?? 0.0,
+        hargaJual:
+            double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
+                0.0,
+        hargaModal:
+            double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
+                0.0,
         kode: _kodeController.text,
         tanggalKadaluwarsa: _tanggalController.text,
         isFavorite: isFavorite,

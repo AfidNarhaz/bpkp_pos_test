@@ -332,18 +332,30 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   itemCount: filteredProdukList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            filteredProdukList[index].imagePath != null
-                                ? FileImage(
-                                    File(filteredProdukList[index].imagePath!))
-                                : null,
-                        backgroundColor: Colors.blue[100],
-                        child: filteredProdukList[index].isFavorite
-                            ? const Icon(Icons.star, color: Colors.yellow)
-                            : null,
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Atur ketajaman tepi di sini
+                          image: filteredProdukList[index].imagePath != null
+                              ? DecorationImage(
+                                  image: FileImage(File(
+                                      filteredProdukList[index].imagePath!)),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                          color: Colors.blue[100],
+                        ),
                       ),
-                      title: Text(filteredProdukList[index].nama),
+                      title: Row(
+                        children: [
+                          if (filteredProdukList[index].isFavorite)
+                            const Icon(Icons.star, color: Colors.yellow),
+                          const SizedBox(width: 8),
+                          Text(filteredProdukList[index].nama),
+                        ],
+                      ),
                       onTap: () async {
                         final updatedProduk = await Navigator.push(
                           context,
