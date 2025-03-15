@@ -100,6 +100,26 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<Product>> getProduk() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('products');
+
+    return List.generate(maps.length, (i) {
+      return Product(
+        id: maps[i]['id'],
+        nama: maps[i]['nama'],
+        merek: maps[i]['merek'],
+        kategori: maps[i]['kategori'],
+        hargaJual: maps[i]['hargaJual'],
+        hargaModal: maps[i]['hargaModal'],
+        kode: maps[i]['kode'],
+        tanggalKadaluwarsa: maps[i]['tanggalKadaluwarsa'],
+        isFavorite: maps[i]['isFavorite'] == 1,
+        imagePath: maps[i]['imagePath'],
+      );
+    });
+  }
+
   // Masukkan produk baru
   Future<int> insertProduct(Product product) async {
     try {

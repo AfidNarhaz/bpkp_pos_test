@@ -137,6 +137,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             key: _formKey,
             child: Column(
               children: [
+                //Gambar Produk
                 GestureDetector(
                   onTap: _pickImage,
                   child: Container(

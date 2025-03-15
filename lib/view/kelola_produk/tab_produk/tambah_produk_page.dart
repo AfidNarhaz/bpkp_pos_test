@@ -142,6 +142,28 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     }
   }
 
+  Future<void> _saveProduct() async {
+    if (_formKey.currentState!.validate()) {
+      final newProduct = Product(
+        nama: _namaController.text,
+        merek: _merekController.text,
+        kategori: _kategoriController.text,
+        hargaJual: double.tryParse(_hargaJualController.text) ?? 0.0,
+        hargaModal: double.tryParse(_hargaModalController.text) ?? 0.0,
+        kode: _kodeController.text,
+        tanggalKadaluwarsa: _tanggalController.text,
+        isFavorite: isFavorite,
+        imagePath: _image?.path,
+      );
+      await DatabaseHelper()
+          .insertProduct(newProduct); // Simpan produk ke database
+      if (mounted) {
+        Navigator.pop(context,
+            newProduct); // Kembalikan produk baru untuk memuat ulang data
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,6 +181,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
             key: _formKey,
             child: Column(
               children: [
+                // Image Picker
                 GestureDetector(
                   onTap: () async {
                     debugPrint("[INFO] Image picker triggered.");
@@ -229,6 +252,10 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                           await DatabaseHelper().insertKategori(newKategori);
                           if (mounted) {
                             _loadKategori();
+                            setState(() {
+                              _kategoriController.text =
+                                  newKategori; // Set the text field value immediately
+                            });
                           }
                         }
                       },
@@ -273,6 +300,10 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                           await DatabaseHelper().insertMerek(newMerek);
                           if (mounted) {
                             _loadMerek();
+                            setState(() {
+                              _merekController.text =
+                                  newMerek; // Set the text field value immediately
+                            });
                           }
                         }
                       },
@@ -327,7 +358,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 _buildTextField(
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
-                  suffixIcon: Icons.barcode_reader,
+                  suffixIcon:
+                      Icons.qr_code_scanner, // Ganti dengan ikon yang benar
                   onTap: () async {
                     final barcode = await Navigator.push(
                       context,
@@ -398,21 +430,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
                 // Tombol Simpan
                 OutlinedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final newProduct = {
-                        'nama': _namaController.text,
-                        'brand': _merekController.text,
-                        'category': _kategoriController.text,
-                        'price': _hargaJualController.text,
-                        'hargaModal': _hargaModalController.text,
-                        'kode': _kodeController.text,
-                        'tanggalKadaluwarsa': _tanggalController.text,
-                        'isFavorite': isFavorite,
-                      };
-                      Navigator.pop(context, newProduct);
-                    }
-                  },
+                  onPressed:
+                      _saveProduct, // Panggil fungsi _saveProduct saat tombol simpan ditekan
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     minimumSize: const Size(250, 50),
