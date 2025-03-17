@@ -1,10 +1,11 @@
-import 'package:bpkp_pos_test/view/colors.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori_dialog.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/detail_produk_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/tambah_produk_page.dart';
-import 'package:flutter/material.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:bpkp_pos_test/view/colors.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'dart:io';
 
@@ -248,7 +249,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3, // Update the length to 3
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
@@ -268,36 +269,17 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             unselectedLabelColor: AppColors.hidden,
             tabs: [
               Tab(text: 'Produk'),
+              Tab(text: 'Stok'), // Add new tab for Stok
               Tab(text: 'Kategori'),
             ],
           ),
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                // if (value == 'kelola_stok') {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const KelolaStokPage()),
-                //   );
-                // }
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem<String>(
-                    value: 'kelola_stok',
-                    child: Text('Kelola Stok'),
-                  ),
-                ];
-              },
-            ),
-          ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 children: [
                   _buildProdukTab(),
+                  _buildStokTab(), // Add new Stok tab content
                   _buildKategoriTab(),
                 ],
               ),
@@ -440,32 +422,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     );
   }
 
+  Widget _buildStokTab() {
+    return StokTab(); // Use the existing KelolaStokPage content
+  }
+
   Widget _buildKategoriTab() {
-    return _listKategori.isNotEmpty
-        ? ListView.builder(
-            itemCount: _listKategori.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(_listKategori[index]['name']),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return KategoriDialog(
-                          index: index,
-                          listKategori: _listKategori,
-                          dbHelper: dbHelper,
-                          onUpdate: _loadKategoriAsync,
-                        );
-                      },
-                    );
-                  },
-                ),
-              );
-            },
-          )
-        : const Center(child: Text('Belum ada kategori'));
+    return KategoriTab(); // Use the existing KelolaStokPage content
   }
 }
