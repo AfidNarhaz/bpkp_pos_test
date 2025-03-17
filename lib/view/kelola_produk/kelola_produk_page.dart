@@ -1,7 +1,7 @@
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/detail_produk_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/tambah_produk_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/atur_stok.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
