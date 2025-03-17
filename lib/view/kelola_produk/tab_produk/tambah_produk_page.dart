@@ -6,6 +6,7 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -409,6 +410,27 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       },
                     );
                   },
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Kelola Stok',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => KelolaStokPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
 
                 // Jadikan Favorit Switch
