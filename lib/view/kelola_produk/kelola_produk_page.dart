@@ -283,9 +283,29 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   _buildKategoriTab(),
                 ],
               ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _tambahProduk,
-          child: const Icon(Icons.add),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final tabController = DefaultTabController.of(context);
+
+            return AnimatedBuilder(
+              animation: tabController,
+              builder: (context, child) {
+                return Visibility(
+                  visible: tabController.index == 0 || tabController.index == 2,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (tabController.index == 0) {
+                        _tambahProduk();
+                      } else if (tabController.index == 2) {
+                        // Add functionality for adding a new category if needed
+                      }
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );
