@@ -35,7 +35,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _kodeController;
   late TextEditingController _hargaModalController;
   late TextEditingController _hargaJualController;
-  late TextEditingController _tanggalKadaluwarsaController;
+  late TextEditingController _tanggalController;
 
   bool isFavorite = false;
 
@@ -59,7 +59,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaJual)
             .replaceAll(',', '.'));
-    _tanggalKadaluwarsaController =
+    _tanggalController =
         TextEditingController(text: widget.produk.tanggalKadaluwarsa);
     isFavorite = widget.produk.isFavorite;
     if (widget.produk.imagePath != null) {
@@ -75,7 +75,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _kodeController.dispose();
     _hargaModalController.dispose();
     _hargaJualController.dispose();
-    _tanggalKadaluwarsaController.dispose();
+    _tanggalController.dispose();
     super.dispose();
   }
 
@@ -118,7 +118,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
-        tanggalKadaluwarsa: _tanggalKadaluwarsaController.text,
+        tanggalKadaluwarsa: _tanggalController.text,
         isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,
       );
@@ -301,7 +301,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
 
                 // Tanggal Kadaluwarsa
                 _buildTextField(
-                  controller: _tanggalKadaluwarsaController,
+                  controller: _tanggalController,
                   label: 'Tanggal Kadaluwarsa',
                   suffixIcon: Icons.calendar_today,
                   readOnly: true,
@@ -310,19 +310,35 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       context,
                       (selectedDate) {
                         setState(() {
-                          _tanggalKadaluwarsaController.text = selectedDate;
+                          _tanggalController.text = selectedDate;
                         });
                       },
                     );
                   },
                 ),
 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Kelola Stok',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+
                 // Jadikan Favorit Switch
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Jadikan favorit?',
-                        style: TextStyle(fontSize: 16)),
+                    const Text(
+                      'Jadikan favorit?',
+                      style: TextStyle(fontSize: 16),
+                    ),
                     Switch(
                       value: isFavorite,
                       onChanged: (value) {
@@ -341,8 +357,37 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                   children: [
                     // Tombol Hapus
                     OutlinedButton(
-                      onPressed: () {
-                        // Tambahkan logika hapus di sini
+                      onPressed: () async {
+                        // Logika hapus produk
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Konfirmasi'),
+                              content: const Text(
+                                  'Apakah Anda yakin ingin menghapus produk ini?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Tutup dialog
+                                  },
+                                  child: const Text('Batal'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    if (widget.produk.id != null) {
+                                      await DatabaseHelper()
+                                          .deleteProduk(widget.produk.id!);
+                                      // Navigator.of(context).pop(); // Tutup dialog
+                                      // Navigator.pop(context,'deleted'); // Kembali ke halaman sebelumnya
+                                    }
+                                  },
+                                  child: const Text('Hapus'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.blue[100],

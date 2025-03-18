@@ -6,12 +6,11 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'image_service.dart'; // Import image_service
-import 'package:image_picker/image_picker.dart'; // Import image_picker package
+import 'image_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TambahProdukPage extends StatefulWidget {
   final Produk? produk;
@@ -366,8 +365,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 _buildTextField(
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
-                  suffixIcon:
-                      Icons.barcode_reader, // Ubah ikon menjadi barcode scanner
+                  suffixIcon: Icons.barcode_reader,
                   onSuffixIconTap: () async {
                     final barcode = await Navigator.push(
                       context,
@@ -420,15 +418,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KelolaStokPage(
-                                produkId: widget.produk?.id ?? 0),
-                          ),
-                        );
-                      },
+                      onPressed: () {},
                     ),
                   ],
                 ),
@@ -493,7 +483,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     bool readOnly = false,
     List<TextInputFormatter>? inputFormatter,
     Function()? onTap,
-    Function()? onSuffixIconTap, // Add a new parameter for suffix icon tap
+    Function()? onSuffixIconTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),

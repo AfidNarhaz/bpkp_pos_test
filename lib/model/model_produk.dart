@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 class Produk {
   final int? id;
   final String? imagePath;
@@ -53,5 +56,24 @@ class Produk {
       'tanggalKadaluwarsa': tanggalKadaluwarsa,
       'isFavorite': isFavorite ? 1 : 0,
     };
+  }
+
+  // Save list of Produk to a file
+  static Future<void> saveToFile(
+      List<Produk> produkList, String filePath) async {
+    final file = File(filePath);
+    final jsonList = produkList.map((produk) => produk.toMap()).toList();
+    await file.writeAsString(jsonEncode(jsonList));
+  }
+
+  // Load list of Produk from a file
+  static Future<List<Produk>> loadFromFile(String filePath) async {
+    final file = File(filePath);
+    if (!file.existsSync()) {
+      return [];
+    }
+    final jsonString = await file.readAsString();
+    final List<dynamic> jsonList = jsonDecode(jsonString);
+    return jsonList.map((json) => Produk.fromMap(json)).toList();
   }
 }
