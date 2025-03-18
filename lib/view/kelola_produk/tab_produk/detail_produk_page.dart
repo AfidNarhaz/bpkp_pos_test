@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 import 'image_service.dart'; // Import image_service
 
 class DetailProdukPage extends StatefulWidget {
-  final Product produk;
+  final Produk produk;
 
   const DetailProdukPage({super.key, required this.produk});
 
@@ -106,7 +106,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   void _saveChanges() {
     if (_formKey.currentState!.validate()) {
       // Perbarui objek produk dengan nilai baru
-      Product updatedProduct = Product(
+      Produk updatedProduct = Produk(
         id: widget.produk.id,
         nama: _namaController.text,
         kategori: _kategoriController.text,

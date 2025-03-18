@@ -14,11 +14,10 @@ import 'image_service.dart'; // Import image_service
 import 'package:image_picker/image_picker.dart'; // Import image_picker package
 
 class TambahProdukPage extends StatefulWidget {
-  final Product? produk;
-  final VoidCallback onProductAdded;
+  final Produk? produk;
+  final VoidCallback onProdukAdded;
 
-  const TambahProdukPage(
-      {super.key, this.produk, required this.onProductAdded});
+  const TambahProdukPage({super.key, this.produk, required this.onProdukAdded});
 
   @override
   TambahProdukPageState createState() => TambahProdukPageState();
@@ -146,9 +145,9 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     }
   }
 
-  Future<void> _saveProduct() async {
+  Future<void> _saveProduk() async {
     if (_formKey.currentState!.validate()) {
-      final newProduct = Product(
+      final newProduk = Produk(
         nama: _namaController.text,
         merek: _merekController.text,
         kategori: _kategoriController.text,
@@ -164,11 +163,11 @@ class TambahProdukPageState extends State<TambahProdukPage> {
         imagePath: _image?.path,
       );
       await DatabaseHelper()
-          .insertProduct(newProduct); // Simpan produk ke database
+          .insertProduk(newProduk); // Simpan produk ke database
       if (mounted) {
-        widget.onProductAdded(); // Call the callback function
+        widget.onProdukAdded(); // Call the callback function
         Navigator.pop(context,
-            newProduct); // Kembalikan produk baru untuk memuat ulang data
+            newProduk); // Kembalikan produk baru untuk memuat ulang data
       }
     }
   }
@@ -426,7 +425,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => KelolaStokPage(
-                                productId: widget.produk?.id ?? 0),
+                                produkId: widget.produk?.id ?? 0),
                           ),
                         );
                       },
@@ -460,7 +459,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 // Tombol Simpan
                 OutlinedButton(
                   onPressed:
-                      _saveProduct, // Panggil fungsi _saveProduct saat tombol simpan ditekan
+                      _saveProduk, // Panggil fungsi _saveProduk saat tombol simpan ditekan
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     minimumSize: const Size(250, 50),

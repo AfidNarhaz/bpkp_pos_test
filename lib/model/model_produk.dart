@@ -1,4 +1,4 @@
-class Product {
+class Produk {
   final int? id;
   final String? imagePath;
   String nama;
@@ -10,7 +10,7 @@ class Product {
   String tanggalKadaluwarsa;
   bool isFavorite;
 
-  Product({
+  Produk({
     this.id,
     this.imagePath,
     required this.nama,
@@ -23,9 +23,9 @@ class Product {
     this.isFavorite = false,
   });
 
-  // Konversi dari map (Database ke Product)
-  factory Product.fromMap(Map<String, dynamic> map) {
-    return Product(
+  // Konversi dari map (Database ke Produk)
+  factory Produk.fromMap(Map<String, dynamic> map) {
+    return Produk(
       id: map['id'] as int?,
       imagePath: map['imagePath'] as String?,
       nama: map['nama'] as String? ?? '',
@@ -39,7 +39,7 @@ class Product {
     );
   }
 
-  // Konversi ke map (Product ke Database)
+  // Konversi ke map (Produk ke Database)
   Map<String, dynamic> toMap() {
     return {
       'id': id,

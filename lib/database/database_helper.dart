@@ -18,7 +18,7 @@ class DatabaseHelper {
   static const int _dbVersion = 1;
 
   // Nama tabel
-  static const String tableProducts = 'products';
+  static const String tableProduks = 'produks';
   static const String tablePegawai = 'pegawai';
   static const String tableKategori = 'kategori';
   static const String tableMerek = 'merek';
@@ -45,7 +45,7 @@ class DatabaseHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE $tableProducts(
+      CREATE TABLE $tableProduks(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         imagePath TEXT,
         nama TEXT NOT NULL,
@@ -83,29 +83,38 @@ class DatabaseHelper {
         name TEXT NOT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE stok(
+        produkId INTEGER PRIMARY KEY,
+        stokProduk TEXT,
+        minimumStok TEXT,
+        isChecked INTEGER NOT NULL
+      )
+    ''');
   }
 
   // Ambil semua produk
-  Future<List<Product>> getProducts({int limit = 50, int offset = 0}) async {
+  Future<List<Produk>> getProduks({int limit = 50, int offset = 0}) async {
     try {
       final db = await database;
       final List<Map<String, dynamic>> maps = await db.query(
-        tableProducts,
+        tableProduks,
         limit: limit,
         offset: offset,
       );
-      return maps.map((map) => Product.fromMap(map)).toList();
+      return maps.map((map) => Produk.fromMap(map)).toList();
     } catch (e) {
-      throw Exception("Error fetching products: $e");
+      throw Exception("Error fetching produks: $e");
     }
   }
 
-  Future<List<Product>> getProduk() async {
+  Future<List<Produk>> getProduk() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('products');
+    final List<Map<String, dynamic>> maps = await db.query('produks');
 
     return List.generate(maps.length, (i) {
-      return Product(
+      return Produk(
         id: maps[i]['id'],
         nama: maps[i]['nama'],
         merek: maps[i]['merek'],
@@ -125,41 +134,41 @@ class DatabaseHelper {
   }
 
   // Masukkan produk baru
-  Future<int> insertProduct(Product product) async {
+  Future<int> insertProduk(Produk produk) async {
     try {
       final db = await database;
-      return await db.insert(tableProducts, product.toMap());
+      return await db.insert(tableProduks, produk.toMap());
     } catch (e) {
-      throw Exception("Error inserting product: $e");
+      throw Exception("Error inserting produk: $e");
     }
   }
 
   // Update produk
-  Future<int> updateProduct(Product product) async {
+  Future<int> updateProduk(Produk produk) async {
     try {
       final db = await database;
       return await db.update(
-        tableProducts,
-        product.toMap(),
+        tableProduks,
+        produk.toMap(),
         where: 'id = ?',
-        whereArgs: [product.id],
+        whereArgs: [produk.id],
       );
     } catch (e) {
-      throw Exception("Error updating product: $e");
+      throw Exception("Error updating produk: $e");
     }
   }
 
   // Hapus produk
-  Future<int> deleteProduct(int id) async {
+  Future<int> deleteProduk(int id) async {
     try {
       final db = await database;
       return await db.delete(
-        tableProducts,
+        tableProduks,
         where: 'id = ?',
         whereArgs: [id],
       );
     } catch (e) {
-      throw Exception("Error deleting product: $e");
+      throw Exception("Error deleting produk: $e");
     }
   }
 
@@ -282,27 +291,27 @@ class DatabaseHelper {
     _database?.close();
   }
 
-  Future<void> saveStockData(int productId, String stokProduk,
-      String minimumStock, bool isChecked) async {
+  Future<void> saveStokData(int produkId, String stokProduk, String minimumStok,
+      bool isChecked) async {
     final db = await database;
     await db.insert(
-      'stock',
+      'stok',
       {
-        'productId': productId,
-        'stokProduk': stokProduk,
-        'minimumStock': minimumStock,
+        'produkId': produkId,
+        'stokProduk': stokProduk, // Updated column name
+        'minimumStok': minimumStok,
         'isChecked': isChecked ? 1 : 0,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<Map<String, dynamic>?> getStockData(int productId) async {
+  Future<Map<String, dynamic>?> getStokData(int produkId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
-      'stock',
-      where: 'productId = ?',
-      whereArgs: [productId],
+      'stok',
+      where: 'produkId = ?',
+      whereArgs: [produkId],
     );
 
     if (maps.isNotEmpty) {
@@ -310,5 +319,29 @@ class DatabaseHelper {
     } else {
       return null;
     }
+  }
+
+  Future<int> updateStokData(int produkId, String stokProduk,
+      String minimumStok, bool isChecked) async {
+    final db = await database;
+    return await db.update(
+      'stok',
+      {
+        'stokProduk': stokProduk, // Updated column name
+        'minimumStok': minimumStok,
+        'isChecked': isChecked ? 1 : 0,
+      },
+      where: 'produkId = ?',
+      whereArgs: [produkId],
+    );
+  }
+
+  Future<int> deleteStokData(int produkId) async {
+    final db = await database;
+    return await db.delete(
+      'stok',
+      where: 'produkId = ?',
+      whereArgs: [produkId],
+    );
   }
 }

@@ -19,8 +19,8 @@ class KelolaProdukPage extends StatefulWidget {
 }
 
 class KelolaProdukPageState extends State<KelolaProdukPage> {
-  List<Product> produkList = [];
-  List<Product> filteredProdukList = [];
+  List<Produk> produkList = [];
+  List<Produk> filteredProdukList = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
 
@@ -55,7 +55,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     });
 
     try {
-      List<Product> products = await dbHelper.getProducts();
+      List<Produk> products = await dbHelper.getProduks();
       setState(() {
         produkList = products;
         filteredProdukList = produkList;
@@ -203,7 +203,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
       context,
       MaterialPageRoute(
         builder: (context) => TambahProdukPage(
-          onProductAdded: () async {
+          onProdukAdded: () async {
             await _loadProdukAsync(); // Reload the product list
           },
         ),
@@ -215,7 +215,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
     // Pastikan result adalah Map<String, dynamic> yang sesuai
     if (result != null && result is Map<String, dynamic>) {
       if (mounted) {
-        Product newProduct = Product(
+        Produk newProduct = Produk(
           nama: result['nama'] as String? ?? '',
           kategori: result['category'] as String? ?? '',
           merek: result['brand'] as String? ?? '',
@@ -227,14 +227,14 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           imagePath: result['imagePath'] as String? ?? '',
         );
 
-        await dbHelper.insertProduct(newProduct);
+        await dbHelper.insertProduk(newProduct);
         await _loadProdukAsync(); // Ensure the product list is reloaded
       }
     }
   }
 
   Future<void> _deleteProduk(int index) async {
-    await dbHelper.deleteProduct(produkList[index].id!);
+    await dbHelper.deleteProduk(produkList[index].id!);
     _loadProdukAsync();
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 
 class TambahPegawaiPage extends StatefulWidget {
-  final Product? produk;
+  final Produk? produk;
 
   const TambahPegawaiPage({super.key, this.produk});
 

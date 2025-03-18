@@ -9,34 +9,20 @@ class StokTab extends StatefulWidget {
 }
 
 class StokTabState extends State<StokTab> {
+  List<String> filteredStocks = [];
   final TextEditingController _searchController = TextEditingController();
-  final List<String> _allStocks = [
-    'Product 1',
-    'Product 2',
-    'Product 3'
-  ]; // Example data
-  List<String> _filteredStocks = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredStocks = _allStocks;
-  }
-
-  void _filterStocks(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredStocks = _allStocks;
-      } else {
-        _filteredStocks = _allStocks
-            .where((stock) => stock.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
   }
 
   void _showFilterDialog(BuildContext context) {
     // Implement filter dialog
+  }
+
+  void _filterStocks(String query) {
+    // Implement the filter logic here
   }
 
   @override
@@ -53,7 +39,7 @@ class StokTabState extends State<StokTab> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      labelText: 'Cari Produk',
+                      labelText: 'Cari Produk...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -73,14 +59,24 @@ class StokTabState extends State<StokTab> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _filteredStocks.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_filteredStocks[index]),
-                );
-              },
-            ),
+            child: filteredStocks.isEmpty
+                ? Center(
+                    child: Text(
+                      'Tidak ada stok ditemukan',
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: filteredStocks.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredStocks[index]),
+                      );
+                    },
+                  ),
           ),
           Row(
             children: [
