@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori_dialog.dart';
+import 'package:bpkp_pos_test/view/colors.dart';
 
 class KategoriTab extends StatefulWidget {
   const KategoriTab({super.key});
@@ -29,6 +30,7 @@ class KategoriTabState extends State<KategoriTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: _listKategori.isNotEmpty
           ? ListView.builder(
               itemCount: _listKategori.length,

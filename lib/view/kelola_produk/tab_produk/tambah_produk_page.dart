@@ -425,7 +425,8 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => KelolaStokPage(),
+                            builder: (context) => KelolaStokPage(
+                                productId: widget.produk?.id ?? 0),
                           ),
                         );
                       },

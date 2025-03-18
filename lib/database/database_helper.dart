@@ -281,4 +281,34 @@ class DatabaseHelper {
   Future<void> closeDatabase() async {
     _database?.close();
   }
+
+  Future<void> saveStockData(int productId, String stokProduk,
+      String minimumStock, bool isChecked) async {
+    final db = await database;
+    await db.insert(
+      'stock',
+      {
+        'productId': productId,
+        'stokProduk': stokProduk,
+        'minimumStock': minimumStock,
+        'isChecked': isChecked ? 1 : 0,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<Map<String, dynamic>?> getStockData(int productId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'stock',
+      where: 'productId = ?',
+      whereArgs: [productId],
+    );
+
+    if (maps.isNotEmpty) {
+      return maps.first;
+    } else {
+      return null;
+    }
+  }
 }

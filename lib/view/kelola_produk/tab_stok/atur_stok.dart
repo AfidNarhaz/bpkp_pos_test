@@ -86,27 +86,45 @@ class StokTabState extends State<StokTab> {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
+                  padding: const EdgeInsets.all(16.0),
+                  child: OutlinedButton(
                     onPressed: () {
                       // Cancel changes
                     },
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    child: Text('Batal'),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.black),
+                      foregroundColor: AppColors.text,
+                    ),
+                    child: Text(
+                      'Batal',
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
+                  padding: const EdgeInsets.all(16.0),
+                  child: OutlinedButton(
                     onPressed: () {
                       // Save changes
                     },
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: Text('Simpan'),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.black),
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: Text(
+                      'Simpan',
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
