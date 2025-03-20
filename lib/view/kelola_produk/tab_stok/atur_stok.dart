@@ -1,5 +1,7 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:bpkp_pos_test/model/model_produk.dart';
 
 class StokTab extends StatefulWidget {
   const StokTab({super.key});
@@ -9,20 +11,42 @@ class StokTab extends StatefulWidget {
 }
 
 class StokTabState extends State<StokTab> {
-  List<String> filteredStocks = [];
+  List<Produk> produkList = [];
+  List<Produk> filteredStocks = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _loadProdukAsync();
+    _searchController.addListener(() {
+      _filterStocks(_searchController.text);
+    });
+  }
+
+  Future<void> _loadProdukAsync() async {
+    try {
+      List<Produk> products = await DatabaseHelper().getProduks();
+      setState(() {
+        produkList = products;
+        filteredStocks = produkList;
+      });
+    } catch (e) {
+      debugPrint('Error loading products: $e');
+    }
+  }
+
+  void _filterStocks(String query) {
+    setState(() {
+      filteredStocks = produkList
+          .where((produk) =>
+              produk.nama.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   void _showFilterDialog(BuildContext context) {
     // Implement filter dialog
-  }
-
-  void _filterStocks(String query) {
-    // Implement the filter logic here
   }
 
   @override
@@ -45,7 +69,6 @@ class StokTabState extends State<StokTab> {
                       ),
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: _filterStocks,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -73,7 +96,10 @@ class StokTabState extends State<StokTab> {
                     itemCount: filteredStocks.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filteredStocks[index]),
+                        title: Text(filteredStocks[index].nama),
+                        subtitle: Text(
+                          'Stok: ${filteredStocks[index].stok ?? 0}, Min Stok: ${filteredStocks[index].minStok ?? 0}, Satuan: ${filteredStocks[index].satuan ?? ''}',
+                        ),
                       );
                     },
                   ),

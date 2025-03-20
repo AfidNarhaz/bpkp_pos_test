@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -15,13 +16,14 @@ class DatabaseHelper {
 
   // Nama database
   static const String _dbName = 'produk.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2; // Incremented version
 
   // Nama tabel
   static const String tableProduks = 'produks';
   static const String tablePegawai = 'pegawai';
   static const String tableKategori = 'kategori';
   static const String tableMerek = 'merek';
+  static const String tableSatuan = 'satuan';
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -37,6 +39,7 @@ class DatabaseHelper {
         path,
         version: _dbVersion,
         onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
       );
     } catch (e) {
       throw Exception("Error opening database: $e");
@@ -55,7 +58,10 @@ class DatabaseHelper {
         hargaModal REAL NOT NULL,
         kode TEXT NOT NULL,
         tanggalKadaluwarsa TEXT,
-        isFavorite INTEGER NOT NULL DEFAULT 0
+        isFavorite INTEGER NOT NULL DEFAULT 0,
+        stok INTEGER,
+        minStok INTEGER,
+        satuan TEXT
       )
     ''');
 
@@ -85,13 +91,36 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE stok(
-        produkId INTEGER PRIMARY KEY,
-        stokProduk TEXT,
-        minimumStok TEXT,
-        isChecked INTEGER NOT NULL
+      CREATE TABLE $tableSatuan(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE stok(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id INTEGER NOT NULL,
+        jumlah INTEGER NOT NULL DEFAULT 0,
+        minStok INTEGER NOT NULL DEFAULT 0,
+        satuan TEXT NOT NULL,
+        FOREIGN KEY (product_id) REFERENCES produk(id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        ALTER TABLE $tableProduks ADD COLUMN stok INTEGER;
+      ''');
+      await db.execute('''
+        ALTER TABLE $tableProduks ADD COLUMN minStok INTEGER;
+      ''');
+      await db.execute('''
+        ALTER TABLE $tableProduks ADD COLUMN satuan TEXT;
+      ''');
+    }
   }
 
   // Ambil semua produk
@@ -129,6 +158,9 @@ class DatabaseHelper {
         tanggalKadaluwarsa: maps[i]['tanggalKadaluwarsa'],
         isFavorite: maps[i]['isFavorite'] == 1,
         imagePath: maps[i]['imagePath'],
+        stok: maps[i]['stok'],
+        minStok: maps[i]['minStok'],
+        satuan: maps[i]['satuan'],
       );
     });
   }
@@ -270,6 +302,55 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk mengambil semua satuan dari database
+  Future<List<Map<String, dynamic>>> getSatuan() async {
+    try {
+      final db = await database;
+      return await db.query(tableSatuan);
+    } catch (e) {
+      throw Exception("Error fetching satuan: $e");
+    }
+  }
+
+  // Fungsi untuk menambahkan satuan baru
+  Future<int> insertSatuan(String namaSatuan) async {
+    try {
+      final db = await database;
+      return await db.insert(tableSatuan, {'name': namaSatuan});
+    } catch (e) {
+      throw Exception("Error inserting satuan: $e");
+    }
+  }
+
+  // Fungsi untuk mengedit satuan
+  Future<int> updateSatuan(int id, String name) async {
+    try {
+      final db = await database;
+      return await db.update(
+        tableSatuan,
+        {'name': name},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error updating satuan: $e");
+    }
+  }
+
+  // Fungsi untuk menghapus satuan
+  Future<int> deleteSatuan(int id) async {
+    try {
+      final db = await database;
+      return await db.delete(
+        tableSatuan,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error deleting satuan: $e");
+    }
+  }
+
   // Fungsi pegawai
   Future<List<Pegawai>> getAllPegawai() async {
     final db = await database;
@@ -287,61 +368,31 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> updateProductData(
+      int productId, String stok, String minStok, String satuan) async {
+    final db = await database;
+    await db.update(
+      'stok',
+      {'jumlah': stok, 'minStok': minStok, 'satuan': satuan},
+      where: 'product_id = ?',
+      whereArgs: [productId],
+    );
+    debugPrint(
+        "Data stok diperbarui di database: Product ID: $productId, Stok: $stok, Minimum Stok: $minStok, Satuan: $satuan");
+  }
+
+  Future<int> insertStockData(
+      int productId, String stok, String minStok, String satuan) async {
+    final db = await database;
+    return await db.insert('stok', {
+      'product_id': productId,
+      'jumlah': stok,
+      'minStok': minStok,
+      'satuan': satuan,
+    });
+  }
+
   Future<void> closeDatabase() async {
     _database?.close();
-  }
-
-  Future<void> saveStokData(int produkId, String stokProduk, String minimumStok,
-      bool isChecked) async {
-    final db = await database;
-    await db.insert(
-      'stok',
-      {
-        'produkId': produkId,
-        'stokProduk': stokProduk, // Updated column name
-        'minimumStok': minimumStok,
-        'isChecked': isChecked ? 1 : 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<Map<String, dynamic>?> getStokData(int produkId) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'stok',
-      where: 'produkId = ?',
-      whereArgs: [produkId],
-    );
-
-    if (maps.isNotEmpty) {
-      return maps.first;
-    } else {
-      return null;
-    }
-  }
-
-  Future<int> updateStokData(int produkId, String stokProduk,
-      String minimumStok, bool isChecked) async {
-    final db = await database;
-    return await db.update(
-      'stok',
-      {
-        'stokProduk': stokProduk, // Updated column name
-        'minimumStok': minimumStok,
-        'isChecked': isChecked ? 1 : 0,
-      },
-      where: 'produkId = ?',
-      whereArgs: [produkId],
-    );
-  }
-
-  Future<int> deleteStokData(int produkId) async {
-    final db = await database;
-    return await db.delete(
-      'stok',
-      where: 'produkId = ?',
-      whereArgs: [produkId],
-    );
   }
 }

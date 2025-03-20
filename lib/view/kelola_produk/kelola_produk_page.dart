@@ -443,7 +443,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   }
 
   Widget _buildStokTab() {
-    return StokTab(); // Use the existing KelolaStokPage content
+    return StokTab();
   }
 
   Widget _buildKategoriTab() {

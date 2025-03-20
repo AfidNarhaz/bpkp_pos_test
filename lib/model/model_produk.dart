@@ -12,6 +12,9 @@ class Produk {
   String kode;
   String tanggalKadaluwarsa;
   bool isFavorite;
+  int? stok;
+  int? minStok;
+  String? satuan;
 
   Produk({
     this.id,
@@ -24,6 +27,9 @@ class Produk {
     required this.kode,
     required this.tanggalKadaluwarsa,
     this.isFavorite = false,
+    this.stok,
+    this.minStok,
+    this.satuan,
   });
 
   // Konversi dari map (Database ke Produk)
@@ -39,6 +45,9 @@ class Produk {
       kode: map['kode'] as String? ?? '',
       tanggalKadaluwarsa: map['tanggalKadaluwarsa'] as String? ?? '',
       isFavorite: map['isFavorite'] == 1, // 1 untuk true, 0 untuk false
+      stok: map['stok'] as int?,
+      minStok: map['minStok'] as int?,
+      satuan: map['satuan'] as String?,
     );
   }
 
@@ -55,6 +64,9 @@ class Produk {
       'kode': kode,
       'tanggalKadaluwarsa': tanggalKadaluwarsa,
       'isFavorite': isFavorite ? 1 : 0,
+      'stok': stok,
+      'minStok': minStok,
+      'satuan': satuan,
     };
   }
 

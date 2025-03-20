@@ -6,14 +6,14 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'image_service.dart'; // Import image_service
+import 'image_service.dart';
 
 class DetailProdukPage extends StatefulWidget {
   final Produk produk;
-
   const DetailProdukPage({super.key, required this.produk});
 
   @override
@@ -39,12 +39,17 @@ class DetailProdukPageState extends State<DetailProdukPage> {
 
   bool isFavorite = false;
 
+  String? stok;
+  String? minStok;
+  String? satuan;
+
   @override
   void initState() {
     super.initState();
     _imageService.initDb(); // Inisialisasi database gambar
     _loadKategori();
     _loadMerek();
+    _loadStockData();
 
     // Inisialisasi dengan nilai produk yang ada
     _namaController = TextEditingController(text: widget.produk.nama);
@@ -65,6 +70,11 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     if (widget.produk.imagePath != null) {
       _image = File(widget.produk.imagePath!);
     }
+
+    // Inisialisasi data stok dengan nilai produk yang ada
+    stok = widget.produk.stok?.toString();
+    minStok = widget.produk.minStok?.toString();
+    satuan = widget.produk.satuan;
   }
 
   @override
@@ -82,6 +92,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   Future<void> _pickImage() async {
     final image = await _imageService.pickAndSaveImage(); // Ambil gambar
     if (image != null) {
+      if (!mounted) return;
       setState(() {
         _image = image; // Update nilai _image dan render ulang UI
       });
@@ -91,6 +102,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   void _loadKategori() async {
     List<Map<String, dynamic>> kategoriList =
         await DatabaseHelper().getKategori();
+    if (!mounted) return;
     setState(() {
       _listKategori = kategoriList;
     });
@@ -98,9 +110,29 @@ class DetailProdukPageState extends State<DetailProdukPage> {
 
   void _loadMerek() async {
     List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
+    if (!mounted) return;
     setState(() {
       _listMerek = merekList;
     });
+  }
+
+  Future<void> _loadStockData() async {
+    final db = await DatabaseHelper().database;
+    final stockData = await db.query(
+      'stok',
+      where: 'product_id = ?',
+      whereArgs: [widget.produk.id],
+    );
+
+    if (stockData.isNotEmpty) {
+      final stock = stockData.first;
+      if (!mounted) return;
+      setState(() {
+        stok = stock['jumlah'].toString();
+        minStok = stock['minStok'].toString();
+        satuan = stock['satuan'] as String?;
+      });
+    }
   }
 
   void _saveChanges() {
@@ -121,6 +153,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         tanggalKadaluwarsa: _tanggalController.text,
         isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,
+        stok: int.tryParse(stok ?? '0'),
+        minStok: int.tryParse(minStok ?? '0'),
+        satuan: satuan,
       );
 
       Navigator.pop(
@@ -194,6 +229,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       (newKategori) async {
                         if (newKategori.isNotEmpty) {
                           await DatabaseHelper().insertKategori(newKategori);
+                          if (!mounted) return;
                           _loadKategori();
                         }
                       },
@@ -201,14 +237,17 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                         if (updatedKategori.isNotEmpty) {
                           await DatabaseHelper()
                               .updateKategori(id, updatedKategori);
+                          if (!mounted) return;
                           _loadKategori();
                         }
                       },
                       (id) async {
                         await DatabaseHelper().deleteKategori(id);
+                        if (!mounted) return;
                         _loadKategori();
                       },
                       (selectedKategori) {
+                        if (!mounted) return;
                         setState(() {
                           _kategoriController.text = selectedKategori;
                         });
@@ -230,20 +269,24 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       (newMerek) async {
                         if (newMerek.isNotEmpty) {
                           await DatabaseHelper().insertMerek(newMerek);
+                          if (!mounted) return;
                           _loadMerek();
                         }
                       },
                       (id, updatedMerek) async {
                         if (updatedMerek.isNotEmpty) {
                           await DatabaseHelper().updateMerek(id, updatedMerek);
+                          if (!mounted) return;
                           _loadMerek();
                         }
                       },
                       (id) async {
                         await DatabaseHelper().deleteMerek(id);
+                        if (!mounted) return;
                         _loadMerek();
                       },
                       (selectedMerek) {
+                        if (!mounted) return;
                         setState(() {
                           _merekController.text = selectedMerek;
                         });
@@ -285,6 +328,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       MaterialPageRoute(
                         builder: (context) => BarcodeScannerPage(
                           onBarcodeScanned: (barcode) {
+                            if (!mounted) return;
                             Navigator.pop(context, barcode);
                           },
                         ),
@@ -292,6 +336,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
 
                     if (barcode != null && barcode.isNotEmpty) {
+                      if (!mounted) return;
                       setState(() {
                         _kodeController.text = barcode;
                       });
@@ -309,6 +354,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     PopUpExpired.showPopUpExpired(
                       context,
                       (selectedDate) {
+                        if (!mounted) return;
                         setState(() {
                           _tanggalController.text = selectedDate;
                         });
@@ -326,7 +372,30 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => KelolaStokPage(
+                              productId: widget.produk.id!,
+                              initialStok: stok,
+                              initialMinStok: minStok,
+                              initialSatuan: satuan,
+                            ),
+                          ),
+                        );
+
+                        if (result != null) {
+                          // Logika untuk menggabungkan data stok dengan data produk
+                          final stokData = result as Map<String, String>;
+                          setState(() {
+                            stok = stokData['stok'];
+                            minStok = stokData['minStok'];
+                            satuan = stokData['satuan'];
+                          });
+                          debugPrint('Data stok diterima: $stokData');
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -342,6 +411,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     Switch(
                       value: isFavorite,
                       onChanged: (value) {
+                        if (!mounted) return;
                         setState(() {
                           isFavorite = value;
                         });
@@ -378,8 +448,11 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                                     if (widget.produk.id != null) {
                                       await DatabaseHelper()
                                           .deleteProduk(widget.produk.id!);
-                                      // Navigator.of(context).pop(); // Tutup dialog
-                                      // Navigator.pop(context,'deleted'); // Kembali ke halaman sebelumnya
+                                      if (!mounted) return;
+                                      Navigator.of(context)
+                                          .pop(); // Tutup dialog
+                                      Navigator.pop(context,
+                                          'deleted'); // Kembali ke halaman sebelumnya
                                     }
                                   },
                                   child: const Text('Hapus'),
@@ -462,6 +535,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                         MaterialPageRoute(
                           builder: (context) => BarcodeScannerPage(
                             onBarcodeScanned: (barcode) {
+                              if (!mounted) return;
                               Navigator.pop(context, barcode);
                             },
                           ),
@@ -469,6 +543,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       );
 
                       if (barcode != null && barcode.isNotEmpty) {
+                        if (!mounted) return;
                         setState(() {
                           controller.text = barcode;
                         });

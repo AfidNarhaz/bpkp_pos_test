@@ -6,6 +6,7 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -40,6 +41,10 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   final TextEditingController _tanggalController = TextEditingController();
 
   bool isFavorite = false;
+
+  String? stok;
+  String? minStok;
+  String? satuan;
 
   @override
   void dispose() {
@@ -132,15 +137,15 @@ class TambahProdukPageState extends State<TambahProdukPage> {
 
   Future<void> _loadMerek() async {
     try {
-      debugPrint("[INFO] Loading brands...");
+      debugPrint("[INFO] Loading merek...");
       List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
       if (!mounted) return;
       setState(() {
         _listMerek = merekList;
       });
-      debugPrint("[INFO] Loaded ${_listMerek.length} brands.");
+      debugPrint("[INFO] Loaded ${_listMerek.length} merek.");
     } catch (e) {
-      debugPrint("[ERROR] Error loading brands: $e");
+      debugPrint("[ERROR] Error loading merek: $e");
     }
   }
 
@@ -418,7 +423,30 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => KelolaStokPage(
+                              productId: widget.produk?.id ?? 0,
+                              initialStok: stok,
+                              initialMinStok: minStok,
+                              initialSatuan: satuan,
+                            ),
+                          ),
+                        );
+
+                        if (result != null) {
+                          // Logika untuk menggabungkan data stok dengan data produk
+                          final stokData = result as Map<String, String>;
+                          setState(() {
+                            stok = stokData['stok'];
+                            minStok = stokData['minStok'];
+                            satuan = stokData['satuan'];
+                          });
+                          debugPrint('Data stok diterima: $stokData');
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -474,7 +502,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     );
   }
 
-  // Fungsi untuk membangun TextFormField dengan ikon opsional
+  // Fungsi untuk membangun TextFormField
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
