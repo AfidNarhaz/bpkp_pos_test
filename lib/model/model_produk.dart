@@ -15,6 +15,7 @@ class Produk {
   int? stok;
   int? minStok;
   String? satuan;
+  bool? sendNotification;
 
   Produk({
     this.id,
@@ -30,6 +31,7 @@ class Produk {
     this.stok,
     this.minStok,
     this.satuan,
+    this.sendNotification, // Added field to constructor
   });
 
   // Konversi dari map (Database ke Produk)
@@ -48,6 +50,7 @@ class Produk {
       stok: map['stok'] as int?,
       minStok: map['minStok'] as int?,
       satuan: map['satuan'] as String?,
+      sendNotification: map['sendNotification'] == 1, // Added field to fromMap
     );
   }
 
@@ -67,6 +70,8 @@ class Produk {
       'stok': stok,
       'minStok': minStok,
       'satuan': satuan,
+      'sendNotification':
+          sendNotification == true ? 1 : 0, // Added field to toMap
     };
   }
 

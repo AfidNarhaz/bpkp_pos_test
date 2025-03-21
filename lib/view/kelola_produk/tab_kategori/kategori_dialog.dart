@@ -31,17 +31,17 @@ class KategoriDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          child: const Text('Batal'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        TextButton(
           child: const Text('Hapus'),
           onPressed: () async {
             if (context.mounted) {
               await _deleteKategori(context);
             }
+          },
+        ),
+        TextButton(
+          child: const Text('Batal'),
+          onPressed: () {
+            Navigator.of(context).pop();
           },
         ),
         TextButton(
@@ -59,7 +59,10 @@ class KategoriDialog extends StatelessWidget {
   Future<void> _updateKategori(BuildContext context, String newName) async {
     try {
       final kategoriId = listKategori[index]['id'];
+      final oldName = listKategori[index]['name'];
       await dbHelper.updateKategori(kategoriId, newName);
+      await dbHelper.updateProdukKategori(
+          oldName, newName); // Update category name in produks table
       onUpdate(); // Memperbarui daftar kategori
       if (context.mounted) {
         Navigator.of(context).pop();

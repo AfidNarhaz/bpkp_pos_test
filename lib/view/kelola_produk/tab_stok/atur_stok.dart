@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
@@ -96,10 +98,29 @@ class StokTabState extends State<StokTab> {
                     itemCount: filteredStocks.length,
                     itemBuilder: (context, index) {
                       return ListTile(
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Atur ketajaman tepi di sini
+                            image: filteredStocks[index].imagePath != null
+                                ? DecorationImage(
+                                    image: FileImage(
+                                        File(filteredStocks[index].imagePath!)),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                            color: Colors.blue[100],
+                          ),
+                        ),
                         title: Text(filteredStocks[index].nama),
                         subtitle: Text(
                           'Stok: ${filteredStocks[index].stok ?? 0}, Min Stok: ${filteredStocks[index].minStok ?? 0}, Satuan: ${filteredStocks[index].satuan ?? ''}',
                         ),
+                        onTap: () async {
+                          // Implement edit stock
+                        },
                       );
                     },
                   ),

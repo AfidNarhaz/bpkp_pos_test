@@ -61,7 +61,8 @@ class DatabaseHelper {
         isFavorite INTEGER NOT NULL DEFAULT 0,
         stok INTEGER,
         minStok INTEGER,
-        satuan TEXT
+        satuan TEXT,
+        sendNotification INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -120,6 +121,9 @@ class DatabaseHelper {
       await db.execute('''
         ALTER TABLE $tableProduks ADD COLUMN satuan TEXT;
       ''');
+      await db.execute('''
+        ALTER TABLE $tableProduks ADD COLUMN sendNotification INTEGER NOT NULL DEFAULT 0;
+      ''');
     }
   }
 
@@ -161,6 +165,8 @@ class DatabaseHelper {
         stok: maps[i]['stok'],
         minStok: maps[i]['minStok'],
         satuan: maps[i]['satuan'],
+        sendNotification:
+            maps[i]['sendNotification'] == 1, // Handle sendNotification
       );
     });
   }
@@ -390,6 +396,21 @@ class DatabaseHelper {
       'minStok': minStok,
       'satuan': satuan,
     });
+  }
+
+  Future<void> updateProdukKategori(String oldName, String newName) async {
+    try {
+      final db = await database;
+      await db.update(
+        tableProduks,
+        {'kategori': newName},
+        where: 'kategori = ?',
+        whereArgs: [oldName],
+      );
+      debugPrint("Kategori produk diperbarui dari $oldName ke $newName");
+    } catch (e) {
+      throw Exception("Error updating produk kategori: $e");
+    }
   }
 
   Future<void> closeDatabase() async {

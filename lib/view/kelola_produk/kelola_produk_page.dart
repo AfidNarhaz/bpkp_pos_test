@@ -26,6 +26,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
 
   final dbHelper = DatabaseHelper();
   List<Map<String, dynamic>> _listKategori = [];
+  List<bool> _selectedCategories = [];
 
   @override
   void initState() {
@@ -70,11 +71,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   }
 
   void _showFilterDialog(BuildContext context) {
-    List<bool> selectedCategories =
-        List<bool>.filled(_listKategori.length, false);
+    if (_selectedCategories.isEmpty) {
+      _selectedCategories = List<bool>.filled(_listKategori.length, false);
+    }
     TextEditingController searchCategoryController = TextEditingController();
-    List<Map<String, dynamic>> filteredKategoriList =
-        _listKategori; // Mulai dengan semua kategori
+    List<Map<String, dynamic>> filteredKategoriList = _listKategori;
 
     showDialog(
       context: context,
@@ -85,7 +86,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             width: double.maxFinite,
             child: StatefulBuilder(
               builder: (context, setState) {
-                // Fungsi untuk memfilter kategori berdasarkan input pencarian
                 void filterCategories() {
                   setState(() {
                     final query = searchCategoryController.text.toLowerCase();
@@ -101,7 +101,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // TextField untuk pencarian kategori
                     TextField(
                       controller: searchCategoryController,
                       decoration: InputDecoration(
@@ -113,7 +112,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Daftar kategori yang difilter
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -121,15 +119,24 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                         itemBuilder: (context, index) {
                           return CheckboxListTile(
                             title: Text(filteredKategoriList[index]['name']),
-                            value: selectedCategories[index],
+                            value: _selectedCategories[index],
                             onChanged: (bool? value) {
                               setState(() {
-                                selectedCategories[index] = value!;
+                                _selectedCategories[index] = value!;
                               });
                             },
                           );
                         },
                       ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _loadKategoriAsync();
+                        setState(() {
+                          filteredKategoriList = _listKategori;
+                        });
+                      },
+                      child: const Text('Refresh Kategori'),
                     ),
                   ],
                 );
@@ -138,17 +145,31 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           ),
           actions: [
             TextButton(
-              child: const Text('Tutup'),
+              child: const Text('Reset'),
+              onPressed: () {
+                setState(() {
+                  for (int i = 0; i < _selectedCategories.length; i++) {
+                    _selectedCategories[i] = false;
+                  }
+                  filteredKategoriList = List.from(_listKategori);
+                  searchCategoryController.clear();
+                });
+                Navigator.of(context).pop(); // Close the dialog
+                _showFilterDialog(context); // Reopen the dialog to refresh UI
+              },
+            ),
+            TextButton(
+              child: const Text('Batal'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Terapkan'),
+              child: const Text('Filter'),
               onPressed: () {
                 List<String> filteredCategories = [];
-                for (int i = 0; i < selectedCategories.length; i++) {
-                  if (selectedCategories[i]) {
+                for (int i = 0; i < _selectedCategories.length; i++) {
+                  if (_selectedCategories[i]) {
                     filteredCategories.add(_listKategori[i]['name']);
                   }
                 }
@@ -168,6 +189,8 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
       List<Map<String, dynamic>> categories = await dbHelper.getKategori();
       setState(() {
         _listKategori = categories;
+        _selectedCategories = List<bool>.filled(
+            _listKategori.length, false); // Initialize _selectedCategories
       });
     } catch (e) {
       _logger.severe('Error loading categories: $e');
@@ -404,11 +427,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                                 actions: [
                                   TextButton(
                                     style: TextButton.styleFrom(
-                                      backgroundColor: Colors.red,
+                                      backgroundColor: AppColors.background,
                                     ),
                                     child: const Text(
                                       'Batal',
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: AppColors.text),
                                     ),
                                     onPressed: () {
                                       Navigator.of(context).pop();
@@ -416,11 +439,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                                   ),
                                   TextButton(
                                     style: TextButton.styleFrom(
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: AppColors.accent,
                                     ),
                                     child: const Text(
                                       'Yakin',
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: AppColors.text),
                                     ),
                                     onPressed: () {
                                       Navigator.of(context).pop();

@@ -6,11 +6,11 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/kelola_stok.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
 
 class DetailProdukPage extends StatefulWidget {
   final Produk produk;
@@ -23,6 +23,7 @@ class DetailProdukPage extends StatefulWidget {
 class DetailProdukPageState extends State<DetailProdukPage> {
   List<Map<String, dynamic>> _listKategori = [];
   List<Map<String, dynamic>> _listMerek = [];
+  List<Map<String, dynamic>> _listSatuan = [];
   final _formKey = GlobalKey<FormState>();
 
   // Kontrol gambar dan service image
@@ -36,8 +37,12 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _hargaModalController;
   late TextEditingController _hargaJualController;
   late TextEditingController _tanggalController;
+  late TextEditingController _stokController;
+  late TextEditingController _minStokController;
+  late TextEditingController _satuanController;
 
   bool isFavorite = false;
+  bool _sendNotification = false;
 
   String? stok;
   String? minStok;
@@ -49,7 +54,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _imageService.initDb(); // Inisialisasi database gambar
     _loadKategori();
     _loadMerek();
-    _loadStockData();
+    _loadSatuan();
 
     // Inisialisasi dengan nilai produk yang ada
     _namaController = TextEditingController(text: widget.produk.nama);
@@ -66,6 +71,13 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             .replaceAll(',', '.'));
     _tanggalController =
         TextEditingController(text: widget.produk.tanggalKadaluwarsa);
+    _satuanController = TextEditingController(
+        text: widget.produk.satuan); // Initialize _satuanController
+    _stokController = TextEditingController(
+        text: widget.produk.stok?.toString()); // Initialize _stokController
+    _minStokController = TextEditingController(
+        text:
+            widget.produk.minStok?.toString()); // Initialize _minStokController
     isFavorite = widget.produk.isFavorite;
     if (widget.produk.imagePath != null) {
       _image = File(widget.produk.imagePath!);
@@ -75,6 +87,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     stok = widget.produk.stok?.toString();
     minStok = widget.produk.minStok?.toString();
     satuan = widget.produk.satuan;
+    _sendNotification = widget.produk.sendNotification ?? false;
   }
 
   @override
@@ -86,6 +99,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _hargaModalController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
+    _stokController.dispose(); // Dispose _stokController
+    _minStokController.dispose(); // Dispose _minStokController
+    _satuanController.dispose(); // Dispose _satuanController
     super.dispose();
   }
 
@@ -116,26 +132,22 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     });
   }
 
-  Future<void> _loadStockData() async {
-    final db = await DatabaseHelper().database;
-    final stockData = await db.query(
-      'stok',
-      where: 'product_id = ?',
-      whereArgs: [widget.produk.id],
-    );
-
-    if (stockData.isNotEmpty) {
-      final stock = stockData.first;
+  Future<void> _loadSatuan() async {
+    try {
+      debugPrint("[INFO] Loading satuan...");
+      List<Map<String, dynamic>> satuanList =
+          await DatabaseHelper().getSatuan();
       if (!mounted) return;
       setState(() {
-        stok = stock['jumlah'].toString();
-        minStok = stock['minStok'].toString();
-        satuan = stock['satuan'] as String?;
+        _listSatuan = satuanList;
       });
+      debugPrint("[INFO] Loaded ${_listSatuan.length} satuan.");
+    } catch (e) {
+      debugPrint("[ERROR] Error loading satuan: $e");
     }
   }
 
-  void _saveChanges() {
+  void _saveChanges() async {
     if (_formKey.currentState!.validate()) {
       // Perbarui objek produk dengan nilai baru
       Produk updatedProduct = Produk(
@@ -153,13 +165,36 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         tanggalKadaluwarsa: _tanggalController.text,
         isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,
-        stok: int.tryParse(stok ?? '0'),
-        minStok: int.tryParse(minStok ?? '0'),
-        satuan: satuan,
+        stok: int.tryParse(_stokController.text.replaceAll('.', '')) ??
+            0, // Use _stokController
+        minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ??
+            0, // Use _minStokController
+        satuan: _satuanController.text, // Use _satuanController
+        sendNotification: _sendNotification, // Include sendNotification
       );
 
-      Navigator.pop(
-          context, updatedProduct); // Kembali dengan produk yang diperbarui
+      await DatabaseHelper()
+          .updateProduk(updatedProduct); // Save changes to database
+
+      _checkStockAndNotify();
+
+      if (mounted) {
+        Navigator.pop(
+            context, updatedProduct); // Kembali dengan produk yang diperbarui
+      }
+    }
+  }
+
+  void _checkStockAndNotify() {
+    if (_sendNotification && stok != null && minStok != null) {
+      int currentStock = int.tryParse(stok!) ?? 0;
+      int minimumStock = int.tryParse(minStok!) ?? 0;
+      if (currentStock <= minimumStock) {
+        // Logic to send notification
+        // This is a placeholder for actual notification logic
+        debugPrint(
+            "Sending notification: Stock has reached the minimum limit.");
+      }
     }
   }
 
@@ -363,39 +398,92 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                   },
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Kelola Stok',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KelolaStokPage(
-                              productId: widget.produk.id!,
-                              initialStok: stok,
-                              initialMinStok: minStok,
-                              initialSatuan: satuan,
-                            ),
-                          ),
-                        );
+                //Stok Produk
+                _buildTextField(
+                  controller: _stokController,
+                  label: 'Stok Produk',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
 
-                        if (result != null) {
-                          // Logika untuk menggabungkan data stok dengan data produk
-                          final stokData = result as Map<String, String>;
-                          setState(() {
-                            stok = stokData['stok'];
-                            minStok = stokData['minStok'];
-                            satuan = stokData['satuan'];
-                          });
-                          debugPrint('Data stok diterima: $stokData');
+                //Stok Minimal
+                _buildTextField(
+                  controller: _minStokController,
+                  label: 'Stok Minimal',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+
+                // Pilih Satuan
+                _buildTextField(
+                  controller: _satuanController,
+                  label: 'Pilih Satuan',
+                  suffixIcon: Icons.arrow_forward_ios,
+                  readOnly: true,
+                  onTap: () async {
+                    SatuanDialog.showSatuanDialog(
+                      context,
+                      _listSatuan,
+                      (newSatuan) async {
+                        if (newSatuan.isNotEmpty) {
+                          await DatabaseHelper().insertSatuan(newSatuan);
+                          if (mounted) {
+                            _loadSatuan();
+                            setState(() {
+                              _satuanController.text =
+                                  newSatuan; // Set the text field value immediately
+                            });
+                          }
                         }
                       },
+                      (id, updatedSatuan) async {
+                        if (updatedSatuan.isNotEmpty) {
+                          await DatabaseHelper()
+                              .updateSatuan(id, updatedSatuan);
+                          if (mounted) {
+                            _loadSatuan();
+                          }
+                        }
+                      },
+                      (id) async {
+                        await DatabaseHelper().deleteSatuan(id);
+                        if (mounted) {
+                          _loadSatuan();
+                        }
+                      },
+                      (selectedSatuan) {
+                        if (mounted) {
+                          setState(() {
+                            _satuanController.text = selectedSatuan;
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
+
+                // Checkbox for notification
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _sendNotification,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _sendNotification = value ?? false;
+                        });
+                      },
+                    ),
+                    Expanded(
+                      child: const Text(
+                        'Kirimkan notifikasi saat stok mencapai batas minimum',
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                   ],
                 ),
