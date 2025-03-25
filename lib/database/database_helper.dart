@@ -24,6 +24,7 @@ class DatabaseHelper {
   static const String tableKategori = 'kategori';
   static const String tableMerek = 'merek';
   static const String tableSatuan = 'satuan';
+  static const String tableProducts = 'products'; // New table
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -106,6 +107,17 @@ class DatabaseHelper {
         minStok INTEGER NOT NULL DEFAULT 0,
         satuan TEXT NOT NULL,
         FOREIGN KEY (product_id) REFERENCES produk(id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE $tableProducts(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        namaProduk TEXT NOT NULL,
+        hargaProduk TEXT NOT NULL,
+        stokProduk TEXT NOT NULL,
+        minimumStock TEXT NOT NULL,
+        isChecked BOOLEAN NOT NULL
       )
     ''');
   }
@@ -411,6 +423,11 @@ class DatabaseHelper {
     } catch (e) {
       throw Exception("Error updating produk kategori: $e");
     }
+  }
+
+  Future<void> addProduct(Map<String, dynamic> product) async {
+    final db = await database;
+    await db.insert(tableProducts, product);
   }
 
   Future<void> closeDatabase() async {
