@@ -97,12 +97,18 @@ class ManualTabState extends State<ManualTab> {
                     children: [
                       Expanded(
                         flex: 1,
-                        child: _buildIconButton(Icons.backspace, _onDelete),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: _buildIconButton(Icons.backspace, _onDelete),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Expanded(
                         flex: 3,
-                        child: _buildCartButton(), // Tombol keranjang tinggi
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: _buildCartButton(),
+                        ),
                       ),
                     ],
                   ),
