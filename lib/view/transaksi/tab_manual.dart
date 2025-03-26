@@ -1,6 +1,7 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:intl/intl.dart';
 
 class ManualTab extends StatefulWidget {
   const ManualTab({super.key});
@@ -12,6 +13,7 @@ class ManualTab extends StatefulWidget {
 class ManualTabState extends State<ManualTab> {
   String displayText = 'Rp0';
   double total = 0;
+  final NumberFormat currencyFormatter = NumberFormat('#,##0', 'id_ID');
 
   void _onButtonPressed(String value) {
     setState(() {
@@ -20,7 +22,10 @@ class ManualTabState extends State<ManualTab> {
       } else {
         displayText += value;
       }
-      total = double.tryParse(displayText.replaceAll('Rp', '')) ?? 0;
+      total = double.tryParse(
+              displayText.replaceAll('Rp', '').replaceAll('.', '')) ??
+          0;
+      displayText = 'Rp${currencyFormatter.format(total)}';
     });
   }
 
@@ -28,6 +33,11 @@ class ManualTabState extends State<ManualTab> {
     setState(() {
       if (displayText.length > 3) {
         displayText = displayText.substring(0, displayText.length - 1);
+        total = double.tryParse(
+                displayText.replaceAll('Rp', '').replaceAll('.', '')) ??
+            0;
+        displayText =
+            total > 0 ? 'Rp${currencyFormatter.format(total)}' : 'Rp0';
       } else {
         displayText = 'Rp0';
       }
@@ -46,7 +56,7 @@ class ManualTabState extends State<ManualTab> {
   }
 
   void _onTagih() {
-    Logger('Menagih produk dengan total: $total');
+    debugPrint('Menagih produk dengan total: $total');
   }
 
   @override

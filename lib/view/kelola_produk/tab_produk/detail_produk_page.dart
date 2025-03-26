@@ -537,10 +537,12 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                                       await DatabaseHelper()
                                           .deleteProduk(widget.produk.id!);
                                       if (!mounted) return;
-                                      Navigator.of(context)
-                                          .pop(); // Tutup dialog
-                                      Navigator.pop(context,
-                                          'deleted'); // Kembali ke halaman sebelumnya
+                                      if (context.mounted) {
+                                        Navigator.of(context)
+                                            .pop(); // Tutup dialog
+                                        Navigator.pop(context,
+                                            'deleted'); // Kembali ke halaman sebelumnya
+                                      }
                                     }
                                   },
                                   child: const Text('Hapus'),
