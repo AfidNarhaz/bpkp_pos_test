@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+// Model untuk data produk
 class Produk {
   final int? id;
   final String? imagePath;
@@ -17,6 +18,7 @@ class Produk {
   String? satuan;
   bool? sendNotification;
 
+  // Constructor
   Produk({
     this.id,
     this.imagePath,

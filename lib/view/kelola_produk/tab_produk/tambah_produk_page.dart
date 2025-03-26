@@ -176,9 +176,10 @@ class TambahProdukPageState extends State<TambahProdukPage> {
   Future<void> _saveProduk() async {
     if (_formKey.currentState!.validate()) {
       final newProduk = Produk(
+        imagePath: _image?.path,
         nama: _namaController.text,
-        merek: _merekController.text,
         kategori: _kategoriController.text,
+        merek: _merekController.text,
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
@@ -187,19 +188,19 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                 0.0,
         kode: _kodeController.text,
         tanggalKadaluwarsa: _tanggalController.text,
-        isFavorite: isFavorite,
-        imagePath: _image?.path,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ?? 0,
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
         satuan: _satuanController.text,
+        isFavorite: isFavorite,
         sendNotification: _sendNotification, // Include sendNotification
       );
       await DatabaseHelper()
           .insertProduk(newProduk); // Simpan produk ke database
+
       if (mounted) {
-        widget.onProdukAdded(); // Call the callback function
+        widget.onProdukAdded(); // Panggil callback onProdukAdded
         Navigator.pop(context,
-            newProduk); // Kembalikan produk baru untuk memuat ulang data
+            newProduk); // Kembali ke halaman sebelumnya dengan membawa data produk
       }
 
       if (_sendNotification &&

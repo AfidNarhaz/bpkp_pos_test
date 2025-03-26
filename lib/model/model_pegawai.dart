@@ -1,38 +1,73 @@
+import 'dart:convert';
+import 'dart:io';
+
 class Pegawai {
+  final int? id;
+  final String? imagePath;
   final String nama;
-  final String nik;
-  final String alamat;
-  final DateTime tanggalLahir;
-  final String fotoPath;
+  final String noHp;
+  final String jabatan;
+  final String email;
+  final int pin;
 
   Pegawai({
+    this.id,
+    this.imagePath,
     required this.nama,
-    required this.nik,
-    required this.alamat,
-    required this.tanggalLahir,
-    required this.fotoPath,
+    required this.noHp,
+    required this.jabatan,
+    required this.email,
+    required this.pin,
   });
 
-  // Factory constructor untuk membangun objek dari Map
+  // Konversi dari map (Database ke Pegawai)
   factory Pegawai.fromMap(Map<String, dynamic> map) {
     return Pegawai(
-      nama: map['nama'],
-      nik: map['nik'],
-      alamat: map['alamat'],
-      tanggalLahir: DateTime.parse(map['tanggalLahir']),
-      fotoPath: map['fotoPath'],
+      id: map['id'] as int?,
+      imagePath: map['imagePath'] as String?,
+      nama: map['nama'] as String? ?? '',
+      noHp: map['noHp'] as String? ?? '',
+      jabatan: map['jabatan'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      pin: map['pin'] as int? ?? 0,
     );
   }
 
-  // Metode untuk mengonversi objek Pegawai menjadi Map
+  // Konversi ke map (Pegawai ke Database)
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
+      'imagePath': imagePath,
       'nama': nama,
-      'nik': nik,
-      'alamat': alamat,
-      'tanggalLahir':
-          tanggalLahir.toIso8601String(), // Mengonversi DateTime ke String
-      'fotoPath': fotoPath,
+      'noHp': noHp,
+      'jabatan': jabatan,
+      'email': email,
+      'pin': pin,
     };
+  }
+
+  // Save list pegawai ke file
+  static Future<void> saveToFile(
+      List<Pegawai> pegawaiList, String filePath) async {
+    final file = File(filePath);
+    final jsonList = pegawaiList.map((pegawai) => pegawai.toMap()).toList();
+    await file.writeAsString(jsonEncode(jsonList));
+  }
+
+  // Load list of Pegawai from a file
+  static Future<List<Pegawai>> loadFromFile(String filePath) async {
+    final file = File(filePath);
+    if (!file.existsSync()) {
+      return [];
+    }
+    final jsonString = await file.readAsString();
+    final List<dynamic> jsonList = jsonDecode(jsonString);
+    return jsonList.map((json) => Pegawai.fromMap(json)).toList();
+  }
+
+  // Override method toString untuk debugging
+  @override
+  String toString() {
+    return 'Pegawai{id: $id, imagePath: $imagePath, nama: $nama, noHp: $noHp, jabatan: $jabatan, email: $email, pin: $pin}';
   }
 }
