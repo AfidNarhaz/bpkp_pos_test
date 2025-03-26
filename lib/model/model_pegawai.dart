@@ -5,7 +5,7 @@ class Pegawai {
   final int? id;
   final String? imagePath;
   final String nama;
-  final String noHp;
+  final int noHp;
   final String jabatan;
   final String email;
   final int pin;
@@ -26,7 +26,7 @@ class Pegawai {
       id: map['id'] as int?,
       imagePath: map['imagePath'] as String?,
       nama: map['nama'] as String? ?? '',
-      noHp: map['noHp'] as String? ?? '',
+      noHp: map['noHp'] as int? ?? 0,
       jabatan: map['jabatan'] as String? ?? '',
       email: map['email'] as String? ?? '',
       pin: map['pin'] as int? ?? 0,

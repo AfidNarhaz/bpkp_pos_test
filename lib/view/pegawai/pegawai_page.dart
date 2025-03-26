@@ -1,7 +1,7 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:flutter/material.dart';
-import 'package:bpkp_pos_test/view/pegawai/tambah_pegawai_page.dart'; // Import the new page
+import 'package:bpkp_pos_test/view/pegawai/add_pegawai_page.dart';
 
 class PegawaiPage extends StatefulWidget {
   const PegawaiPage({super.key});
@@ -11,14 +11,16 @@ class PegawaiPage extends StatefulWidget {
 }
 
 class PegawaiPageState extends State<PegawaiPage> {
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController =
+      TextEditingController(); // Controller untuk search bar
   List<Pegawai> _pegawaiList = []; // List untuk menyimpan data pegawai
   List<Pegawai> _filteredPegawaiList = []; // List untuk menyimpan hasil filter
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final DatabaseHelper _databaseHelper =
+      DatabaseHelper(); // Instance dari DatabaseHelper
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); // Panggil method initState dari parent class
     _fetchPegawai(); // Ambil data pegawai saat halaman diinisialisasi
     _searchController
         .addListener(_filterPegawai); // Tambahkan listener untuk search bar
@@ -27,7 +29,7 @@ class PegawaiPageState extends State<PegawaiPage> {
   @override
   void dispose() {
     _searchController.dispose(); // Hapus controller saat widget dihapus
-    super.dispose();
+    super.dispose(); // Panggil method dispose dari parent class
   }
 
   Future<void> _fetchPegawai() async {
@@ -41,12 +43,12 @@ class PegawaiPageState extends State<PegawaiPage> {
   }
 
   void _filterPegawai() {
-    String query = _searchController.text.toLowerCase();
+    String query = _searchController.text.toLowerCase(); // Ambil query
     setState(() {
       _filteredPegawaiList = _pegawaiList
           .where((pegawai) => pegawai.nama.toLowerCase().contains(query))
-          .toList();
-    });
+          .toList(); // Filter pegawai berdasarkan query
+    }); // Update list pegawai yang ditampilkan
   }
 
   // Tampilkan data pegawai dalam ListView
@@ -75,7 +77,8 @@ class PegawaiPageState extends State<PegawaiPage> {
                 : ListView.builder(
                     itemCount: _filteredPegawaiList.length,
                     itemBuilder: (context, index) {
-                      Pegawai pegawai = _filteredPegawaiList[index];
+                      Pegawai pegawai =
+                          _filteredPegawaiList[index]; // Ambil data pegawai
                       return GestureDetector(
                         onTap: () {}, // Tampilkan detail pegawai saat ditekan
                         child: Container(
@@ -120,9 +123,11 @@ class PegawaiPageState extends State<PegawaiPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddPegawaiPage()),
-          ); // Navigate to the new page
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddPegawaiPage(
+                      onPegawaiAdded:
+                          _fetchPegawai))); // Navigate to the new page
         },
         child: const Icon(Icons.add),
       ),

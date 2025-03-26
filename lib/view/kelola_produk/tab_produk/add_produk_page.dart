@@ -13,25 +13,24 @@ import 'image_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
 
-class TambahProdukPage extends StatefulWidget {
+class AddProdukPage extends StatefulWidget {
+  const AddProdukPage({super.key, this.produk, required this.onProdukAdded});
   final Produk? produk;
   final VoidCallback onProdukAdded;
 
-  const TambahProdukPage({super.key, this.produk, required this.onProdukAdded});
-
   @override
-  TambahProdukPageState createState() => TambahProdukPageState();
+  AddProdukPageState createState() => AddProdukPageState();
 }
 
-class TambahProdukPageState extends State<TambahProdukPage> {
+class AddProdukPageState extends State<AddProdukPage> {
   List<Map<String, dynamic>> _listKategori = [];
   List<Map<String, dynamic>> _listMerek = [];
   List<Map<String, dynamic>> _listSatuan = [];
-  final _formKey = GlobalKey<FormState>();
 
-  File? _image;
+  final _formKey = GlobalKey<FormState>();
   final ImageService _imageService = ImageService();
   final ImagePicker _picker = ImagePicker();
+  File? _image;
 
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
@@ -60,17 +59,17 @@ class TambahProdukPageState extends State<TambahProdukPage> {
     _hargaModalController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
-    _stokController.dispose(); // Dispose _stokController
-    _minStokController.dispose(); // Dispose _minStokController
-    _satuanController.dispose(); // Dispose _satuanController
+    _stokController.dispose();
+    _minStokController.dispose();
+    _satuanController.dispose();
     super.dispose();
-  }
+  } // Panggil method dispose dari parent class
 
   @override
   void initState() {
     super.initState();
     _imageService.initDb(); // Inisialisasi database gambar
-    _initializeServices();
+    _initializeServices(); // Inisialisasi service
     _loadKategori(); // Memuat kategori dari database
     _loadMerek(); // Memuat merek dari database
     _loadSatuan(); // Memuat satuan dari database
@@ -196,7 +195,6 @@ class TambahProdukPageState extends State<TambahProdukPage> {
       );
       await DatabaseHelper()
           .insertProduk(newProduk); // Simpan produk ke database
-
       if (mounted) {
         widget.onProdukAdded(); // Panggil callback onProdukAdded
         Navigator.pop(context,
@@ -250,7 +248,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Image picked successfully')),
-                        );
+                        ); // Tampilkan snackbar
                       }
                     } catch (e) {
                       debugPrint("[ERROR] Error picking image: $e");
@@ -259,7 +257,7 @@ class TambahProdukPageState extends State<TambahProdukPage> {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Error picking image: $e')),
-                        );
+                        ); // Tampilkan snackbar
                       }
                     }
                   },

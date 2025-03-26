@@ -1,5 +1,5 @@
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/detail_produk_page.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/tambah_produk_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/add_produk_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/atur_stok.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
@@ -221,11 +221,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
         RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
   }
 
-  Future<void> _tambahProduk() async {
+  Future<void> _addProduk() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TambahProdukPage(
+        builder: (context) => AddProdukPage(
           onProdukAdded: () async {
             await _loadProdukAsync(); // Reload the product list
           },
@@ -292,7 +292,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             unselectedLabelColor: AppColors.hidden,
             tabs: [
               Tab(text: 'Produk'),
-              Tab(text: 'Stok'), // Add new tab for Stok
+              Tab(text: 'Stok'),
               Tab(text: 'Kategori'),
             ],
           ),
@@ -302,7 +302,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             : TabBarView(
                 children: [
                   _buildProdukTab(),
-                  _buildStokTab(), // Add new Stok tab content
+                  _buildStokTab(),
                   _buildKategoriTab(),
                 ],
               ),
@@ -318,7 +318,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                   child: FloatingActionButton(
                     onPressed: () {
                       if (tabController.index == 0) {
-                        _tambahProduk();
+                        _addProduk();
                       } else if (tabController.index == 2) {
                         // Add functionality for adding a new category if needed
                       }
