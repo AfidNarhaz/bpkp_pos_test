@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 
 class KategoriDialog {
@@ -26,18 +27,18 @@ class KategoriDialog {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Pilih Kategori',
+                      'Tambah Kategori',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: AppColors.text,
                       ),
                     ),
                     IconButton(
                       onPressed: () {
                         _showTambahKategoriDialog(context, onKategoriAdded);
                       },
-                      icon: const Icon(Icons.add, color: Colors.red),
+                      icon: const Icon(Icons.add, color: AppColors.text),
                     ),
                   ],
                 ),
@@ -91,15 +92,17 @@ class KategoriDialog {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Nama Kategori'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: kategoriBaruController,
                     decoration: InputDecoration(
-                      hintText: 'Nama Kategori',
+                      labelText: 'Nama Kategori',
                       errorText: errorMessage,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
                     ),
                   ),
                 ],
@@ -109,14 +112,15 @@ class KategoriDialog {
                   onPressed: () {
                     Navigator.of(context).pop(); // Tutup dialog
                   },
-                  child: const Text('Batal'),
+                  child:
+                      const Text('Batal', style: TextStyle(color: Colors.grey)),
                 ),
                 TextButton(
                   onPressed: () {
                     String newKategori = kategoriBaruController.text.trim();
                     if (newKategori.isEmpty) {
                       setState(() {
-                        errorMessage = 'Kategori wajib diisi';
+                        errorMessage = 'Nama Kategori wajib diisi';
                       });
                     } else {
                       onKategoriAdded(newKategori);
@@ -125,8 +129,8 @@ class KategoriDialog {
                       Navigator.of(context).pop(); // Tutup dialog utama
                     }
                   },
-                  child:
-                      const Text('Simpan', style: TextStyle(color: Colors.red)),
+                  child: const Text('Simpan',
+                      style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             );
@@ -174,13 +178,14 @@ class KategoriDialog {
                         .pop(); // Tutup dialog setelah menghapus
                   },
                   child:
-                      const Text('Hapus', style: TextStyle(color: Colors.grey)),
+                      const Text('Hapus', style: TextStyle(color: Colors.red)),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Batal edit
                   },
-                  child: const Text('Batal'),
+                  child:
+                      const Text('Batal', style: TextStyle(color: Colors.grey)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -195,8 +200,8 @@ class KategoriDialog {
                       Navigator.of(context).pop(); // Tutup dialog utama
                     }
                   },
-                  child:
-                      const Text('Simpan', style: TextStyle(color: Colors.red)),
+                  child: const Text('Simpan',
+                      style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             );

@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 
 class MerekDialog {
@@ -26,18 +27,18 @@ class MerekDialog {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Pilih Merek',
+                      'Tambah Merek',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: AppColors.text,
                       ),
                     ),
                     IconButton(
                       onPressed: () {
                         _showTambahMerekDialog(context, onMerekAdded);
                       },
-                      icon: const Icon(Icons.add, color: Colors.red),
+                      icon: const Icon(Icons.add, color: AppColors.text),
                     ),
                   ],
                 ),
@@ -89,27 +90,35 @@ class MerekDialog {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Nama Merek'),
-              content: TextField(
-                controller: merekBaruController,
-                decoration: InputDecoration(
-                  hintText: 'Nama Merek',
-                  errorText: errorMessage,
-                ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: merekBaruController,
+                    decoration: InputDecoration(
+                      labelText: 'Nama Merek',
+                      errorText: errorMessage,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Batal'),
+                  child:
+                      const Text('Batal', style: TextStyle(color: Colors.grey)),
                 ),
                 TextButton(
                   onPressed: () {
                     String newMerek = merekBaruController.text.trim();
                     if (newMerek.isEmpty) {
                       setState(() {
-                        errorMessage = 'Merek wajib diisi';
+                        errorMessage = 'Nama Merek wajib diisi';
                       });
                     } else {
                       onMerekAdded(newMerek);
@@ -117,8 +126,8 @@ class MerekDialog {
                       Navigator.of(context).pop();
                     }
                   },
-                  child:
-                      const Text('Simpan', style: TextStyle(color: Colors.red)),
+                  child: const Text('Simpan',
+                      style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             );
@@ -161,13 +170,14 @@ class MerekDialog {
                     Navigator.of(context).pop();
                   },
                   child:
-                      const Text('Hapus', style: TextStyle(color: Colors.grey)),
+                      const Text('Hapus', style: TextStyle(color: Colors.red)),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Batal'),
+                  child:
+                      const Text('Batal', style: TextStyle(color: Colors.grey)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -182,8 +192,8 @@ class MerekDialog {
                       Navigator.of(context).pop();
                     }
                   },
-                  child:
-                      const Text('Simpan', style: TextStyle(color: Colors.red)),
+                  child: const Text('Simpan',
+                      style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             );

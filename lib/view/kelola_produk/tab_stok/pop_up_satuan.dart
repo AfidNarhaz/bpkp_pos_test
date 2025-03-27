@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 
 class SatuanDialog {
@@ -30,14 +31,14 @@ class SatuanDialog {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: AppColors.text,
                       ),
                     ),
                     IconButton(
                       onPressed: () {
                         _showTambahSatuanDialog(context, onSatuanAdded);
                       },
-                      icon: const Icon(Icons.add, color: Colors.red),
+                      icon: const Icon(Icons.add, color: AppColors.text),
                     ),
                   ],
                 ),
@@ -102,7 +103,8 @@ class SatuanDialog {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Batal'),
+                  child:
+                      const Text('Batal', style: TextStyle(color: Colors.grey)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -117,8 +119,8 @@ class SatuanDialog {
                       Navigator.of(context).pop();
                     }
                   },
-                  child:
-                      const Text('Simpan', style: TextStyle(color: Colors.red)),
+                  child: const Text('Simpan',
+                      style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             );

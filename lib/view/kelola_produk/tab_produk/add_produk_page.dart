@@ -234,38 +234,15 @@ class AddProdukPageState extends State<AddProdukPage> {
             key: _formKey,
             child: Column(
               children: [
-                // Image Picker
                 GestureDetector(
                   onTap: () async {
-                    debugPrint("[INFO] Image picker triggered.");
-                    try {
-                      await _pickImage();
-                      if (!mounted) {
-                        return; // Cek apakah widget masih dalam tree
-                      }
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Image picked successfully')),
-                        ); // Tampilkan snackbar
-                      }
-                    } catch (e) {
-                      debugPrint("[ERROR] Error picking image: $e");
-                      if (!mounted) return; // Cek sebelum menggunakan context
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error picking image: $e')),
-                        ); // Tampilkan snackbar
-                      }
-                    }
+                    await _pickImage(); // Panggil fungsi _pickImage saat gambar ditekan
                   },
                   child: Container(
-                    height: 150,
-                    width: 150,
+                    height: 100,
+                    width: 100,
                     decoration: BoxDecoration(
-                      color: Colors.blue[100],
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(10),
                       image: _image != null
                           ? DecorationImage(
@@ -275,7 +252,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     child: _image == null
                         ? const Icon(
                             Icons.camera_alt,
-                            size: 50,
+                            size: 25,
                             color: Colors.black54,
                           )
                         : null,
@@ -535,6 +512,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                           _sendNotification = value ?? false;
                         });
                       },
+                      activeColor: AppColors.accent,
                     ),
                     Expanded(
                       child: const Text(
@@ -555,6 +533,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ),
                     Switch(
                       value: isFavorite,
+                      activeColor: AppColors.favorit,
                       onChanged: (value) {
                         if (mounted) {
                           setState(() {
