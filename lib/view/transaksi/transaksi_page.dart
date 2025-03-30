@@ -19,8 +19,7 @@ class TransaksiPageState extends State<TransaksiPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        resizeToAvoidBottomInset:
-            false, // Prevent resizing when keyboard appears
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text(
@@ -36,7 +35,6 @@ class TransaksiPageState extends State<TransaksiPage> {
           ),
         ),
         body: SafeArea(
-          // Ensure content stays within visible area
           child: Stack(
             children: [
               TabBarView(
@@ -47,7 +45,6 @@ class TransaksiPageState extends State<TransaksiPage> {
                 ],
               ),
               _buildDraggableSheet(),
-              if (!_isSheetExpanded) _buildBottomActionButton(),
             ],
           ),
         ),
@@ -69,8 +66,7 @@ class TransaksiPageState extends State<TransaksiPage> {
         maxChildSize: 0.9,
         builder: (context, scrollController) {
           return Padding(
-            padding: const EdgeInsets.only(
-                bottom: 100), // Add padding to avoid overlap
+            padding: const EdgeInsets.only(bottom: 100),
             child: DraggableSheetContent(
               scrollController: scrollController,
               onToggle: () {
@@ -81,35 +77,6 @@ class TransaksiPageState extends State<TransaksiPage> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildBottomActionButton() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(16),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            backgroundColor: Colors.red,
-          ),
-          onPressed: () {
-            // Add your "Tagih" button action here
-          },
-          child: FittedBox(
-            // Ensure text fits dynamically
-            fit: BoxFit.scaleDown,
-            child: const Text(
-              'Tagih = Rp0',
-              style: TextStyle(fontSize: 18, color: Colors.white),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -154,7 +121,7 @@ class DraggableSheetContent extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Prevent overflow by minimizing height
+        mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
             onVerticalDragUpdate: (details) {
@@ -232,100 +199,75 @@ class ManualTabContentState extends State<ManualTabContent> {
   }
 
   void _onAddToCart() {
-    final logger = Logger('TransaksiPage'); // Perbaikan Logger
+    final logger = Logger('TransaksiPage');
     logger.info('Produk ditambahkan ke keranjang: $total');
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      // Ensure content stays within visible area
       child: Column(
         children: [
           Expanded(
-            flex: 2,
+            // flex: 2,
             child: Container(
               color: Colors.grey[200],
-              width: double.infinity,
+              width: 50,
+              height: 50,
               padding: const EdgeInsets.all(16),
               alignment: Alignment.centerRight,
               child: Text(
                 displayText,
-                style: const TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold), // Penyesuaian ukuran teks
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
           Expanded(
-            flex: 6,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                height: 300, // Adjust the height as needed
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Table(
-                        border: TableBorder.all(color: Colors.transparent),
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        children: [
-                          _buildTableRow(['1', '2', '3']),
-                          _buildTableRow(['4', '5', '6']),
-                          _buildTableRow(['7', '8', '9']),
-                          _buildTableRow(['0', '000', 'C']),
-                        ],
-                      ),
+            // flex: 5,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Table(
+                      border: TableBorder.all(color: Colors.transparent),
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
+                      children: [
+                        _buildTableRow(['1', '2', '3']),
+                        _buildTableRow(['4', '5', '6']),
+                        _buildTableRow(['7', '8', '9']),
+                        _buildTableRow(['0', '000', 'C']),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 72,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child:
-                                  _buildIconButton(Icons.backspace, _onDelete),
-                            ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 72,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: _buildIconButton(Icons.backspace, _onDelete),
                           ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            flex: 3,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: _buildCartButton(),
-                            ),
+                        ),
+                        SizedBox(height: 8),
+                        Expanded(
+                          flex: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: _buildCartButton(),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(
-                16, 16, 16, 16), // Adjust bottom padding to avoid overlap
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () {
-                // Add your "Tagih" button action here
-              },
-              child: Text(
-                'Tagih = $displayText', // Menampilkan total sesuai input
-                style: const TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ],
               ),
             ),
           ),
@@ -353,13 +295,10 @@ class ManualTabContentState extends State<ManualTabContent> {
                 backgroundColor: AppColors.secondary,
                 foregroundColor: AppColors.text,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(8), // Penyesuaian bentuk tombol
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(label,
-                  style: const TextStyle(
-                      fontSize: 20)), // Penyesuaian ukuran teks tombol
+              child: Text(label, style: const TextStyle(fontSize: 20)),
             ),
           ),
         );
@@ -367,7 +306,6 @@ class ManualTabContentState extends State<ManualTabContent> {
     );
   }
 
-  // Tombol Backspace
   Widget _buildIconButton(IconData icon, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -375,14 +313,13 @@ class ManualTabContentState extends State<ManualTabContent> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.text,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Penyesuaian bentuk tombol
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
-      child: Icon(icon, size: 24), // Penyesuaian ukuran ikon
+      child: Icon(icon, size: 16),
     );
   }
 
-  // Tombol Keranjang
   Widget _buildCartButton() {
     return ElevatedButton(
       onPressed: _onAddToCart,
@@ -390,13 +327,13 @@ class ManualTabContentState extends State<ManualTabContent> {
         backgroundColor: AppColors.accent,
         foregroundColor: AppColors.text,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Penyesuaian bentuk tombol
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.shopping_cart, size: 30), // Penyesuaian ukuran ikon
+        children: [
+          Icon(Icons.shopping_cart, size: 16),
         ],
       ),
     );
@@ -452,6 +389,11 @@ class ProdukTabContentState extends State<ProdukTabContent> {
       _filteredProduk =
           _allProduk.where((produk) => produk['kategori'] == kategori).toList();
     });
+  }
+
+  String _formatCurrency(dynamic amount) {
+    final formatter = NumberFormat('#,##0', 'id_ID');
+    return formatter.format(amount);
   }
 
   @override
@@ -510,10 +452,5 @@ class ProdukTabContentState extends State<ProdukTabContent> {
         ),
       ],
     );
-  }
-
-  String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
   }
 }
