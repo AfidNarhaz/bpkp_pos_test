@@ -1,6 +1,8 @@
-import 'package:bpkp_pos_test/model/user.dart';
+// import 'package:bpkp_pos_test/model/user.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,20 +15,35 @@ class _LoginState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isObscure = true; // Untuk menyembunyikan/menampilkan password
+  String? _errorMessage; // Variable to store error messages
 
-  void _checkLogin(String userInput, String passInput) {
-    bool loginStatus = users.any(
-        (user) => user.username == userInput && user.password == passInput);
+  void _login() async {
+    final username = usernameController.text;
+    final password = passwordController.text;
 
-    if (loginStatus) {
-      Navigator.pushReplacementNamed(context, 'home', arguments: 0);
+    // print('Login attempt: $username / $password'); // Debug log
+
+    final user = await DatabaseHelper().getUser(username, password);
+
+    if (user != null) {
+      // print('User found: role = ${user.role}'); // Debug log
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('role', user.role); // Pastikan role tidak null
+
+      if (user.role == 'admin') {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else if (user.role == 'kasir') {
+        Navigator.pushReplacementNamed(context, '/transaksi');
+      } else {
+        setState(() {
+          _errorMessage = 'Role pengguna tidak dikenali.';
+        });
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login Gagal!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // print('No user matched'); // Debug log
+      setState(() {
+        _errorMessage = 'Username atau password salah';
+      });
     }
   }
 
@@ -155,14 +172,17 @@ class _LoginState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
+                  if (_errorMessage != null)
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  const SizedBox(height: 16.0),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () {
-                            _checkLogin(usernameController.text,
-                                passwordController.text);
-                          },
+                          onPressed: _login,
                           style: OutlinedButton.styleFrom(
                             backgroundColor: AppColors.accent,
                             minimumSize: const Size(250, 50),

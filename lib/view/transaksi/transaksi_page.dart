@@ -1,5 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -26,6 +27,19 @@ class TransaksiPageState extends State<TransaksiPage> {
             'Transaksi',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.black),
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Manual'),

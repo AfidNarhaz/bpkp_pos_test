@@ -3,8 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logging/logging.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper().seedUsers();
+
   // Setup logging
   setupLogging();
 
@@ -20,10 +24,9 @@ void main() async {
 // Fungsi setupLogging di luar main()
 void setupLogging() {
   if (kReleaseMode) {
-    Logger.root.level =
-        Level.WARNING; // Hanya log WARNING dan SEVERE di production
+    Logger.root.level = Level.WARNING;
   } else {
-    Logger.root.level = Level.ALL; // Semua log di mode development
+    Logger.root.level = Level.ALL;
   }
 
   Logger.root.onRecord.listen((record) {

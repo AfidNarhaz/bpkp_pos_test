@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
+import 'package:bpkp_pos_test/model/user.dart';
 
 class DatabaseHelper {
   // Singleton instance
@@ -75,6 +76,16 @@ class DatabaseHelper {
 
   // Fungsi untuk membuat tabel
   Future<void> _onCreate(Database db, int version) async {
+    // Tabel user
+    await db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
+      )
+    ''');
+
     // Tabel produk
     await db.execute('''
       CREATE TABLE $tableProduk(
@@ -190,6 +201,42 @@ class DatabaseHelper {
             maps[i]['sendNotification'] == 1, // Handle sendNotification
       );
     });
+  }
+
+  // Fungsi untuk menambahkan user baru
+  Future<void> insertUser(User user) async {
+    final db = await database;
+    await db.insert(
+      'users',
+      user.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Fungsi untuk mendapatkan user berdasarkan username dan password
+  Future<User?> getUser(String username, String password) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'username = ? AND password = ?',
+      whereArgs: [username, password],
+    );
+    if (result.isNotEmpty) {
+      return User.fromMap(result.first);
+    }
+    return null;
+  }
+
+  // Fungsi untuk menambahkan user default jika tabel kosong
+  Future<void> seedUsers() async {
+    final db = await database;
+    final existing = await db.query('users');
+    if (existing.isEmpty) {
+      await insertUser(
+          User(username: 'admin', password: 'admin123', role: 'admin'));
+      await insertUser(
+          User(username: 'kasir', password: 'kasir123', role: 'kasir'));
+    }
   }
 
   // Fungsi untuk mengambil semua produk
