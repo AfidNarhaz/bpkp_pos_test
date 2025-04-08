@@ -69,8 +69,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaJual)
             .replaceAll(',', '.'));
-    _tanggalController =
-        TextEditingController(text: widget.produk.tanggalKadaluwarsa);
+    _tanggalController = TextEditingController(text: widget.produk.tglExpired);
     _satuanController = TextEditingController(
         text: widget.produk.satuan); // Initialize _satuanController
     _stokController = TextEditingController(
@@ -162,7 +161,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
-        tanggalKadaluwarsa: _tanggalController.text,
+        tglExpired: _tanggalController.text,
         isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ??

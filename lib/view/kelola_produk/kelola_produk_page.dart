@@ -245,7 +245,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           kode: result['kode'] as String? ?? '',
           hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
           hargaJual: _parsePrice(result['price'] as String? ?? '0'),
-          tanggalKadaluwarsa: result['tanggalKadaluwarsa'] as String? ?? '',
+          tglExpired: result['tglExpired'] as String? ?? '',
           isFavorite: result['isFavorite'] as bool? ?? false,
           imagePath: result['imagePath'] as String? ?? '',
         );

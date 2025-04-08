@@ -226,7 +226,7 @@ class ManualTabContentState extends State<ManualTabContent> {
             // flex: 2,
             child: Container(
               color: Colors.grey[200],
-              width: 50,
+              width: double.infinity,
               height: 50,
               padding: const EdgeInsets.all(16),
               alignment: Alignment.centerRight,

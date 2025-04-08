@@ -186,7 +186,7 @@ class AddProdukPageState extends State<AddProdukPage> {
             double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
                 0.0,
         kode: _kodeController.text,
-        tanggalKadaluwarsa: _tanggalController.text,
+        tglExpired: _tanggalController.text,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ?? 0,
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
         satuan: _satuanController.text,

@@ -97,7 +97,7 @@ class DatabaseHelper {
         hargaJual REAL NOT NULL,
         hargaModal REAL NOT NULL,
         kode TEXT NOT NULL,
-        tanggalKadaluwarsa TEXT,
+        tglExpired TEXT,
         isFavorite INTEGER NOT NULL DEFAULT 0,
         stok INTEGER,
         minStok INTEGER,
@@ -191,8 +191,7 @@ class DatabaseHelper {
             ? maps[i]['hargaModal'].toDouble()
             : maps[i]['hargaModal'],
         kode: maps[i]['kode'], // Handle hargaModal
-        tanggalKadaluwarsa: maps[i]
-            ['tanggalKadaluwarsa'], // Handle tanggalKadaluwarsa
+        tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
         stok: maps[i]['stok'], // Handle stok
         minStok: maps[i]['minStok'], // Handle minStok
         satuan: maps[i]['satuan'], // Handle satuan
