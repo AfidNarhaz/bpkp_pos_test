@@ -29,7 +29,7 @@ class _LoginState extends State<LoginPage> {
       // print('User found: role = ${user.role}'); // Debug log
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('role', user.role); // Pastikan role tidak null
-
+      if (!mounted) return;
       if (user.role == 'admin') {
         Navigator.pushReplacementNamed(context, '/home');
       } else if (user.role == 'kasir') {
