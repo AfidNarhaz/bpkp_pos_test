@@ -3,6 +3,7 @@ import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
+import 'package:bpkp_pos_test/view/laporan/laporan.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -69,11 +70,22 @@ class _HomePageState extends State<HomePage> {
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 GestureDetector(
                   onTap: () {
-                    // aksi untuk tombol "lihat semua"
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LaporanPage(),
+                      ),
+                    );
                   },
-                  child: const Row(
-                    children: [
-                      Text("Lihat Semua", style: TextStyle(fontSize: 16)),
+                  child: Row(
+                    children: const [
+                      Text(
+                        "Lihat Semua",
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       Icon(Icons.chevron_right),
                     ],
                   ),
@@ -91,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                   child: _buildLaporanCard('Penjualan bulan ini', ''),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

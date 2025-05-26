@@ -15,7 +15,7 @@ class _LoginState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isObscure = true; // Untuk menyembunyikan/menampilkan password
-  String? _errorMessage; // Variable to store error messages
+  String? _errorMessage; // Untuk menyimpan pesan error
 
   void _login() async {
     final username = usernameController.text;

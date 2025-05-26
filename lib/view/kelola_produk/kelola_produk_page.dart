@@ -272,7 +272,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Update the length to 3
+      length: 3,
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(

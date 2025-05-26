@@ -20,14 +20,12 @@ class TransaksiPageState extends State<TransaksiPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text(
             'Transaksi',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.white,
           actions: [
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.black),
@@ -41,6 +39,15 @@ class TransaksiPageState extends State<TransaksiPage> {
             ),
           ],
           bottom: const TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 2.0,
+                color: AppColors.text,
+              ),
+            ),
+            labelColor: AppColors.text,
+            unselectedLabelColor: AppColors.hidden,
             tabs: [
               Tab(text: 'Manual'),
               Tab(text: 'Produk'),
