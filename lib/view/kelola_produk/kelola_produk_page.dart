@@ -25,15 +25,11 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   bool _isLoading = true;
 
   final dbHelper = DatabaseHelper();
-  List<Map<String, dynamic>> _listKategori = [];
-  List<bool> _selectedCategories = [];
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_filterProduk);
-    _loadProdukAsync();
-    _loadKategoriAsync();
   }
 
   void _filterProductsByCategory(List<String> selectedCategories) {
@@ -71,25 +67,30 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   }
 
   void _showFilterDialog(BuildContext context) {
-    if (_selectedCategories.isEmpty) {
-      _selectedCategories = List<bool>.filled(_listKategori.length, false);
-    }
     TextEditingController searchCategoryController = TextEditingController();
-    List<Map<String, dynamic>> filteredKategoriList = _listKategori;
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Filter Kategori'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: StatefulBuilder(
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: dbHelper.getKategori(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return const AlertDialog(content: Text('Gagal memuat kategori'));
+            }
+            final kategoriList = snapshot.data ?? [];
+            List<bool> selectedCategories =
+                List<bool>.filled(kategoriList.length, false);
+            List<Map<String, dynamic>> filteredKategoriList =
+                List.from(kategoriList);
+            return StatefulBuilder(
               builder: (context, setState) {
                 void filterCategories() {
                   setState(() {
                     final query = searchCategoryController.text.toLowerCase();
-                    filteredKategoriList = _listKategori
+                    filteredKategoriList = kategoriList
                         .where((kategori) =>
                             kategori['name'].toLowerCase().contains(query))
                         .toList();
@@ -97,104 +98,87 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                 }
 
                 searchCategoryController.addListener(filterCategories);
-
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: searchCategoryController,
-                      decoration: InputDecoration(
-                        hintText: 'Cari Kategori...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                return AlertDialog(
+                  title: const Text('Filter Kategori'),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: searchCategoryController,
+                          decoration: InputDecoration(
+                            hintText: 'Cari Kategori...',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: filteredKategoriList.length,
-                        itemBuilder: (context, index) {
-                          return CheckboxListTile(
-                            title: Text(filteredKategoriList[index]['name']),
-                            value: _selectedCategories[index],
-                            onChanged: (bool? value) {
-                              setState(() {
-                                _selectedCategories[index] = value!;
-                              });
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: filteredKategoriList.length,
+                            itemBuilder: (context, index) {
+                              return CheckboxListTile(
+                                title:
+                                    Text(filteredKategoriList[index]['name']),
+                                value: selectedCategories[index],
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    selectedCategories[index] = value!;
+                                  });
+                                },
+                              );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await _loadKategoriAsync();
+                  ),
+                  actions: [
+                    TextButton(
+                      child: const Text('Reset'),
+                      onPressed: () {
                         setState(() {
-                          filteredKategoriList = _listKategori;
+                          for (int i = 0; i < selectedCategories.length; i++) {
+                            selectedCategories[i] = false;
+                          }
+                          filteredKategoriList = List.from(kategoriList);
+                          searchCategoryController.clear();
                         });
+                        Navigator.of(context).pop();
+                        _showFilterDialog(context);
                       },
-                      child: const Text('Refresh Kategori'),
+                    ),
+                    TextButton(
+                      child: const Text('Batal'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Filter'),
+                      onPressed: () {
+                        List<String> filteredCategories = [];
+                        for (int i = 0; i < selectedCategories.length; i++) {
+                          if (selectedCategories[i]) {
+                            filteredCategories.add(kategoriList[i]['name']);
+                          }
+                        }
+                        _filterProductsByCategory(filteredCategories);
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ],
                 );
               },
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Reset'),
-              onPressed: () {
-                setState(() {
-                  for (int i = 0; i < _selectedCategories.length; i++) {
-                    _selectedCategories[i] = false;
-                  }
-                  filteredKategoriList = List.from(_listKategori);
-                  searchCategoryController.clear();
-                });
-                Navigator.of(context).pop(); // Close the dialog
-                _showFilterDialog(context); // Reopen the dialog to refresh UI
-              },
-            ),
-            TextButton(
-              child: const Text('Batal'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Filter'),
-              onPressed: () {
-                List<String> filteredCategories = [];
-                for (int i = 0; i < _selectedCategories.length; i++) {
-                  if (_selectedCategories[i]) {
-                    filteredCategories.add(_listKategori[i]['name']);
-                  }
-                }
-
-                _filterProductsByCategory(filteredCategories);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
-  }
-
-  Future<void> _loadKategoriAsync() async {
-    try {
-      List<Map<String, dynamic>> categories = await dbHelper.getKategori();
-      setState(() {
-        _listKategori = categories;
-        _selectedCategories = List<bool>.filled(
-            _listKategori.length, false); // Initialize _selectedCategories
-      });
-    } catch (e) {
-      _logger.severe('Error loading categories: $e');
-    }
   }
 
   void _filterProduk() {
@@ -271,66 +255,78 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          title: const Text(
-            'Kelola Produk',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          bottom: const TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(
-                width: 2.0,
-                color: AppColors.text,
+    return FutureBuilder<List<Produk>>(
+      future: dbHelper.getProduks(), // proses async
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Gagal memuat produk'));
+        }
+        return DefaultTabController(
+          length: 3,
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              title: const Text(
+                'Kelola Produk',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-            labelColor: AppColors.text,
-            unselectedLabelColor: AppColors.hidden,
-            tabs: [
-              Tab(text: 'Produk'),
-              Tab(text: 'Stok'),
-              Tab(text: 'Kategori'),
-            ],
-          ),
-        ),
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : TabBarView(
-                children: [
-                  _buildProdukTab(),
-                  _buildStokTab(),
-                  _buildKategoriTab(),
+              bottom: const TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(
+                    width: 2.0,
+                    color: AppColors.text,
+                  ),
+                ),
+                labelColor: AppColors.text,
+                unselectedLabelColor: AppColors.hidden,
+                tabs: [
+                  Tab(text: 'Produk'),
+                  Tab(text: 'Stok'),
+                  Tab(text: 'Kategori'),
                 ],
               ),
-        floatingActionButton: Builder(
-          builder: (context) {
-            final tabController = DefaultTabController.of(context);
-
-            return AnimatedBuilder(
-              animation: tabController,
-              builder: (context, child) {
-                return Visibility(
-                  visible: tabController.index == 0 || tabController.index == 2,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      if (tabController.index == 0) {
-                        _addProduk();
-                      } else if (tabController.index == 2) {
-                        // Add functionality for adding a new category if needed
-                      }
-                    },
-                    child: const Icon(Icons.add),
+            ),
+            body: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    children: [
+                      _buildProdukTab(),
+                      _buildStokTab(),
+                      _buildKategoriTab(),
+                    ],
                   ),
+            floatingActionButton: Builder(
+              builder: (context) {
+                final tabController = DefaultTabController.of(context);
+
+                return AnimatedBuilder(
+                  animation: tabController,
+                  builder: (context, child) {
+                    return Visibility(
+                      visible:
+                          tabController.index == 0 || tabController.index == 2,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          if (tabController.index == 0) {
+                            _addProduk();
+                          } else if (tabController.index == 2) {
+                            // Add functionality for adding a new category if needed
+                          }
+                        },
+                        child: const Icon(Icons.add),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 

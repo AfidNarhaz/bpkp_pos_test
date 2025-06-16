@@ -21,9 +21,6 @@ class DetailProdukPage extends StatefulWidget {
 }
 
 class DetailProdukPageState extends State<DetailProdukPage> {
-  List<Map<String, dynamic>> _listKategori = [];
-  List<Map<String, dynamic>> _listMerek = [];
-  List<Map<String, dynamic>> _listSatuan = [];
   final _formKey = GlobalKey<FormState>();
 
   // Kontrol gambar dan service image
@@ -52,10 +49,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   void initState() {
     super.initState();
     _imageService.initDb(); // Inisialisasi database gambar
-    _loadKategori();
-    _loadMerek();
-    _loadSatuan();
-
     // Inisialisasi dengan nilai produk yang ada
     _namaController = TextEditingController(text: widget.produk.nama);
     _kategoriController = TextEditingController(text: widget.produk.kategori);
@@ -70,19 +63,15 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             .format(widget.produk.hargaJual)
             .replaceAll(',', '.'));
     _tanggalController = TextEditingController(text: widget.produk.tglExpired);
-    _satuanController = TextEditingController(
-        text: widget.produk.satuan); // Initialize _satuanController
-    _stokController = TextEditingController(
-        text: widget.produk.stok?.toString()); // Initialize _stokController
-    _minStokController = TextEditingController(
-        text:
-            widget.produk.minStok?.toString()); // Initialize _minStokController
+    _satuanController = TextEditingController(text: widget.produk.satuan);
+    _stokController =
+        TextEditingController(text: widget.produk.stok?.toString());
+    _minStokController =
+        TextEditingController(text: widget.produk.minStok?.toString());
     isFavorite = widget.produk.isFavorite;
     if (widget.produk.imagePath != null) {
       _image = File(widget.produk.imagePath!);
     }
-
-    // Inisialisasi data stok dengan nilai produk yang ada
     stok = widget.produk.stok?.toString();
     minStok = widget.produk.minStok?.toString();
     satuan = widget.produk.satuan;
@@ -111,38 +100,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
       setState(() {
         _image = image; // Update nilai _image dan render ulang UI
       });
-    }
-  }
-
-  void _loadKategori() async {
-    List<Map<String, dynamic>> kategoriList =
-        await DatabaseHelper().getKategori();
-    if (!mounted) return;
-    setState(() {
-      _listKategori = kategoriList;
-    });
-  }
-
-  void _loadMerek() async {
-    List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
-    if (!mounted) return;
-    setState(() {
-      _listMerek = merekList;
-    });
-  }
-
-  Future<void> _loadSatuan() async {
-    try {
-      debugPrint("[INFO] Loading satuan...");
-      List<Map<String, dynamic>> satuanList =
-          await DatabaseHelper().getSatuan();
-      if (!mounted) return;
-      setState(() {
-        _listSatuan = satuanList;
-      });
-      debugPrint("[INFO] Loaded ${_listSatuan.length} satuan.");
-    } catch (e) {
-      debugPrint("[ERROR] Error loading satuan: $e");
     }
   }
 
@@ -251,79 +208,93 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                 ),
 
                 // Pilih Kategori
-                _buildTextField(
-                  controller: _kategoriController,
-                  label: 'Pilih Kategori',
-                  suffixIcon: Icons.arrow_forward_ios,
-                  readOnly: true,
-                  onTap: () {
-                    KategoriDialog.showKategoriDialog(
-                      context,
-                      _listKategori,
-                      (newKategori) async {
-                        if (newKategori.isNotEmpty) {
-                          await DatabaseHelper().insertKategori(newKategori);
-                          if (!mounted) return;
-                          _loadKategori();
-                        }
-                      },
-                      (id, updatedKategori) async {
-                        if (updatedKategori.isNotEmpty) {
-                          await DatabaseHelper()
-                              .updateKategori(id, updatedKategori);
-                          if (!mounted) return;
-                          _loadKategori();
-                        }
-                      },
-                      (id) async {
-                        await DatabaseHelper().deleteKategori(id);
-                        if (!mounted) return;
-                        _loadKategori();
-                      },
-                      (selectedKategori) {
-                        if (!mounted) return;
-                        setState(() {
-                          _kategoriController.text = selectedKategori;
-                        });
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getKategori(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final kategoriList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _kategoriController,
+                      label: 'Pilih Kategori',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        KategoriDialog.showKategoriDialog(
+                          context,
+                          kategoriList,
+                          (newKategori) async {
+                            if (newKategori.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .insertKategori(newKategori);
+                              setState(() {});
+                              _kategoriController.text = newKategori;
+                            }
+                          },
+                          (id, updatedKategori) async {
+                            if (updatedKategori.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateKategori(id, updatedKategori);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteKategori(id);
+                            setState(() {});
+                          },
+                          (selectedKategori) {
+                            setState(() {
+                              _kategoriController.text = selectedKategori;
+                            });
+                          },
+                        );
                       },
                     );
                   },
                 ),
 
                 // Pilih Merek
-                _buildTextField(
-                  controller: _merekController,
-                  label: 'Pilih Merek',
-                  suffixIcon: Icons.arrow_forward_ios,
-                  readOnly: true,
-                  onTap: () async {
-                    MerekDialog.showMerekDialog(
-                      context,
-                      _listMerek,
-                      (newMerek) async {
-                        if (newMerek.isNotEmpty) {
-                          await DatabaseHelper().insertMerek(newMerek);
-                          if (!mounted) return;
-                          _loadMerek();
-                        }
-                      },
-                      (id, updatedMerek) async {
-                        if (updatedMerek.isNotEmpty) {
-                          await DatabaseHelper().updateMerek(id, updatedMerek);
-                          if (!mounted) return;
-                          _loadMerek();
-                        }
-                      },
-                      (id) async {
-                        await DatabaseHelper().deleteMerek(id);
-                        if (!mounted) return;
-                        _loadMerek();
-                      },
-                      (selectedMerek) {
-                        if (!mounted) return;
-                        setState(() {
-                          _merekController.text = selectedMerek;
-                        });
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getMerek(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final merekList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _merekController,
+                      label: 'Pilih Merek',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        MerekDialog.showMerekDialog(
+                          context,
+                          merekList,
+                          (newMerek) async {
+                            if (newMerek.isNotEmpty) {
+                              await DatabaseHelper().insertMerek(newMerek);
+                              setState(() {});
+                              _merekController.text = newMerek;
+                            }
+                          },
+                          (id, updatedMerek) async {
+                            if (updatedMerek.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateMerek(id, updatedMerek);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteMerek(id);
+                            setState(() {});
+                          },
+                          (selectedMerek) {
+                            setState(() {
+                              _merekController.text = selectedMerek;
+                            });
+                          },
+                        );
                       },
                     );
                   },
@@ -420,48 +391,46 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                 ),
 
                 // Pilih Satuan
-                _buildTextField(
-                  controller: _satuanController,
-                  label: 'Pilih Satuan',
-                  suffixIcon: Icons.arrow_forward_ios,
-                  readOnly: true,
-                  onTap: () async {
-                    SatuanDialog.showSatuanDialog(
-                      context,
-                      _listSatuan,
-                      (newSatuan) async {
-                        if (newSatuan.isNotEmpty) {
-                          await DatabaseHelper().insertSatuan(newSatuan);
-                          if (mounted) {
-                            _loadSatuan();
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getSatuan(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final satuanList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _satuanController,
+                      label: 'Pilih Satuan',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        SatuanDialog.showSatuanDialog(
+                          context,
+                          satuanList,
+                          (newSatuan) async {
+                            if (newSatuan.isNotEmpty) {
+                              await DatabaseHelper().insertSatuan(newSatuan);
+                              setState(() {});
+                              _satuanController.text = newSatuan;
+                            }
+                          },
+                          (id, updatedSatuan) async {
+                            if (updatedSatuan.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateSatuan(id, updatedSatuan);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteSatuan(id);
+                            setState(() {});
+                          },
+                          (selectedSatuan) {
                             setState(() {
-                              _satuanController.text =
-                                  newSatuan; // Set the text field value immediately
+                              _satuanController.text = selectedSatuan;
                             });
-                          }
-                        }
-                      },
-                      (id, updatedSatuan) async {
-                        if (updatedSatuan.isNotEmpty) {
-                          await DatabaseHelper()
-                              .updateSatuan(id, updatedSatuan);
-                          if (mounted) {
-                            _loadSatuan();
-                          }
-                        }
-                      },
-                      (id) async {
-                        await DatabaseHelper().deleteSatuan(id);
-                        if (mounted) {
-                          _loadSatuan();
-                        }
-                      },
-                      (selectedSatuan) {
-                        if (mounted) {
-                          setState(() {
-                            _satuanController.text = selectedSatuan;
-                          });
-                        }
+                          },
+                        );
                       },
                     );
                   },

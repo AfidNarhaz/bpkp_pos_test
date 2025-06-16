@@ -11,32 +11,28 @@ class KategoriTab extends StatefulWidget {
 }
 
 class KategoriTabState extends State<KategoriTab> {
-  List<Map<String, dynamic>> _listKategori = [];
   final dbHelper = DatabaseHelper();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadKategoriAsync();
-  }
-
-  Future<void> _loadKategoriAsync() async {
-    final data = await dbHelper.getKategori();
-    setState(() {
-      _listKategori = data;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: _listKategori.isNotEmpty
-          ? ListView.builder(
-              itemCount: _listKategori.length,
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: dbHelper.getKategori(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text('Gagal memuat kategori'));
+          }
+          final listKategori = snapshot.data ?? [];
+          if (listKategori.isNotEmpty) {
+            return ListView.builder(
+              itemCount: listKategori.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_listKategori[index]['name']),
+                  title: Text(listKategori[index]['name']),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
@@ -45,9 +41,9 @@ class KategoriTabState extends State<KategoriTab> {
                         builder: (BuildContext context) {
                           return KategoriDialog(
                             index: index,
-                            listKategori: _listKategori,
+                            listKategori: listKategori,
                             dbHelper: dbHelper,
-                            onUpdate: _loadKategoriAsync,
+                            onUpdate: () => setState(() {}),
                           );
                         },
                       );
@@ -55,8 +51,12 @@ class KategoriTabState extends State<KategoriTab> {
                   ),
                 );
               },
-            )
-          : const Center(child: Text('Belum ada kategori')),
+            );
+          } else {
+            return const Center(child: Text('Belum ada kategori'));
+          }
+        },
+      ),
     );
   }
 }

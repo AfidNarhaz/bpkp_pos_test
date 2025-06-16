@@ -370,108 +370,100 @@ class ProdukTabContent extends StatefulWidget {
 
 class ProdukTabContentState extends State<ProdukTabContent> {
   final dbHelper = DatabaseHelper();
-  List<Map<String, dynamic>> _listKategori = [];
-  List<Map<String, dynamic>> _allProduk = [];
-  List<Map<String, dynamic>> _filteredProduk = [];
   String? _selectedKategori;
 
   @override
-  void initState() {
-    super.initState();
-    _loadKategoriAsync();
-    _loadProdukAsync();
-  }
-
-  Future<void> _loadKategoriAsync() async {
-    final data = await dbHelper.getKategori();
-    setState(() {
-      _listKategori = data;
-      if (_listKategori.isNotEmpty) {
-        _selectedKategori = _listKategori.first['name'];
-        _filterProdukByKategori(_selectedKategori!);
-      }
-    });
-  }
-
-  Future<void> _loadProdukAsync() async {
-    final data = await dbHelper.getProduks();
-    setState(() {
-      _allProduk = data
-          .map((produk) => produk.toMap())
-          .toList(); // Ensure Produk has a toMap() method
-      if (_selectedKategori != null) {
-        _filterProdukByKategori(_selectedKategori!);
-      }
-    });
-  }
-
-  void _filterProdukByKategori(String kategori) {
-    setState(() {
-      _filteredProduk =
-          _allProduk.where((produk) => produk['kategori'] == kategori).toList();
-    });
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: dbHelper.getKategori(),
+      builder: (context, kategoriSnapshot) {
+        if (kategoriSnapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (kategoriSnapshot.hasError) {
+          return const Center(child: Text('Gagal memuat kategori'));
+        }
+        final listKategori = kategoriSnapshot.data ?? [];
+        _selectedKategori ??=
+            listKategori.isNotEmpty ? listKategori.first['name'] : null;
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: dbHelper
+              .getProduks()
+              .then((produkList) => produkList.map((p) => p.toMap()).toList()),
+          builder: (context, produkSnapshot) {
+            if (produkSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (produkSnapshot.hasError) {
+              return const Center(child: Text('Gagal memuat produk'));
+            }
+            final allProduk = produkSnapshot.data ?? [];
+            final filteredProduk = allProduk
+                .where((produk) =>
+                    _selectedKategori == null ||
+                    produk['kategori'] == _selectedKategori)
+                .toList();
+            return Column(
+              children: [
+                if (listKategori.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'Pilih Kategori',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedKategori,
+                              items: listKategori
+                                  .map((kategori) => DropdownMenuItem<String>(
+                                        value: kategori['name'],
+                                        child: Text(kategori['name']),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedKategori = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Expanded(
+                  child: filteredProduk.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredProduk.length,
+                          itemBuilder: (context, index) {
+                            final produk = filteredProduk[index];
+                            return ListTile(
+                              title: Text(produk['nama']),
+                              subtitle: Text(
+                                  'Harga: Rp.${_formatCurrency(produk['hargaJual'])}'),
+                            );
+                          },
+                        )
+                      : const Center(child: Text('Tidak ada produk tersedia')),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   String _formatCurrency(dynamic amount) {
     final formatter = NumberFormat('#,##0', 'id_ID');
     return formatter.format(amount);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (_listKategori.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: 'Pilih Kategori',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12.0),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedKategori,
-                      items: _listKategori
-                          .map((kategori) => DropdownMenuItem<String>(
-                                value: kategori['name'],
-                                child: Text(kategori['name']),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedKategori = value;
-                          _filterProdukByKategori(value!);
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        Expanded(
-          child: _filteredProduk.isNotEmpty
-              ? ListView.builder(
-                  itemCount: _filteredProduk.length,
-                  itemBuilder: (context, index) {
-                    final produk = _filteredProduk[index];
-                    return ListTile(
-                      title: Text(produk['nama']),
-                      subtitle: Text(
-                          'Harga: Rp.${_formatCurrency(produk['hargaJual'])}'),
-                    );
-                  },
-                )
-              : const Center(child: Text('Tidak ada produk tersedia')),
-        ),
-      ],
-    );
   }
 }

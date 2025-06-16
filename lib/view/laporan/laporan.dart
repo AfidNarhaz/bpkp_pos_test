@@ -88,7 +88,7 @@ class _LaporanPageState extends State<LaporanPage> {
               'Beranda',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 20, width: null),
             GestureDetector(
               onTap: _showDateRangePicker,
               child: Container(

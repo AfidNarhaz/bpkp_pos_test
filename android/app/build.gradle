@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.bpkp_pos_test"
     compileSdk = 35 // Pastikan compileSdk sesuai dengan versi Android terbaru
-    ndkVersion = "25.1.8937393"
+    ndkVersion = "26.2.11394342"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId = "com.example.bpkp_pos_test"
         minSdk = 21 // Minimal versi Android (ubah sesuai kebutuhan)
-        targetSdk = 34 // Target SDK sesuai dengan compileSdk
+        targetSdk = 35 // Target SDK sesuai dengan compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
