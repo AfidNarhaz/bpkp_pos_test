@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
@@ -23,9 +23,6 @@ class AddProdukPage extends StatefulWidget {
 }
 
 class AddProdukPageState extends State<AddProdukPage> {
-  List<Map<String, dynamic>> _listKategori = [];
-  List<Map<String, dynamic>> _listMerek = [];
-
   final _formKey = GlobalKey<FormState>();
   final ImageService _imageService = ImageService();
   final ImagePicker _picker = ImagePicker();
@@ -45,10 +42,6 @@ class AddProdukPageState extends State<AddProdukPage> {
   bool isFavorite = false;
   bool _sendNotification = false;
 
-  String? stok;
-  String? minStok;
-  String? satuan;
-
   @override
   void dispose() {
     _namaController.dispose();
@@ -62,31 +55,16 @@ class AddProdukPageState extends State<AddProdukPage> {
     _minStokController.dispose();
     _satuanController.dispose();
     super.dispose();
-  } // Panggil method dispose dari parent class
+  }
 
   @override
   void initState() {
     super.initState();
-    _imageService.initDb(); // Inisialisasi database gambar
-    _initializeServices(); // Inisialisasi service
-    // Hapus _loadKategori, _loadMerek, _loadSatuan dari initState
-  }
-
-  Future<void> _initializeServices() async {
-    try {
-      debugPrint("[INFO] Initializing ImageService and loading data...");
-      await _imageService.initDb();
-      await _loadKategori();
-      await _loadMerek();
-      debugPrint("[INFO] Initialization completed successfully.");
-    } catch (e) {
-      debugPrint("[ERROR] Failed to initialize services: $e");
-    }
+    _imageService.initDb();
   }
 
   Future<void> _pickImage() async {
     try {
-      debugPrint("[INFO] Attempting to pick an image...");
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         final image = File(pickedFile.path);
@@ -94,63 +72,14 @@ class AddProdukPageState extends State<AddProdukPage> {
           setState(() {
             _image = image;
           });
-          debugPrint("[INFO] Image picked and set successfully: ${image.path}");
         }
-      } else {
-        debugPrint("[WARNING] No image was picked.");
-      }
-    } on PlatformException catch (e) {
-      debugPrint(
-          "[ERROR] PlatformException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick an image: ${e.message}')),
-        );
-      }
-    } on FileSystemException catch (e) {
-      debugPrint(
-          "[ERROR] FileSystemException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save the image: ${e.message}')),
-        );
       }
     } catch (e) {
-      debugPrint("[ERROR] Unexpected error while picking an image: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred: $e')),
+          SnackBar(content: Text('Failed to pick an image: $e')),
         );
       }
-    }
-  }
-
-  Future<void> _loadKategori() async {
-    try {
-      debugPrint("[INFO] Loading categories...");
-      List<Map<String, dynamic>> kategoriList =
-          await DatabaseHelper().getKategori();
-      if (!mounted) return;
-      setState(() {
-        _listKategori = kategoriList;
-      });
-      debugPrint("[INFO] Loaded ${_listKategori.length} categories.");
-    } catch (e) {
-      debugPrint("[ERROR] Error loading categories: $e");
-    }
-  }
-
-  Future<void> _loadMerek() async {
-    try {
-      debugPrint("[INFO] Loading merek...");
-      List<Map<String, dynamic>> merekList = await DatabaseHelper().getMerek();
-      if (!mounted) return;
-      setState(() {
-        _listMerek = merekList;
-      });
-      debugPrint("[INFO] Loaded ${_listMerek.length} merek.");
-    } catch (e) {
-      debugPrint("[ERROR] Error loading merek: $e");
     }
   }
 
@@ -173,16 +102,13 @@ class AddProdukPageState extends State<AddProdukPage> {
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
         satuan: _satuanController.text,
         isFavorite: isFavorite,
-        sendNotification: _sendNotification, // Include sendNotification
+        sendNotification: _sendNotification,
       );
-      await DatabaseHelper()
-          .insertProduk(newProduk); // Simpan produk ke database
+      await DatabaseHelper().insertProduk(newProduk);
       if (mounted) {
-        widget.onProdukAdded(); // Panggil callback onProdukAdded
-        Navigator.pop(context,
-            newProduk); // Kembali ke halaman sebelumnya dengan membawa data produk
+        widget.onProdukAdded();
+        Navigator.pop(context, newProduk);
       }
-
       if (_sendNotification &&
           newProduk.stok != null &&
           newProduk.minStok != null &&
@@ -193,10 +119,7 @@ class AddProdukPageState extends State<AddProdukPage> {
   }
 
   void _sendStockNotification(Produk produk) {
-    // Implement the logic to send a notification
-    // This is a placeholder for the actual notification logic
     debugPrint("[INFO] Sending notification for product: ${produk.nama}");
-    // Use a package like flutter_local_notifications to send the notification
   }
 
   @override
@@ -218,7 +141,7 @@ class AddProdukPageState extends State<AddProdukPage> {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    await _pickImage(); // Panggil fungsi _pickImage saat gambar ditekan
+                    await _pickImage();
                   },
                   child: Container(
                     height: 100,
@@ -240,16 +163,11 @@ class AddProdukPageState extends State<AddProdukPage> {
                         : null,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                // Nama Produk
                 _buildTextField(
                   controller: _namaController,
                   label: 'Nama Produk',
                 ),
-
-                // Pilih Kategori
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getKategori(),
                   builder: (context, snapshot) {
@@ -270,7 +188,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                             if (newKategori.isNotEmpty) {
                               await DatabaseHelper()
                                   .insertKategori(newKategori);
-                              setState(() {}); // Refresh FutureBuilder
+                              setState(() {});
                               _kategoriController.text = newKategori;
                             }
                           },
@@ -295,8 +213,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-
-                // Pilih Merek
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getMerek(),
                   builder: (context, snapshot) {
@@ -341,8 +257,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-
-                // Harga Jual
                 _buildTextField(
                   controller: _hargaJualController,
                   label: 'Harga Jual',
@@ -352,8 +266,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
-
-                // Harga Modal
                 _buildTextField(
                   controller: _hargaModalController,
                   label: 'Harga Modal',
@@ -363,8 +275,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
-
-                // Kode Produk / Barcode
                 _buildTextField(
                   controller: _kodeController,
                   label: 'Kode Produk/Barcode',
@@ -373,16 +283,9 @@ class AddProdukPageState extends State<AddProdukPage> {
                     final barcode = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BarcodeScannerPage(
-                          onBarcodeScanned: (barcode) {
-                            if (mounted) {
-                              Navigator.pop(context, barcode);
-                            }
-                          },
-                        ),
+                        builder: (context) => const BarcodeScannerPage(),
                       ),
                     );
-
                     if (barcode != null && barcode.isNotEmpty && mounted) {
                       setState(() {
                         _kodeController.text = barcode;
@@ -390,8 +293,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     }
                   },
                 ),
-
-                // Tanggal Kadaluwarsa
                 _buildTextField(
                   controller: _tanggalController,
                   label: 'Tanggal Kadaluwarsa',
@@ -403,16 +304,13 @@ class AddProdukPageState extends State<AddProdukPage> {
                       (selectedDate) {
                         if (mounted) {
                           setState(() {
-                            _tanggalController.text =
-                                selectedDate; // Mengisi field dengan tanggal yang dipilih
+                            _tanggalController.text = selectedDate;
                           });
                         }
                       },
                     );
                   },
                 ),
-
-                //Stok Produk
                 _buildTextField(
                   controller: _stokController,
                   label: 'Stok Produk',
@@ -422,8 +320,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
-
-                //Stok Minimal
                 _buildTextField(
                   controller: _minStokController,
                   label: 'Stok Minimal',
@@ -433,8 +329,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
-
-                // Pilih Satuan
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getSatuan(),
                   builder: (context, snapshot) {
@@ -479,8 +373,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-
-                // Checkbox for notification
                 Row(
                   children: [
                     Checkbox(
@@ -500,8 +392,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ),
                   ],
                 ),
-
-                // Jadikan Favorit Switch
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -522,13 +412,9 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
-
-                // Tombol Simpan
                 OutlinedButton(
-                  onPressed:
-                      _saveProduk, // Panggil fungsi _saveProduk saat tombol simpan ditekan
+                  onPressed: _saveProduk,
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     minimumSize: const Size(250, 50),
@@ -544,7 +430,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -553,7 +439,6 @@ class AddProdukPageState extends State<AddProdukPage> {
     );
   }
 
-  // Fungsi untuk membangun TextFormField
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -576,7 +461,7 @@ class AddProdukPageState extends State<AddProdukPage> {
           labelText: label,
           suffixIcon: suffixIcon != null
               ? GestureDetector(
-                  onTap: onSuffixIconTap, // Handle suffix icon tap
+                  onTap: onSuffixIconTap,
                   child: Icon(suffixIcon),
                 )
               : null,
@@ -597,9 +482,8 @@ class AddProdukPageState extends State<AddProdukPage> {
   }
 }
 
-// Formatter untuk menambahkan pemisah ribuan (menggunakan titik)
 class ThousandsSeparatorInputFormatter extends TextInputFormatter {
-  final formatter = NumberFormat('#,###', 'en_US'); // Gunakan format titik
+  final formatter = NumberFormat('#,###', 'en_US');
 
   @override
   TextEditingValue formatEditUpdate(
@@ -609,15 +493,9 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
     if (newValue.selection.baseOffset == 0) {
       return newValue;
     }
-
-    final newText = newValue.text
-        .replaceAll('.', '')
-        .replaceAll(',', ''); // Hilangkan koma dan titik
-    final number = int.parse(newText);
-    final newString = formatter
-        .format(number)
-        .replaceAll(',', '.'); // Ganti koma dengan titik
-
+    final newText = newValue.text.replaceAll('.', '').replaceAll(',', '');
+    final number = int.tryParse(newText) ?? 0;
+    final newString = formatter.format(number).replaceAll(',', '.');
     return newValue.copyWith(
       text: newString,
       selection: TextSelection.collapsed(offset: newString.length),

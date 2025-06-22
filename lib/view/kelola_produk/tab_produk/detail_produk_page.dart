@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/barcode_scanner_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
@@ -331,15 +331,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     final barcode = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BarcodeScannerPage(
-                          onBarcodeScanned: (barcode) {
-                            if (!mounted) return;
-                            Navigator.pop(context, barcode);
-                          },
-                        ),
+                        builder: (context) => const BarcodeScannerPage(),
                       ),
                     );
-
                     if (barcode != null && barcode.isNotEmpty) {
                       if (!mounted) return;
                       setState(() {
@@ -591,15 +585,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                       final barcode = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BarcodeScannerPage(
-                            onBarcodeScanned: (barcode) {
-                              if (!mounted) return;
-                              Navigator.pop(context, barcode);
-                            },
-                          ),
+                          builder: (context) => const BarcodeScannerPage(),
                         ),
                       );
-
                       if (barcode != null && barcode.isNotEmpty) {
                         if (!mounted) return;
                         setState(() {

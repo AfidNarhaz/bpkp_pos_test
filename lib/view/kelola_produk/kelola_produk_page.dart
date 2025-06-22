@@ -30,6 +30,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
   void initState() {
     super.initState();
     _searchController.addListener(_filterProduk);
+    _loadProdukAsync(); // Kembalikan pemanggilan ini agar data produk di-load saat init
   }
 
   void _filterProductsByCategory(List<String> selectedCategories) {
@@ -255,78 +256,65 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Produk>>(
-      future: dbHelper.getProduks(), // proses async
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('Gagal memuat produk'));
-        }
-        return DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            backgroundColor: AppColors.background,
-            appBar: AppBar(
-              title: const Text(
-                'Kelola Produk',
-                style: TextStyle(fontWeight: FontWeight.bold),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: const Text(
+            'Kelola Produk',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          bottom: const TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 2.0,
+                color: AppColors.text,
               ),
-              bottom: const TabBar(
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    width: 2.0,
-                    color: AppColors.text,
-                  ),
-                ),
-                labelColor: AppColors.text,
-                unselectedLabelColor: AppColors.hidden,
-                tabs: [
-                  Tab(text: 'Produk'),
-                  Tab(text: 'Stok'),
-                  Tab(text: 'Kategori'),
+            ),
+            labelColor: AppColors.text,
+            unselectedLabelColor: AppColors.hidden,
+            tabs: [
+              Tab(text: 'Produk'),
+              Tab(text: 'Stok'),
+              Tab(text: 'Kategori'),
+            ],
+          ),
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : TabBarView(
+                children: [
+                  _buildProdukTab(),
+                  _buildStokTab(),
+                  _buildKategoriTab(),
                 ],
               ),
-            ),
-            body: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : TabBarView(
-                    children: [
-                      _buildProdukTab(),
-                      _buildStokTab(),
-                      _buildKategoriTab(),
-                    ],
+        floatingActionButton: Builder(
+          builder: (context) {
+            final tabController = DefaultTabController.of(context);
+            return AnimatedBuilder(
+              animation: tabController,
+              builder: (context, child) {
+                return Visibility(
+                  visible: tabController.index == 0 || tabController.index == 2,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (tabController.index == 0) {
+                        _addProduk();
+                      } else if (tabController.index == 2) {
+                        // Add functionality for adding a new category if needed
+                      }
+                    },
+                    child: const Icon(Icons.add),
                   ),
-            floatingActionButton: Builder(
-              builder: (context) {
-                final tabController = DefaultTabController.of(context);
-
-                return AnimatedBuilder(
-                  animation: tabController,
-                  builder: (context, child) {
-                    return Visibility(
-                      visible:
-                          tabController.index == 0 || tabController.index == 2,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          if (tabController.index == 0) {
-                            _addProduk();
-                          } else if (tabController.index == 2) {
-                            // Add functionality for adding a new category if needed
-                          }
-                        },
-                        child: const Icon(Icons.add),
-                      ),
-                    );
-                  },
                 );
               },
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
