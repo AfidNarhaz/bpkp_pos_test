@@ -31,7 +31,7 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _merekController = TextEditingController();
-  final TextEditingController _kodeController = TextEditingController();
+  final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _hargaModalController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
   final TextEditingController _tanggalController = TextEditingController();
@@ -47,7 +47,7 @@ class AddProdukPageState extends State<AddProdukPage> {
     _namaController.dispose();
     _kategoriController.dispose();
     _merekController.dispose();
-    _kodeController.dispose();
+    _barcodeController.dispose();
     _hargaModalController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
@@ -96,7 +96,7 @@ class AddProdukPageState extends State<AddProdukPage> {
         hargaModal:
             double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
                 0.0,
-        kode: _kodeController.text,
+        barcode: _barcodeController.text,
         tglExpired: _tanggalController.text,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ?? 0,
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
@@ -276,8 +276,8 @@ class AddProdukPageState extends State<AddProdukPage> {
                   ],
                 ),
                 _buildTextField(
-                  controller: _kodeController,
-                  label: 'Kode Produk/Barcode',
+                  controller: _barcodeController,
+                  label: 'Barcode',
                   suffixIcon: Icons.barcode_reader,
                   onSuffixIconTap: () async {
                     final barcode = await Navigator.push(
@@ -288,7 +288,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                     if (barcode != null && barcode.isNotEmpty && mounted) {
                       setState(() {
-                        _kodeController.text = barcode;
+                        _barcodeController.text = barcode;
                       });
                     }
                   },

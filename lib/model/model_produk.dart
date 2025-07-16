@@ -10,14 +10,13 @@ class Produk {
   String merek;
   double hargaJual;
   double hargaModal;
-  String kode;
+  String barcode;
   String tglExpired;
   bool isFavorite;
   int? stok;
   int? minStok;
   String? satuan;
   bool? sendNotification;
-  String? barcode; // Tambahkan field barcode
 
   // Constructor
   Produk({
@@ -28,14 +27,13 @@ class Produk {
     required this.merek,
     required this.hargaJual,
     required this.hargaModal,
-    required this.kode,
+    required this.barcode,
     required this.tglExpired,
     this.isFavorite = false,
     this.stok,
     this.minStok,
     this.satuan,
     this.sendNotification, // Added field to constructor
-    this.barcode,
   });
 
   // Konversi dari map (Database ke Produk)
@@ -48,14 +46,13 @@ class Produk {
       merek: map['merek'] as String? ?? '',
       hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
       hargaModal: (map['hargaModal'] as num?)?.toDouble() ?? 0.0,
-      kode: map['kode'] as String? ?? '',
+      barcode: map['barcode'] as String? ?? '',
       tglExpired: map['tglExpired'] as String? ?? '',
       isFavorite: map['isFavorite'] == 1, // 1 untuk true, 0 untuk false
       stok: map['stok'] as int?,
       minStok: map['minStok'] as int?,
       satuan: map['satuan'] as String?,
       sendNotification: map['sendNotification'] == 1, // Added field to fromMap
-      barcode: map['barcode'] as String?,
     );
   }
 
@@ -69,7 +66,7 @@ class Produk {
       'merek': merek,
       'hargaJual': hargaJual,
       'hargaModal': hargaModal,
-      'kode': kode,
+      'barcode': barcode,
       'tglExpired': tglExpired,
       'isFavorite': isFavorite ? 1 : 0,
       'stok': stok,
@@ -77,7 +74,6 @@ class Produk {
       'satuan': satuan,
       'sendNotification':
           sendNotification == true ? 1 : 0, // Added field to toMap
-      'barcode': barcode,
     };
   }
 

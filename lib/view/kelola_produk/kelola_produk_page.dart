@@ -227,7 +227,7 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           nama: result['nama'] as String? ?? '',
           kategori: result['category'] as String? ?? '',
           merek: result['brand'] as String? ?? '',
-          kode: result['kode'] as String? ?? '',
+          barcode: result['barcode'] as String? ?? '',
           hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
           hargaJual: _parsePrice(result['price'] as String? ?? '0'),
           tglExpired: result['tglExpired'] as String? ?? '',
@@ -277,8 +277,8 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             unselectedLabelColor: AppColors.hidden,
             tabs: [
               Tab(text: 'Produk'),
-              Tab(text: 'Stok'),
               Tab(text: 'Kategori'),
+              Tab(text: 'Stok'),
             ],
           ),
         ),
@@ -287,8 +287,8 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
             : TabBarView(
                 children: [
                   _buildProdukTab(),
-                  _buildStokTab(),
                   _buildKategoriTab(),
+                  _buildStokTab(),
                 ],
               ),
         floatingActionButton: Builder(
@@ -298,12 +298,12 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
               animation: tabController,
               builder: (context, child) {
                 return Visibility(
-                  visible: tabController.index == 0 || tabController.index == 2,
+                  visible: tabController.index == 0 || tabController.index == 1,
                   child: FloatingActionButton(
                     onPressed: () {
                       if (tabController.index == 0) {
                         _addProduk();
-                      } else if (tabController.index == 2) {
+                      } else if (tabController.index == 1) {
                         // Add functionality for adding a new category if needed
                       }
                     },

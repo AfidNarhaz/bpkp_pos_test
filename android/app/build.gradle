@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.bpkp_pos_test"
-    compileSdk = 35 // Pastikan compileSdk sesuai dengan versi Android terbaru
-    ndkVersion = "26.2.11394342"
+    compileSdk = 36 // Pastikan compileSdk sesuai dengan versi Android terbaru
+    ndkVersion = "29.0.13599879"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -21,10 +21,14 @@ android {
 
     defaultConfig {
         applicationId = "com.example.bpkp_pos_test"
-        minSdk = 21 // Minimal versi Android (ubah sesuai kebutuhan)
-        targetSdk = 35 // Target SDK sesuai dengan compileSdk
+        minSdk = 24 // Minimal versi Android (ubah sesuai kebutuhan)
+        targetSdk = 36 // Target SDK sesuai dengan compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
 
         // Tambahkan konfigurasi untuk mendukung kamera dan penyimpanan
         vectorDrawables {

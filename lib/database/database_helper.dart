@@ -96,7 +96,7 @@ class DatabaseHelper {
         merek TEXT NOT NULL,
         hargaJual REAL NOT NULL,
         hargaModal REAL NOT NULL,
-        kode TEXT NOT NULL,
+        barcode TEXT NOT NULL,
         tglExpired TEXT,
         isFavorite INTEGER NOT NULL DEFAULT 0,
         stok INTEGER,
@@ -189,8 +189,8 @@ class DatabaseHelper {
             : maps[i]['hargaJual'], // Handle hargaJual
         hargaModal: maps[i]['hargaModal'] is int
             ? maps[i]['hargaModal'].toDouble()
-            : maps[i]['hargaModal'],
-        kode: maps[i]['kode'], // Handle hargaModal
+            : maps[i]['hargaModal'], // Handle hargaModal
+        barcode: maps[i]['barcode'], // Handle barcode
         tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
         stok: maps[i]['stok'], // Handle stok
         minStok: maps[i]['minStok'], // Handle minStok

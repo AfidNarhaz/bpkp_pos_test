@@ -30,7 +30,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _namaController;
   late TextEditingController _kategoriController;
   late TextEditingController _merekController;
-  late TextEditingController _kodeController;
+  late TextEditingController _barcodeController;
   late TextEditingController _hargaModalController;
   late TextEditingController _hargaJualController;
   late TextEditingController _tanggalController;
@@ -53,7 +53,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _namaController = TextEditingController(text: widget.produk.nama);
     _kategoriController = TextEditingController(text: widget.produk.kategori);
     _merekController = TextEditingController(text: widget.produk.merek);
-    _kodeController = TextEditingController(text: widget.produk.kode);
+    _barcodeController = TextEditingController(text: widget.produk.barcode);
     _hargaModalController = TextEditingController(
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaModal)
@@ -83,7 +83,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _namaController.dispose();
     _kategoriController.dispose();
     _merekController.dispose();
-    _kodeController.dispose();
+    _barcodeController.dispose();
     _hargaModalController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
@@ -111,7 +111,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         nama: _namaController.text,
         kategori: _kategoriController.text,
         merek: _merekController.text,
-        kode: _kodeController.text,
+        barcode: _barcodeController.text,
         hargaModal:
             double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
                 0.0,
@@ -324,8 +324,8 @@ class DetailProdukPageState extends State<DetailProdukPage> {
 
                 // Kode Produk / Barcode
                 _buildTextField(
-                  controller: _kodeController,
-                  label: 'Kode Produk/Barcode',
+                  controller: _barcodeController,
+                  label: 'Barcode',
                   suffixIcon: Icons.barcode_reader,
                   onTap: () async {
                     final barcode = await Navigator.push(
@@ -337,7 +337,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     if (barcode != null && barcode.isNotEmpty) {
                       if (!mounted) return;
                       setState(() {
-                        _kodeController.text = barcode;
+                        _barcodeController.text = barcode;
                       });
                     }
                   },
