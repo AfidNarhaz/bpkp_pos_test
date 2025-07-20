@@ -128,7 +128,9 @@ class _HomePageState extends State<HomePage> {
         if (label == 'Transaksi') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const TransaksiPage()),
+            MaterialPageRoute(
+              builder: (context) => const TransaksiPage(initialTabIndex: 1),
+            ),
           );
         }
       },
