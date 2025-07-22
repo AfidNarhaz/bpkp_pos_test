@@ -511,4 +511,15 @@ class DatabaseHelper {
       throw Exception("Error closing database: $e");
     }
   }
+
+  // Tambahkan pada DatabaseHelper
+  Future<List<Produk>> getFavoriteProduk() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableProduk,
+      where: 'isFavorite = ?',
+      whereArgs: [1],
+    );
+    return maps.map((map) => Produk.fromMap(map)).toList();
+  }
 }

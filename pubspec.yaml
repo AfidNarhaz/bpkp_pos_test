@@ -30,23 +30,22 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+
   camera: ^0.11.0
+  camera_android: ^0.10.10+4
+  collection: ^1.19.1
   cupertino_icons: ^1.0.8
   get: ^4.6.6
+  image_picker: ^1.1.2
+  intl: ^0.20.1
+  logging: ^1.0.2
+  material_design_icons_flutter: ^7.0.7296
+  mobile_scanner: ^7.0.0
+  path: ^1.9.0
+  path_provider: ^2.0.11
+  permission_handler: ^12.0.0+1
   shared_preferences: ^2.3.2
   sqflite: ^2.3.3+1
-  path_provider: ^2.0.11
-  path: ^1.9.0
-  logging: ^1.0.2
-  mobile_scanner: ^7.0.0
-  material_design_icons_flutter: ^7.0.7296
-  intl: ^0.20.1
-  image_picker: ^1.1.2
-  permission_handler: ^12.0.0+1
-  collection: ^1.19.1
-  camera_android: ^0.10.10+4
 
 dev_dependencies:
   flutter_test:

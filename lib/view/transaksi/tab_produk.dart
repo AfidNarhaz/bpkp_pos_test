@@ -97,8 +97,8 @@ class ProdukTabState extends State<ProdukTab> {
                     final produk = _filteredProduk[index];
                     return ListTile(
                       title: Text(produk['nama']),
-                      subtitle: Text(
-                          'Harga: Rp.${_formatCurrency(produk['hargaJual'])}'),
+                      subtitle:
+                          Text('Rp.${_formatCurrency(produk['hargaJual'])}'),
                       // subtitle: Text(
                       //     'Rp.${_formatCurrency(filteredProdukList[index].hargaJual)}'),
                     );

@@ -12,6 +12,8 @@ import 'package:intl/intl.dart';
 import 'image_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
 class AddProdukPage extends StatefulWidget {
   const AddProdukPage({super.key, this.produk, required this.onProdukAdded});
@@ -67,16 +69,21 @@ class AddProdukPageState extends State<AddProdukPage> {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
-        final image = File(pickedFile.path);
+        // Salin gambar ke folder aplikasi
+        final appDir = await getApplicationDocumentsDirectory();
+        final fileName =
+            'produk_${DateTime.now().millisecondsSinceEpoch}${extension(pickedFile.path)}';
+        final savedImage =
+            await File(pickedFile.path).copy(join(appDir.path, fileName));
         if (mounted) {
           setState(() {
-            _image = image;
+            _image = savedImage; // path sudah di folder aplikasi
           });
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(this.context).showSnackBar(
           SnackBar(content: Text('Failed to pick an image: $e')),
         );
       }
@@ -107,7 +114,7 @@ class AddProdukPageState extends State<AddProdukPage> {
       await DatabaseHelper().insertProduk(newProduk);
       if (mounted) {
         widget.onProdukAdded();
-        Navigator.pop(context, newProduk);
+        Navigator.pop(this.context, newProduk);
       }
       if (_sendNotification &&
           newProduk.stok != null &&
