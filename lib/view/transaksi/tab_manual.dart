@@ -22,9 +22,9 @@ class ManualTabState extends State<ManualTab> {
       } else {
         displayText += value;
       }
-      total = double.tryParse(
-              displayText.replaceAll('Rp', '').replaceAll('.', '')) ??
-          0;
+      String numericOnly = displayText.replaceAll(RegExp(r'[^0-9]'), '');
+      total = double.tryParse(numericOnly) ?? 0;
+
       displayText = 'Rp${currencyFormatter.format(total)}';
     });
   }
@@ -33,9 +33,9 @@ class ManualTabState extends State<ManualTab> {
     setState(() {
       if (displayText.length > 3) {
         displayText = displayText.substring(0, displayText.length - 1);
-        total = double.tryParse(
-                displayText.replaceAll('Rp', '').replaceAll('.', '')) ??
-            0;
+        String numericOnly = displayText.replaceAll(RegExp(r'[^0-9]'), '');
+        total = double.tryParse(numericOnly) ?? 0;
+
         displayText =
             total > 0 ? 'Rp${currencyFormatter.format(total)}' : 'Rp0';
       } else {
@@ -80,16 +80,15 @@ class ManualTabState extends State<ManualTab> {
             children: [
               // Bagian Tombol Angka
               Expanded(
-                flex: 3,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final buttonCount = 12;
                     final crossAxisCount = 3;
                     final spacing = 8.0;
                     final totalSpacing = spacing * (crossAxisCount - 1);
                     final buttonWidth =
-                        (constraints.maxWidth - totalSpacing) / crossAxisCount;
-                    final buttonHeight = buttonWidth; // biar kotak
+                        (constraints.maxWidth * 0.75 - totalSpacing) /
+                            crossAxisCount;
+                    final buttonHeight = buttonWidth;
 
                     final labels = [
                       '1',
@@ -103,93 +102,96 @@ class ManualTabState extends State<ManualTab> {
                       '9',
                       '0',
                       '000',
-                      'C'
+                      'C',
                     ];
 
-                    return GridView.builder(
-                      itemCount: buttonCount,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: spacing,
-                        mainAxisSpacing: spacing,
-                        childAspectRatio: buttonWidth / buttonHeight,
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final label = labels[index];
-                        return ElevatedButton(
-                          onPressed: () {
-                            if (label == 'C') {
-                              _onClear();
-                            } else {
-                              _onButtonPressed(label);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                    return Row(
+                      children: [
+                        // Tombol angka
+                        Expanded(
+                          flex: 3,
+                          child: GridView.builder(
+                            itemCount: labels.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: spacing,
+                              mainAxisSpacing: spacing,
+                              childAspectRatio: buttonWidth / buttonHeight,
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final label = labels[index];
+                              return ElevatedButton(
+                                onPressed: () {
+                                  if (label == 'C') {
+                                    _onClear();
+                                  } else {
+                                    _onButtonPressed(label);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(label,
+                                    style: const TextStyle(fontSize: 18)),
+                              );
+                            },
+                          ),
+                        ),
+
+                        // Tombol aksi
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                // Backspace (square)
+                                AspectRatio(
+                                  aspectRatio: 1,
+                                  child: ElevatedButton(
+                                    onPressed: _onDelete,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Icon(Icons.backspace,
+                                        color: Colors.black),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // Tombol keranjang (sisa tinggi)
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _onAddToCart,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green[100],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    child: const Icon(Icons.shopping_cart,
+                                        size: 32, color: Colors.black),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child:
-                              Text(label, style: const TextStyle(fontSize: 18)),
-                        );
-                      },
+                        ),
+                      ],
                     );
                   },
-                ),
-              ),
-
-              // Tombol Aksi (Backspace dan Checkout)
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Tombol backspace
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: ElevatedButton(
-                          onPressed: _onDelete,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[300],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Icon(Icons.backspace, color: Colors.black),
-                        ),
-                      ),
-
-                      // Tombol checkout
-                      Expanded(
-                        flex: 3,
-                        child: ElevatedButton(
-                          onPressed: _onAddToCart,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[100],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.shopping_cart,
-                                  size: 32, color: Colors.black),
-                              SizedBox(height: 4),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],

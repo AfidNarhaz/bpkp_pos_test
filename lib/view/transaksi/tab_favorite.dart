@@ -44,13 +44,18 @@ class _FavoriteTabState extends State<FavoriteTab> {
           itemCount: produkList.length,
           itemBuilder: (context, index) {
             final produk = produkList[index];
+            final formattedHarga =
+                produk.hargaJual.toStringAsFixed(0).replaceAllMapped(
+                      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+                      (Match m) => '${m[1]}.',
+                    );
             return ListTile(
               leading: (produk.imagePath != null &&
                       File(produk.imagePath!).existsSync())
                   ? Image.file(File(produk.imagePath!))
                   : const Icon(Icons.image),
               title: Text(produk.nama),
-              subtitle: Text('Kategori: ${produk.kategori}'),
+              subtitle: Text('Rp $formattedHarga'),
               trailing: const Icon(Icons.favorite, color: Colors.yellow),
             );
           },
