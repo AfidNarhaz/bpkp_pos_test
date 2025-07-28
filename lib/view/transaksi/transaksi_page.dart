@@ -148,28 +148,23 @@ class DraggableSheetContent extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            onVerticalDragUpdate: (details) {
-              if (details.primaryDelta! < 0) {
-                onToggle();
-              }
-            },
+      child: CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.all(10),
-              child: const Icon(Icons.drag_handle),
+              alignment: Alignment.center,
+              child: Icon(Icons.drag_handle),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              controller: scrollController,
-              itemCount: 10,
-              itemBuilder: (context, index) => ListTile(
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => ListTile(
                 title: Text('Produk ${index + 1}'),
                 subtitle: const Text('Detail produk'),
               ),
+              childCount: 10, // Jumlah item sama seperti sebelumnya
             ),
           ),
         ],
