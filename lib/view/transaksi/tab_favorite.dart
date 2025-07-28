@@ -4,7 +4,8 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 
 class FavoriteTab extends StatefulWidget {
-  const FavoriteTab({super.key});
+  final void Function(Map<String, dynamic>)? onProdukTap;
+  const FavoriteTab({super.key, this.onProdukTap});
 
   @override
   State<FavoriteTab> createState() => _FavoriteTabState();
@@ -57,6 +58,15 @@ class _FavoriteTabState extends State<FavoriteTab> {
               title: Text(produk.nama),
               subtitle: Text('Rp $formattedHarga'),
               trailing: const Icon(Icons.favorite, color: Colors.yellow),
+              onTap: () {
+                if (widget.onProdukTap != null) {
+                  widget.onProdukTap!({
+                    'nama': produk.nama,
+                    'hargaJual': produk.hargaJual,
+                    'imagePath': produk.imagePath
+                  });
+                }
+              },
             );
           },
         );

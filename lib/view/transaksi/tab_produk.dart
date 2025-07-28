@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class ProdukTab extends StatefulWidget {
-  const ProdukTab({super.key});
+  final void Function(Map<String, dynamic>)? onProdukTap;
+  const ProdukTab({super.key, this.onProdukTap});
 
   @override
   ProdukTabState createState() => ProdukTabState();
@@ -120,6 +121,11 @@ class ProdukTabState extends State<ProdukTab> {
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 16.0),
                           visualDensity: VisualDensity.compact,
+                          onTap: () {
+                            if (widget.onProdukTap != null) {
+                              widget.onProdukTap!(produk);
+                            }
+                          },
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),

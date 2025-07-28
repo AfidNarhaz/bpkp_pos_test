@@ -17,12 +17,19 @@ class TransaksiPage extends StatefulWidget {
 class TransaksiPageState extends State<TransaksiPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Map<String, dynamic>> cartItems = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
         length: 3, vsync: this, initialIndex: widget.initialTabIndex);
+  }
+
+  void addToCart(Map<String, dynamic> produk) {
+    setState(() {
+      cartItems.add(produk);
+    });
   }
 
   @override
@@ -37,13 +44,12 @@ class TransaksiPageState extends State<TransaksiPage>
 
   @override
   Widget build(BuildContext context) {
+    final peekHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Transaksi',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Transaksi',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.black),
@@ -60,10 +66,7 @@ class TransaksiPageState extends State<TransaksiPage>
           controller: _tabController,
           indicatorSize: TabBarIndicatorSize.tab,
           indicator: const UnderlineTabIndicator(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: AppColors.text,
-            ),
+            borderSide: BorderSide(width: 2.0, color: AppColors.text),
           ),
           labelColor: AppColors.text,
           unselectedLabelColor: AppColors.hidden,
@@ -74,13 +77,33 @@ class TransaksiPageState extends State<TransaksiPage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          const ManualTab(),
-          const ProdukTab(),
-          const FavoriteTab(),
-        ],
+
+      // Bagian utama layar
+      body: Padding(
+        padding: EdgeInsets.only(bottom: peekHeight), // agar tidak ketimpa
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            const ManualTab(),
+            ProdukTab(onProdukTap: addToCart),
+            FavoriteTab(onProdukTap: addToCart),
+          ],
+        ),
+      ),
+
+      // Sheet di bagian bawah
+      bottomSheet: DraggableScrollableSheet(
+        initialChildSize: 0.1,
+        minChildSize: 0.1,
+        maxChildSize: 0.6,
+        expand: false, // WAJIB supaya tidak menutupi penuh
+        builder: (ctx, scrollController) {
+          return DraggableSheetContent(
+            scrollController: scrollController,
+            onToggle: () {},
+            cartItems: cartItems,
+          );
+        },
       ),
     );
   }
@@ -109,10 +132,12 @@ class KeyButton extends StatelessWidget {
 class DraggableSheetContent extends StatelessWidget {
   final ScrollController scrollController;
   final VoidCallback onToggle;
+  final List<Map<String, dynamic>> cartItems;
 
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
+    required this.cartItems,
     super.key,
   });
 
@@ -145,14 +170,19 @@ class DraggableSheetContent extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              controller: scrollController,
-              itemCount: 10,
-              itemBuilder: (context, index) => ListTile(
-                title: Text('Produk ${index + 1}'),
-                subtitle: const Text('Detail produk'),
-              ),
-            ),
+            child: cartItems.isEmpty
+                ? const Center(child: Text('Keranjang kosong'))
+                : ListView.builder(
+                    controller: scrollController,
+                    itemCount: cartItems.length,
+                    itemBuilder: (context, index) {
+                      final produk = cartItems[index];
+                      return ListTile(
+                        title: Text(produk['nama'] ?? 'Produk'),
+                        subtitle: Text('Rp${produk['hargaJual'] ?? ''}'),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
