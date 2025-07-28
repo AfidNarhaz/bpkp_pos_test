@@ -5,21 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "bpkp_pos_test (debug Mode)",
+            "name": "Debug Mode",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart",
             "flutterMode": "debug"
         },
         {
-            "name": "bpkp_pos_test (profile mode)",
+            "name": "Profile Mode",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart",
             "flutterMode": "profile"
         },
         {
-            "name": "bpkp_pos_test (release mode)",
+            "name": "Release Mode",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart",

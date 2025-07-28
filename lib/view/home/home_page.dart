@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const TransaksiPage(initialTabIndex: 1),
+              builder: (context) => const TransaksiPage(),
             ),
           );
         }
