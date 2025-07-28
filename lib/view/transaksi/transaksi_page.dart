@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
@@ -86,7 +87,7 @@ class TransaksiPageState extends State<TransaksiPage>
           ),
           DraggableScrollableSheet(
             initialChildSize: 0.1,
-            minChildSize: 0.1,
+            minChildSize: minChildSize,
             maxChildSize: 0.6,
             builder: (context, scrollController) {
               return DraggableSheetContent(

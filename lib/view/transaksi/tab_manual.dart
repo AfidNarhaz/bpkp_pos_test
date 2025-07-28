@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -87,7 +88,7 @@ class ManualTabState extends State<ManualTab> {
                   final buttonWidth =
                       (constraints.maxWidth * 0.75 - totalSpacing) /
                           crossAxisCount;
-                  final buttonHeight = buttonWidth;
+                  // final buttonHeight = buttonWidth;
 
                   final labels = [
                     '1',
@@ -104,43 +105,71 @@ class ManualTabState extends State<ManualTab> {
                     'C'
                   ];
 
+                  double calculateChildAspectRatio(BoxConstraints constraints) {
+                    int totalRows = (labels.length / crossAxisCount).ceil();
+
+                    double availableHeight = constraints.maxHeight;
+
+                    double totalVerticalSpacing = (totalRows - 1) * spacing;
+
+                    double effectiveRowHeight =
+                        (availableHeight - totalVerticalSpacing) / totalRows;
+
+                    // childAspectRatio = buttonWidth / effectiveRowHeight
+                    return buttonWidth / effectiveRowHeight;
+                  }
+
                   return Row(
                     children: [
                       // Tombol angka
                       Expanded(
                         flex: 3,
-                        child: GridView.builder(
-                          itemCount: labels.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: spacing,
-                            mainAxisSpacing: spacing,
-                            childAspectRatio: buttonWidth / buttonHeight,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).size.height *
+                                minChildSize,
                           ),
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final label = labels[index];
-                            return ElevatedButton(
-                              onPressed: () {
-                                if (label == 'C') {
-                                  _onClear();
-                                } else {
-                                  _onButtonPressed(label);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Hitung childAspectRatio secara dinamis
+                              final double dynamicChildAspectRatio =
+                                  calculateChildAspectRatio(constraints);
+
+                              return GridView.builder(
+                                itemCount: labels.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: spacing,
+                                  mainAxisSpacing: spacing,
+                                  childAspectRatio: dynamicChildAspectRatio,
                                 ),
-                              ),
-                              child: Text(label,
-                                  style: const TextStyle(fontSize: 18)),
-                            );
-                          },
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  final label = labels[index];
+                                  return ElevatedButton(
+                                    onPressed: () {
+                                      if (label == 'C') {
+                                        _onClear();
+                                      } else {
+                                        _onButtonPressed(label);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(label,
+                                        style: const TextStyle(fontSize: 18)),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ),
                       ),
 
@@ -150,8 +179,8 @@ class ManualTabState extends State<ManualTab> {
                         child: Column(
                           children: [
                             // Backspace
-                            AspectRatio(
-                              aspectRatio: 1,
+                            Expanded(
+                              flex: 1,
                               child: ElevatedButton(
                                 onPressed: _onDelete,
                                 style: ElevatedButton.styleFrom(
@@ -167,16 +196,25 @@ class ManualTabState extends State<ManualTab> {
                             const SizedBox(height: 8),
                             // Tambahkan ke keranjang
                             Expanded(
-                              child: ElevatedButton(
-                                onPressed: _onAddToCart,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green[100],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
+                              flex: 4,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: MediaQuery.of(context).size.height *
+                                      minChildSize,
+                                  left: 7,
+                                  right: 7,
                                 ),
-                                child: const Icon(Icons.shopping_cart,
-                                    size: 32, color: Colors.black),
+                                child: ElevatedButton(
+                                  onPressed: _onAddToCart,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green[100],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Icon(Icons.shopping_cart,
+                                      size: 32, color: Colors.black),
+                                ),
                               ),
                             ),
                           ],
