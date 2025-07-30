@@ -195,6 +195,33 @@ class DraggableSheetContent extends StatelessWidget {
                     child: Icon(Icons.drag_handle),
                   ),
                 ),
+                // Tambahan: Row info produk, diskon, pelanggan
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          '${keranjang.length} Produk',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.discount, color: Colors.blue),
+                          onPressed: () {},
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.people, color: Colors.green),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
