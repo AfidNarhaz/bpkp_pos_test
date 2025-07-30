@@ -1,19 +1,20 @@
-import 'dart:io';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'dart:io';
 
 class AddProdukPage extends StatefulWidget {
   const AddProdukPage({super.key, this.produk, required this.onProdukAdded});

@@ -1,10 +1,10 @@
-import 'dart:io';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/image_service.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/image_service.dart';
+import 'dart:io';
 
 class AddPegawaiPage extends StatefulWidget {
   const AddPegawaiPage({super.key, this.pegawai, required this.onPegawaiAdded});

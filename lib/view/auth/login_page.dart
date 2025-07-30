@@ -1,8 +1,7 @@
-// import 'package:bpkp_pos_test/model/user.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:bpkp_pos_test/database/database_helper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,15 +19,13 @@ class _LoginState extends State<LoginPage> {
   void _login() async {
     final username = usernameController.text;
     final password = passwordController.text;
-
-    // print('Login attempt: $username / $password'); // Debug log
-
     final user = await DatabaseHelper().getUser(username, password);
 
     if (user != null) {
-      // print('User found: role = ${user.role}'); // Debug log
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('role', user.role); // Pastikan role tidak null
+      await prefs.setString('username', user.username);
+      await prefs.setString('role', user.role);
+      await prefs.setBool('isLoggedIn', true);
       if (!mounted) return;
       if (user.role == 'admin') {
         Navigator.pushReplacementNamed(context, '/home');

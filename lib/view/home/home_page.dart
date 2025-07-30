@@ -1,10 +1,11 @@
-import 'package:bpkp_pos_test/view/colors.dart';
-import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
-import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
+import 'package:bpkp_pos_test/view/home/notification_page.dart';
+import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -196,11 +197,12 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               child: const Text('Ya'),
-              onPressed: () {
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isLoggedIn', false); // Reset status login
                 if (context.mounted) {
-                  Navigator.of(context).pop(); // Tutup dialog
-                  Navigator.pushReplacementNamed(
-                      context, '/login'); // Kembali ke halaman login
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/login');
                 }
               },
             ),

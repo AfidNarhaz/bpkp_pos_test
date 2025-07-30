@@ -1,6 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Add this import for date formatting
+import 'package:intl/intl.dart';
 
 class LaporanPage extends StatefulWidget {
   const LaporanPage({super.key});

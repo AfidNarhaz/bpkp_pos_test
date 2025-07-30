@@ -1,8 +1,8 @@
-import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -179,7 +179,7 @@ class DraggableSheetContent extends StatelessWidget {
               foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
             ),
             onPressed: () {},
-            child: Text('TextButton'),
+            child: Text('Tagih = Rp0'),
           ),
         ],
       ),

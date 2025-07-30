@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:bpkp_pos_test/router/routers.dart'; // Import Routers
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,8 +18,24 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final role = prefs.getString('role') ?? '';
+
     Future.delayed(const Duration(seconds: 2), () {
-      Get.offNamed(Routers.login); // Gunakan GetX untuk navigasi ke login
+      if (isLoggedIn) {
+        if (role == 'admin') {
+          Get.offNamed('/home');
+        } else if (role == 'kasir') {
+          Get.offNamed('/transaksi');
+        }
+      } else {
+        Get.offNamed(Routers.login);
+      }
     });
   }
 
