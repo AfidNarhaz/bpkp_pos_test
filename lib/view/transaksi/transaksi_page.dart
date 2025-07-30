@@ -19,6 +19,9 @@ class TransaksiPageState extends State<TransaksiPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // Tambahkan state keranjang
+  List<Map<String, dynamic>> keranjang = [];
+
   @override
   void initState() {
     super.initState();
@@ -81,8 +84,8 @@ class TransaksiPageState extends State<TransaksiPage>
             controller: _tabController,
             children: [
               const ManualTab(),
-              const ProdukTab(),
-              const FavoriteTab(),
+              ProdukTab(onAddToCart: tambahKeKeranjang), // <-- oper fungsi
+              FavoriteTab(onAddToCart: tambahKeKeranjang), // <-- oper fungsi
             ],
           ),
           DraggableScrollableSheet(
@@ -92,15 +95,21 @@ class TransaksiPageState extends State<TransaksiPage>
             builder: (context, scrollController) {
               return DraggableSheetContent(
                 scrollController: scrollController,
-                onToggle: () {
-                  // Kamu bisa isi logika tambahan di sini
-                },
+                keranjang: keranjang, // <-- oper keranjang
+                onToggle: () {},
               );
             },
           ),
         ],
       ),
     );
+  }
+
+  // Fungsi untuk menambah produk ke keranjang
+  void tambahKeKeranjang(Map<String, dynamic> produk) {
+    setState(() {
+      keranjang.add(produk);
+    });
   }
 }
 
@@ -127,10 +136,12 @@ class KeyButton extends StatelessWidget {
 class DraggableSheetContent extends StatelessWidget {
   final ScrollController scrollController;
   final VoidCallback onToggle;
+  final List<Map<String, dynamic>> keranjang;
 
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
+    required this.keranjang,
     super.key,
   });
 
@@ -163,11 +174,15 @@ class DraggableSheetContent extends StatelessWidget {
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) => ListTile(
-                      title: Text('Produk ${index + 1}'),
-                      subtitle: const Text('Detail produk'),
-                    ),
-                    childCount: 10, // Jumlah item sama seperti sebelumnya
+                    (context, index) {
+                      final item = keranjang[index];
+                      return ListTile(
+                        title: Text(item['nama'] ?? ''),
+                        subtitle: Text('Rp.${item['hargaJual'] ?? ''}'),
+                        // Tambahkan aksi hapus jika perlu
+                      );
+                    },
+                    childCount: keranjang.length,
                   ),
                 ),
               ],

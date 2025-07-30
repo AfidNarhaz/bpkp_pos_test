@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class ProdukTab extends StatefulWidget {
-  const ProdukTab({super.key});
+  final Function(Map<String, dynamic>) onAddToCart;
+  const ProdukTab({super.key, required this.onAddToCart});
 
   @override
   ProdukTabState createState() => ProdukTabState();
@@ -120,6 +121,15 @@ class ProdukTabState extends State<ProdukTab> {
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 16.0),
                           visualDensity: VisualDensity.compact,
+                          onTap: () {
+                            widget.onAddToCart(
+                                produk); // produk adalah Map<String, dynamic>
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      '${produk['nama']} ditambahkan ke keranjang')),
+                            );
+                          },
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),

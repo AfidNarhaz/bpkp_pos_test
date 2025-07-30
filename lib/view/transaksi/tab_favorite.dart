@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class FavoriteTab extends StatefulWidget {
-  const FavoriteTab({super.key});
+  final Function(Map<String, dynamic>) onAddToCart;
+  const FavoriteTab({super.key, required this.onAddToCart});
 
   @override
   State<FavoriteTab> createState() => _FavoriteTabState();
@@ -57,6 +58,14 @@ class _FavoriteTabState extends State<FavoriteTab> {
               title: Text(produk.nama),
               subtitle: Text('Rp $formattedHarga'),
               trailing: const Icon(Icons.favorite, color: Colors.yellow),
+              onTap: () {
+                widget.onAddToCart(produk
+                    .toMap()); // Pastikan produk.toMap() mengembalikan Map<String, dynamic>
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('${produk.nama} ditambahkan ke keranjang')),
+                );
+              },
             );
           },
         );
