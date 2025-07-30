@@ -79,7 +79,7 @@ class ManualTabState extends State<ManualTab> {
           // Area tombol kalkulator
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final crossAxisCount = 3;

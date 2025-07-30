@@ -86,9 +86,9 @@ class TransaksiPageState extends State<TransaksiPage>
             ],
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.1,
+            initialChildSize: 0.17,
             minChildSize: minChildSize,
-            maxChildSize: 0.6,
+            maxChildSize: 1,
             builder: (context, scrollController) {
               return DraggableSheetContent(
                 scrollController: scrollController,
@@ -148,24 +148,38 @@ class DraggableSheetContent extends StatelessWidget {
           ),
         ],
       ),
-      child: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.center,
-              child: Icon(Icons.drag_handle),
+      child: Column(
+        children: [
+          Expanded(
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    child: Icon(Icons.drag_handle),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => ListTile(
+                      title: Text('Produk ${index + 1}'),
+                      subtitle: const Text('Detail produk'),
+                    ),
+                    childCount: 10, // Jumlah item sama seperti sebelumnya
+                  ),
+                ),
+              ],
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => ListTile(
-                title: Text('Produk ${index + 1}'),
-                subtitle: const Text('Detail produk'),
-              ),
-              childCount: 10, // Jumlah item sama seperti sebelumnya
+          TextButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(Colors.cyan),
+              foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
             ),
+            onPressed: () {},
+            child: Text('TextButton'),
           ),
         ],
       ),

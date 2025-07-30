@@ -1,1 +1,1 @@
-const double minChildSize = 0.1;
+const double minChildSize = 0.17;
