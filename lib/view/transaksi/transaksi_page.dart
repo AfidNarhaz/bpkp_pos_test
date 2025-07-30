@@ -108,7 +108,21 @@ class TransaksiPageState extends State<TransaksiPage>
   // Fungsi untuk menambah produk ke keranjang
   void tambahKeKeranjang(Map<String, dynamic> produk) {
     setState(() {
-      keranjang.add(produk);
+      // Cari produk di keranjang berdasarkan id/barcode
+      final index = keranjang.indexWhere((item) => item['id'] == produk['id']);
+      if (index != -1) {
+        // Jika sudah ada, tambah qty dan update total
+        keranjang[index]['qty'] = (keranjang[index]['qty'] ?? 1) + 1;
+        keranjang[index]['total'] =
+            keranjang[index]['qty'] * (keranjang[index]['hargaJual'] ?? 0);
+      } else {
+        // Jika belum ada, tambahkan dengan qty = 1
+        keranjang.add({
+          ...produk,
+          'qty': 1,
+          'total': produk['hargaJual'] ?? 0,
+        });
+      }
     });
   }
 }
@@ -145,6 +159,15 @@ class DraggableSheetContent extends StatelessWidget {
     super.key,
   });
 
+  String _formatCurrency(double? amount) {
+    if (amount == null) return '0';
+    return NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 0,
+    ).format(amount);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -177,8 +200,14 @@ class DraggableSheetContent extends StatelessWidget {
                     (context, index) {
                       final item = keranjang[index];
                       return ListTile(
-                        title: Text(item['nama'] ?? ''),
-                        subtitle: Text('Rp.${item['hargaJual'] ?? ''}'),
+                        title: Text(item['nama']),
+                        subtitle: Text(
+                          '${_formatCurrency(item['hargaJual'])} x ${item['qty']}',
+                        ),
+                        trailing: Text(
+                          _formatCurrency(item['total']),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         // Tambahkan aksi hapus jika perlu
                       );
                     },
