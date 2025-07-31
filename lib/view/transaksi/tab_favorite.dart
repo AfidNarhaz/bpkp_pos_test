@@ -59,12 +59,7 @@ class _FavoriteTabState extends State<FavoriteTab> {
               subtitle: Text('Rp $formattedHarga'),
               trailing: const Icon(Icons.favorite, color: Colors.yellow),
               onTap: () {
-                widget.onAddToCart(produk
-                    .toMap()); // Pastikan produk.toMap() mengembalikan Map<String, dynamic>
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('${produk.nama} ditambahkan ke keranjang')),
-                );
+                widget.onAddToCart(produk.toMap());
               },
             );
           },

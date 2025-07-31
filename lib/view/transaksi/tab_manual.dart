@@ -51,12 +51,6 @@ class ManualTabState extends State<ManualTab> {
 
   void _onAddToCart() {
     debugPrint('Produk ditambahkan ke keranjang: $total');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            'Ditambahkan ke keranjang: Rp${currencyFormatter.format(total)}'),
-      ),
-    );
   }
 
   @override

@@ -124,11 +124,6 @@ class ProdukTabState extends State<ProdukTab> {
                           onTap: () {
                             widget.onAddToCart(
                                 produk); // produk adalah Map<String, dynamic>
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      '${produk['nama']} ditambahkan ke keranjang')),
-                            );
                           },
                         ),
                         const Padding(

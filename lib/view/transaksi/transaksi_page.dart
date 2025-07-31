@@ -203,7 +203,8 @@ class DraggableSheetContent extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          '${keranjang.length} Produk',
+                          // Ganti keranjang.length dengan penjumlahan qty
+                          '${keranjang.fold<int>(0, (sum, item) => sum + ((item['qty'] ?? 1) as int))} Produk',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -250,7 +251,9 @@ class DraggableSheetContent extends StatelessWidget {
               foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
             ),
             onPressed: () {},
-            child: Text('Tagih = Rp0'),
+            child: Text(
+              'Tagih = ${_formatCurrency(keranjang.fold<double>(0, (sum, item) => sum + ((item['total'] ?? 0) as num).toDouble()))}',
+            ),
           ),
         ],
       ),
