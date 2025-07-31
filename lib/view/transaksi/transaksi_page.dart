@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
@@ -236,7 +237,15 @@ class DraggableSheetContent extends StatelessWidget {
                           _formatCurrency(item['total']),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        // Tambahkan aksi hapus jika perlu
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DetailKeranjangPage(produk: item),
+                            ),
+                          );
+                        },
                       );
                     },
                     childCount: keranjang.length,
