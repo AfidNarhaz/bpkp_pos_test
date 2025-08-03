@@ -80,8 +80,9 @@ class ManualTabState extends State<ManualTab> {
                   final spacing = 8.0;
                   final totalSpacing = spacing * (crossAxisCount - 1);
                   final buttonWidth =
-                      (constraints.maxWidth * 0.75 - totalSpacing) /
-                          crossAxisCount;
+                      ((constraints.maxWidth * 0.75 - totalSpacing) /
+                              crossAxisCount)
+                          .clamp(1.0, double.infinity);
                   // final buttonHeight = buttonWidth;
 
                   final labels = [
@@ -101,15 +102,13 @@ class ManualTabState extends State<ManualTab> {
 
                   double calculateChildAspectRatio(BoxConstraints constraints) {
                     int totalRows = (labels.length / crossAxisCount).ceil();
-
                     double availableHeight = constraints.maxHeight;
-
                     double totalVerticalSpacing = (totalRows - 1) * spacing;
-
                     double effectiveRowHeight =
                         (availableHeight - totalVerticalSpacing) / totalRows;
 
-                    // childAspectRatio = buttonWidth / effectiveRowHeight
+                    if (effectiveRowHeight <= 0) return 1.0; // fallback aman
+
                     return buttonWidth / effectiveRowHeight;
                   }
 

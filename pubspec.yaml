@@ -35,6 +35,7 @@ dependencies:
   camera_android: ^0.10.10+4
   collection: ^1.19.1
   cupertino_icons: ^1.0.8
+  flutter_multi_formatter: ^2.11.7
   get: ^4.6.6
   image_picker: ^1.1.2
   intl: ^0.20.1

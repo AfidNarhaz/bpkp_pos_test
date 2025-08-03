@@ -96,8 +96,17 @@ class TransaksiPageState extends State<TransaksiPage>
             builder: (context, scrollController) {
               return DraggableSheetContent(
                 scrollController: scrollController,
-                keranjang: keranjang, // <-- oper keranjang
+                keranjang: keranjang,
                 onToggle: () {},
+                onUpdateKeranjang: (index, updatedProduk) {
+                  setState(() {
+                    if (updatedProduk == null) {
+                      keranjang.removeAt(index); // Hapus produk
+                    } else {
+                      keranjang[index] = updatedProduk; // Update produk
+                    }
+                  });
+                },
               );
             },
           ),
@@ -114,8 +123,9 @@ class TransaksiPageState extends State<TransaksiPage>
       if (index != -1) {
         // Jika sudah ada, tambah qty dan update total
         keranjang[index]['qty'] = (keranjang[index]['qty'] ?? 1) + 1;
-        keranjang[index]['total'] =
-            keranjang[index]['qty'] * (keranjang[index]['hargaJual'] ?? 0);
+        final hargaSatuan =
+            keranjang[index]['hargaNego'] ?? keranjang[index]['hargaJual'] ?? 0;
+        keranjang[index]['total'] = keranjang[index]['qty'] * hargaSatuan;
       } else {
         // Jika belum ada, tambahkan dengan qty = 1
         keranjang.add({
@@ -152,11 +162,13 @@ class DraggableSheetContent extends StatelessWidget {
   final ScrollController scrollController;
   final VoidCallback onToggle;
   final List<Map<String, dynamic>> keranjang;
+  final Function(int, Map<String, dynamic>?) onUpdateKeranjang; // Tambahkan ini
 
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
     required this.keranjang,
+    required this.onUpdateKeranjang, // Tambahkan ini
     super.key,
   });
 
@@ -228,24 +240,50 @@ class DraggableSheetContent extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final item = keranjang[index];
-                      return ListTile(
-                        title: Text(item['nama']),
-                        subtitle: Text(
-                          '${_formatCurrency(item['hargaJual'])} x ${item['qty']}',
-                        ),
-                        trailing: Text(
-                          _formatCurrency(item['total']),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  DetailKeranjangPage(produk: item),
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(item['nama']),
+                            subtitle: Text(
+                              '${_formatCurrency(((item['hargaNego'] ?? item['hargaJual']) as num?)?.toDouble())} x ${item['qty']}',
                             ),
-                          );
-                        },
+                            trailing: Text(
+                              _formatCurrency(
+                                  (item['total'] as num?)?.toDouble()),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailKeranjangPage(
+                                    produk: item,
+                                  ),
+                                ),
+                              );
+                              if (result != null) {
+                                if (result is Map &&
+                                    result['deleted'] == true) {
+                                  // Hapus produk dari keranjang
+                                  onUpdateKeranjang(index,
+                                      null); // Kirim null sebagai tanda hapus
+                                } else {
+                                  onUpdateKeranjang(
+                                      index, result); // Update produk
+                                }
+                              }
+                            },
+                          ),
+                          if (index < keranjang.length - 1)
+                            const Divider(
+                              color: Colors.grey, // warna abu-abu
+                              height: 1,
+                              thickness: 1,
+                              indent: 16,
+                              endIndent: 16,
+                            ),
+                        ],
                       );
                     },
                     childCount: keranjang.length,
