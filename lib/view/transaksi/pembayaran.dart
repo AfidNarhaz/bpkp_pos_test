@@ -1,0 +1,194 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
+
+class PembayaranPage extends StatefulWidget {
+  final List<Map<String, dynamic>> keranjang;
+  final num totalTagihan;
+
+  const PembayaranPage({
+    super.key,
+    required this.keranjang,
+    required this.totalTagihan,
+  });
+
+  @override
+  State<PembayaranPage> createState() => _PembayaranPageState();
+}
+
+class _PembayaranPageState extends State<PembayaranPage> {
+  final NumberFormat formatCurrency =
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+  final TextEditingController tunaiController = TextEditingController();
+
+  void _showSimpanDialog() {
+    final TextEditingController keteranganController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Keterangan Pesanan'),
+        content: TextField(
+          controller: keteranganController,
+          decoration: const InputDecoration(
+            hintText: 'Masukkan keterangan pesanan',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Simpan & Cetak logika di sini
+              Navigator.pop(context);
+              // Implementasi simpan & cetak
+            },
+            child: const Text('Simpan & Cetak Pesanan'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Simpan logika di sini
+              Navigator.pop(context);
+              // Implementasi simpan saja
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    tunaiController.addListener(() {
+      final text = tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      if (text.isEmpty) {
+        tunaiController.value = TextEditingValue(text: '');
+        return;
+      }
+      final formatted = formatCurrency.format(int.parse(text));
+      tunaiController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    tunaiController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(),
+        title: const Text(
+          'Pembayaran',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _showSimpanDialog,
+            child: const Text(
+              'Simpan',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Detail Pesanan:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 75, // Atur tinggi sesuai kebutuhan
+                child: ListView.separated(
+                  itemCount: widget.keranjang.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.keranjang[index];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 0, vertical: 0),
+                      title: Text(item['nama']),
+                      subtitle: Text(
+                        '${formatCurrency.format(item['hargaNego'] ?? item['hargaJual'])} x ${item['qty']}',
+                      ),
+                      trailing: Text(
+                        formatCurrency.format(item['total']),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) => const Divider(),
+                ),
+              ),
+              const Divider(),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Total Tagihan: ${formatCurrency.format(widget.totalTagihan)}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ),
+              const Divider(),
+              const Text(
+                'Tunai',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextFormField(
+                  controller: tunaiController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Uang yang diterima',
+                    border: OutlineInputBorder(),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Uang Pas: uang diterima = total tagihan
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransaksiBerhasilPage(
+                          totalTagihan: widget.totalTagihan,
+                          uangDiterima: widget.totalTagihan, // uang pas
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Uang Pas',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -214,13 +214,15 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                           onPressed: () {
                             setState(() {
                               _hargaNegoController.clear();
+                              hargaJual =
+                                  (widget.produk['hargaJual'] ?? 0).toInt();
                             });
                           },
                         )
                       : null,
                 ),
                 onChanged: (val) {
-                  setState(() {}); // agar suffixIcon X muncul/hilang dinamis
+                  setState(() {});
                 },
               ),
             ],
@@ -257,7 +259,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                 ),
                 onPressed: () {
                   final negoText = toNumericString(_hargaNegoController.text);
-                  int hargaBaru = hargaJual;
+                  int hargaBaru = (widget.produk['hargaJual'] ?? 0).toInt();
                   int? hargaNego;
                   if (negoText.isNotEmpty) {
                     hargaNego = int.parse(negoText);
@@ -268,8 +270,13 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                     'qty': qty,
                     'hargaJual': hargaBaru,
                     'total': qty * hargaBaru,
-                    'hargaNego': hargaNego, // simpan harga nego di keranjang
                   };
+                  if (hargaNego != null) {
+                    updatedProduk['hargaNego'] = hargaNego;
+                  } else {
+                    updatedProduk
+                        .remove('hargaNego'); // Hapus hargaNego jika kosong
+                  }
                   if (widget.onUpdate != null) {
                     widget.onUpdate!(updatedProduk);
                   }

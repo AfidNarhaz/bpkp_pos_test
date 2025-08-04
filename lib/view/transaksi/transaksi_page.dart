@@ -1,4 +1,5 @@
 import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
+import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
@@ -297,9 +298,24 @@ class DraggableSheetContent extends StatelessWidget {
               backgroundColor: WidgetStateProperty.all<Color>(Colors.cyan),
               foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
             ),
-            onPressed: () {},
+            onPressed: () {
+              final totalTagihan = keranjang.fold<num>(
+                0,
+                (sum, item) => sum + ((item['total'] ?? 0) as num),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PembayaranPage(
+                    keranjang: keranjang,
+                    totalTagihan: totalTagihan,
+                  ),
+                ),
+              );
+            },
             child: Text(
               'Tagih = ${_formatCurrency(keranjang.fold<double>(0, (sum, item) => sum + ((item['total'] ?? 0) as num).toDouble()))}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
