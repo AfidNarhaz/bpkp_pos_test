@@ -21,6 +21,13 @@ class _PembayaranPageState extends State<PembayaranPage> {
       NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   final TextEditingController tunaiController = TextEditingController();
 
+  Future<void> _clearKeranjang() async {
+    setState(() {
+      widget.keranjang.clear();
+      tunaiController.clear();
+    });
+  }
+
   void _showSimpanDialog() {
     final TextEditingController keteranganController = TextEditingController();
     showDialog(
@@ -170,13 +177,22 @@ class _PembayaranPageState extends State<PembayaranPage> {
                     ),
                   ),
                   onPressed: () {
+                    final totalTagihan = widget.totalTagihan;
+                    final uangDiterima = widget.totalTagihan;
+                    final keranjang = widget.keranjang;
+                    final namaKasir =
+                        'Nama Kasir'; // Ganti dengan nama kasir yang sesuai
+
                     // Uang Pas: uang diterima = total tagihan
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TransaksiBerhasilPage(
-                          totalTagihan: widget.totalTagihan,
-                          uangDiterima: widget.totalTagihan, // uang pas
+                          totalTagihan: totalTagihan,
+                          uangDiterima: uangDiterima,
+                          keranjang: keranjang,
+                          namaKasir: namaKasir,
+                          onTransaksiBaru: _clearKeranjang, // Tambahkan ini
                         ),
                       ),
                     );

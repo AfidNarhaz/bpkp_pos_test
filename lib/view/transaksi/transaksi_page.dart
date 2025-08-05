@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
-import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
+import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
@@ -24,11 +25,16 @@ class TransaksiPageState extends State<TransaksiPage>
   // Tambahkan state keranjang
   List<Map<String, dynamic>> keranjang = [];
 
+  // Tambahkan di dalam TransaksiPageState
+  String namaKasir = 'Kasir'; // Ganti sesuai kebutuhan
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
         length: 3, vsync: this, initialIndex: widget.initialTabIndex);
+    _loadKeranjang();
+    _loadNamaKasir(); // Tambahkan ini
   }
 
   @override
@@ -40,6 +46,38 @@ class TransaksiPageState extends State<TransaksiPage>
   String displayText = 'Rp0';
   double total = 0;
   final NumberFormat currencyFormatter = NumberFormat('#,##0', 'id_ID');
+
+  Future<void> _saveKeranjang() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('keranjang', jsonEncode(keranjang));
+  }
+
+  Future<void> _loadKeranjang() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keranjangString = prefs.getString('keranjang');
+    if (keranjangString != null) {
+      setState(() {
+        keranjang =
+            List<Map<String, dynamic>>.from(jsonDecode(keranjangString));
+      });
+    }
+  }
+
+  Future<void> resetKeranjang() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('keranjang');
+    setState(() {
+      keranjang.clear();
+    });
+  }
+
+  Future<void> _loadNamaKasir() async {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username') ?? 'Kasir';
+    setState(() {
+      namaKasir = username[0].toUpperCase() + username.substring(1);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +173,19 @@ class TransaksiPageState extends State<TransaksiPage>
           'total': produk['hargaJual'] ?? 0,
         });
       }
+      _saveKeranjang(); // Simpan keranjang setelah diubah
+    });
+  }
+
+  // Update/hapus produk di keranjang
+  void onUpdateKeranjang(int index, Map<String, dynamic>? updatedProduk) {
+    setState(() {
+      if (updatedProduk == null) {
+        keranjang.removeAt(index);
+      } else {
+        keranjang[index] = updatedProduk;
+      }
+      _saveKeranjang(); // Simpan keranjang setelah diubah
     });
   }
 }
@@ -303,12 +354,16 @@ class DraggableSheetContent extends StatelessWidget {
                 0,
                 (sum, item) => sum + ((item['total'] ?? 0) as num),
               );
+              final uangDiterima = totalTagihan;
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PembayaranPage(
-                    keranjang: keranjang,
+                  builder: (context) => TransaksiBerhasilPage(
                     totalTagihan: totalTagihan,
+                    uangDiterima: uangDiterima,
+                    keranjang: keranjang,
+                    namaKasir: '',
                   ),
                 ),
               );

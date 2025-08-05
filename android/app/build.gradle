@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.bpkp_pos_test"
-        minSdk = 24 // Minimal versi Android (ubah sesuai kebutuhan)
+        minSdk = 21 // Minimal versi Android (ubah sesuai kebutuhan)
         targetSdk = 36 // Target SDK sesuai dengan compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
