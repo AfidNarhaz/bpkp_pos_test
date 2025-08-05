@@ -75,7 +75,7 @@ class TransaksiPageState extends State<TransaksiPage>
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString('username') ?? 'Kasir';
     setState(() {
-      namaKasir = username[0].toUpperCase() + username.substring(1);
+      namaKasir = 'Kasir ${username[0].toUpperCase()}${username.substring(1)}';
     });
   }
 
@@ -140,12 +140,13 @@ class TransaksiPageState extends State<TransaksiPage>
                 onUpdateKeranjang: (index, updatedProduk) {
                   setState(() {
                     if (updatedProduk == null) {
-                      keranjang.removeAt(index); // Hapus produk
+                      keranjang.removeAt(index);
                     } else {
-                      keranjang[index] = updatedProduk; // Update produk
+                      keranjang[index] = updatedProduk;
                     }
                   });
                 },
+                namaKasir: namaKasir, // Tambahkan ini
               );
             },
           ),
@@ -214,13 +215,15 @@ class DraggableSheetContent extends StatelessWidget {
   final ScrollController scrollController;
   final VoidCallback onToggle;
   final List<Map<String, dynamic>> keranjang;
-  final Function(int, Map<String, dynamic>?) onUpdateKeranjang; // Tambahkan ini
+  final Function(int, Map<String, dynamic>?) onUpdateKeranjang;
+  final String namaKasir; // Tambahkan ini
 
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
     required this.keranjang,
-    required this.onUpdateKeranjang, // Tambahkan ini
+    required this.onUpdateKeranjang,
+    required this.namaKasir, // Tambahkan ini
     super.key,
   });
 
@@ -317,9 +320,8 @@ class DraggableSheetContent extends StatelessWidget {
                               if (result != null) {
                                 if (result is Map &&
                                     result['deleted'] == true) {
-                                  // Hapus produk dari keranjang
                                   onUpdateKeranjang(index,
-                                      null); // Kirim null sebagai tanda hapus
+                                      null); // Hapus produk dari keranjang
                                 } else {
                                   onUpdateKeranjang(
                                       index, result); // Update produk
@@ -363,7 +365,7 @@ class DraggableSheetContent extends StatelessWidget {
                     totalTagihan: totalTagihan,
                     uangDiterima: uangDiterima,
                     keranjang: keranjang,
-                    namaKasir: '',
+                    namaKasir: namaKasir, // <-- gunakan variabel namaKasir
                   ),
                 ),
               );

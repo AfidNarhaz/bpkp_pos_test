@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:bpkp_pos_test/view/transaksi/kirim_struk.dart';
+import 'package:bpkp_pos_test/view/transaksi/struk.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 
 class TransaksiBerhasilPage extends StatelessWidget {

@@ -81,8 +81,10 @@ class KirimStrukPage extends StatelessWidget {
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text('Total ($totalProduk Produk)'),
-                    pw.Text(formatCurrency.format(totalTagihan)),
+                    pw.Text('Total ($totalProduk Produk)',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Text(formatCurrency.format(totalTagihan),
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                   ],
                 ),
                 pw.Divider(),
