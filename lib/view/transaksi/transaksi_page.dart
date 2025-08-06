@@ -22,11 +22,9 @@ class TransaksiPageState extends State<TransaksiPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  // Tambahkan state keranjang
   List<Map<String, dynamic>> keranjang = [];
-
-  // Tambahkan di dalam TransaksiPageState
-  String namaKasir = 'Kasir'; // Ganti sesuai kebutuhan
+  String namaKasir = 'Kasir';
+  String username = ''; // Tambahkan ini
 
   @override
   void initState() {
@@ -34,7 +32,8 @@ class TransaksiPageState extends State<TransaksiPage>
     _tabController = TabController(
         length: 3, vsync: this, initialIndex: widget.initialTabIndex);
     _loadKeranjang();
-    _loadNamaKasir(); // Tambahkan ini
+    _loadNamaKasir();
+    _loadUsername(); // Tambahkan ini
   }
 
   @override
@@ -79,6 +78,13 @@ class TransaksiPageState extends State<TransaksiPage>
     });
   }
 
+  Future<void> _loadUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,16 +95,17 @@ class TransaksiPageState extends State<TransaksiPage>
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black),
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
-            },
-          ),
+          if (username != 'admin') // Hanya tampil jika bukan admin
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.black),
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
+            ),
         ],
         bottom: TabBar(
           controller: _tabController,

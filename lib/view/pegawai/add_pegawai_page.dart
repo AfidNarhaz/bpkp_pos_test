@@ -1,6 +1,7 @@
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/image_service.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
+import 'package:bpkp_pos_test/model/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,8 +26,8 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _jabatanController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _pinController = TextEditingController();
-  bool _isObscure = true; // Add this variable to manage PIN visibility
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isObscure = true;
 
   @override
   void dispose() {
@@ -34,7 +35,7 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
     _phoneController.dispose();
     _jabatanController.dispose();
     _emailController.dispose();
-    _pinController.dispose();
+    _passwordController.dispose();
     super.dispose();
   } // Hapus controller saat widget dihapus
 
@@ -98,19 +99,38 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
 
   Future<void> _savePegawai() async {
     if (_formKey.currentState!.validate()) {
+      // Cek semua field wajib terisi
+      if (_namaController.text.isEmpty ||
+          _phoneController.text.isEmpty ||
+          _jabatanController.text.isEmpty ||
+          _emailController.text.isEmpty ||
+          _passwordController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Semua field wajib diisi!')),
+        );
+        return;
+      }
       final newPegawai = Pegawai(
-          imagePath: _image?.path,
-          nama: _namaController.text,
-          noHp: int.parse(_pinController.text),
-          jabatan: _jabatanController.text,
-          email: _emailController.text,
-          pin: int.parse(_pinController.text));
-      await DatabaseHelper()
-          .insertPegawai(newPegawai); // Simpan data pegawai ke database
+        imagePath: _image?.path,
+        nama: _namaController.text,
+        noHp: int.tryParse(_phoneController.text) ?? 0,
+        jabatan: _jabatanController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      await DatabaseHelper().insertPegawai(newPegawai);
+
+      // Tambahkan ke tabel users untuk login
+      final user = User(
+        username: _namaController.text,
+        password: _passwordController.text,
+        role: _jabatanController.text.toLowerCase(), // contoh: 'kasir'
+      );
+      await DatabaseHelper().insertUser(user);
+
       if (mounted) {
-        widget.onPegawaiAdded(); // Panggil callback onProdukAdded
-        Navigator.pop(context,
-            newPegawai); // Kembali ke halaman sebelumnya dengan membawa data produk
+        widget.onPegawaiAdded();
+        Navigator.pop(context, newPegawai);
       }
     }
   }
@@ -213,26 +233,25 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
-                //PIN Pegawai
+                // Password Pegawai
                 _buildTextField(
-                  controller: _pinController,
+                  controller: _passwordController,
                   obscureText: _isObscure,
-                  label: 'PIN 6 Digit',
+                  label: 'Password',
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isObscure ? Icons.visibility : Icons.visibility_off,
-                    ), // Ikon untuk show/hide
+                    ),
                     onPressed: () {
                       setState(() {
-                        _isObscure = !_isObscure; // Toggle antara true/false
-                      }); // Toggle PIN visibility
+                        _isObscure = !_isObscure;
+                      });
                     },
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.visiblePassword,
                   inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(6),
-                  ], // Limit to 6 digits
+                    LengthLimitingTextInputFormatter(12)
+                  ], // Limit 12 karakter
                 ),
 
                 const SizedBox(height: 20),
@@ -280,6 +299,12 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Field tidak boleh kosong';
+          }
+          if (label == 'Password' && value.length < 6) {
+            return 'Password minimal 6 karakter';
+          }
+          if (label == 'Password' && value.length > 12) {
+            return 'Password maksimal 12 karakter';
           }
           return null;
         },

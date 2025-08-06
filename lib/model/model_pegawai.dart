@@ -8,7 +8,7 @@ class Pegawai {
   final int noHp;
   final String jabatan;
   final String email;
-  final int pin;
+  final String password;
 
   Pegawai({
     this.id,
@@ -17,7 +17,7 @@ class Pegawai {
     required this.noHp,
     required this.jabatan,
     required this.email,
-    required this.pin,
+    required this.password,
   });
 
   // Konversi dari map (Database ke Pegawai)
@@ -29,7 +29,7 @@ class Pegawai {
       noHp: map['noHp'] as int? ?? 0,
       jabatan: map['jabatan'] as String? ?? '',
       email: map['email'] as String? ?? '',
-      pin: map['pin'] as int? ?? 0,
+      password: map['password'] as String? ?? '',
     );
   }
 
@@ -42,7 +42,7 @@ class Pegawai {
       'noHp': noHp,
       'jabatan': jabatan,
       'email': email,
-      'pin': pin,
+      'password': password,
     };
   }
 
@@ -68,6 +68,6 @@ class Pegawai {
   // Override method toString untuk debugging
   @override
   String toString() {
-    return 'Pegawai{id: $id, imagePath: $imagePath, nama: $nama, noHp: $noHp, jabatan: $jabatan, email: $email, pin: $pin}';
+    return 'Pegawai{id: $id, imagePath: $imagePath, nama: $nama, noHp: $noHp, jabatan: $jabatan, email: $email, password: $password}';
   }
 }

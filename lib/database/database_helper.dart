@@ -151,7 +151,7 @@ class DatabaseHelper {
         noHp INTEGER,
         jabatan TEXT,
         email TEXT,
-        pin INTEGER
+        password TEXT
       )
     ''');
   }
@@ -521,5 +521,19 @@ class DatabaseHelper {
       whereArgs: [1],
     );
     return maps.map((map) => Produk.fromMap(map)).toList();
+  }
+
+  Future<void> updateUser(String oldUsername, User updatedUser) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {
+        'username': updatedUser.username,
+        'password': updatedUser.password,
+        'role': updatedUser.role,
+      },
+      where: 'username = ?',
+      whereArgs: [oldUsername],
+    );
   }
 }

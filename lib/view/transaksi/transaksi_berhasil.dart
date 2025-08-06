@@ -36,6 +36,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
     }
 
     return Scaffold(
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
