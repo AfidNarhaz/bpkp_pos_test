@@ -8,6 +8,7 @@ import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'dart:io';
+import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/add_kategori.dart';
 
 final Logger _logger = Logger('KelolaProdukLogger');
 
@@ -300,11 +301,17 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                 return Visibility(
                   visible: tabController.index == 0 || tabController.index == 1,
                   child: FloatingActionButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (tabController.index == 0) {
                         _addProduk();
                       } else if (tabController.index == 1) {
-                        // Add functionality for adding a new category if needed
+                        // Tampilkan dialog tambah kategori
+                        final namaKategori =
+                            await showAddKategoriDialog(context);
+                        if (namaKategori != null && namaKategori.isNotEmpty) {
+                          await dbHelper.insertKategori(namaKategori);
+                          setState(() {}); // Refresh kategori tab
+                        }
                       }
                     },
                     child: const Icon(Icons.add),

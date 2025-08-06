@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/home/bantuan.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
@@ -131,6 +132,14 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (context) => const TransaksiPage(initialTabIndex: 1),
+            ),
+          );
+        }
+        if (label == 'Bantuan') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const BantuanPage(),
             ),
           );
         }
