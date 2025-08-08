@@ -3,7 +3,7 @@ import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
 import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
-import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
+import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
@@ -358,24 +358,26 @@ class DraggableSheetContent extends StatelessWidget {
               backgroundColor: WidgetStateProperty.all<Color>(Colors.cyan),
               foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
             ),
-            onPressed: () {
+            onPressed: () async {
               final totalTagihan = keranjang.fold<num>(
                 0,
                 (sum, item) => sum + ((item['total'] ?? 0) as num),
               );
-              final uangDiterima = totalTagihan;
 
-              Navigator.push(
+              // Navigasi ke halaman pembayaran
+              // ignore: unused_local_variable
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => TransaksiBerhasilPage(
+                  builder: (context) => PembayaranPage(
+                    keranjang: List<Map<String, dynamic>>.from(keranjang),
                     totalTagihan: totalTagihan,
-                    uangDiterima: uangDiterima,
-                    keranjang: keranjang,
-                    namaKasir: namaKasir, // <-- gunakan variabel namaKasir
+                    namaKasir: namaKasir,
                   ),
                 ),
               );
+
+              // Jika pembayaran sukses, bisa lakukan sesuatu di sini (opsional)
             },
             child: Text(
               'Tagih = ${_formatCurrency(keranjang.fold<double>(0, (sum, item) => sum + ((item['total'] ?? 0) as num).toDouble()))}',

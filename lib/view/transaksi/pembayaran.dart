@@ -5,11 +5,13 @@ import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
 class PembayaranPage extends StatefulWidget {
   final List<Map<String, dynamic>> keranjang;
   final num totalTagihan;
+  final String namaKasir; // <-- tambahkan ini
 
   const PembayaranPage({
     super.key,
     required this.keranjang,
     required this.totalTagihan,
+    required this.namaKasir, // <-- tambahkan ini
   });
 
   @override
@@ -169,6 +171,56 @@ class _PembayaranPageState extends State<PembayaranPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Ambil nilai uang diterima dari input
+                    final text =
+                        tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
+                    final uangDiterima = text.isEmpty ? 0 : int.parse(text);
+                    final totalTagihan = widget.totalTagihan;
+                    final keranjang = widget.keranjang;
+                    // ignore: unused_local_variable
+                    final namaKasir = widget.namaKasir;
+
+                    if (uangDiterima < totalTagihan) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Uang diterima kurang dari total tagihan!')),
+                      );
+                      return;
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransaksiBerhasilPage(
+                          totalTagihan: totalTagihan,
+                          uangDiterima: uangDiterima,
+                          keranjang: keranjang,
+                          namaKasir: widget
+                              .namaKasir, // <-- gunakan namaKasir dari widget
+                          onTransaksiBaru: _clearKeranjang,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Terima',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Tombol Uang Pas tetap di bawahnya
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -180,10 +232,9 @@ class _PembayaranPageState extends State<PembayaranPage> {
                     final totalTagihan = widget.totalTagihan;
                     final uangDiterima = widget.totalTagihan;
                     final keranjang = widget.keranjang;
-                    final namaKasir =
-                        'Nama Kasir'; // Ganti dengan nama kasir yang sesuai
+                    // ignore: unused_local_variable
+                    final namaKasir = widget.namaKasir;
 
-                    // Uang Pas: uang diterima = total tagihan
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -191,8 +242,9 @@ class _PembayaranPageState extends State<PembayaranPage> {
                           totalTagihan: totalTagihan,
                           uangDiterima: uangDiterima,
                           keranjang: keranjang,
-                          namaKasir: namaKasir,
-                          onTransaksiBaru: _clearKeranjang, // Tambahkan ini
+                          namaKasir: widget
+                              .namaKasir, // <-- gunakan namaKasir dari widget
+                          onTransaksiBaru: _clearKeranjang,
                         ),
                       ),
                     );

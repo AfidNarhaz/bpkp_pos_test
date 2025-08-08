@@ -1,6 +1,6 @@
-# bpkp_pos_test
+# POS BPKP
 
-A new Flutter project.
+Projek pembuatan aplikasi Point of Sales untuk BPKP
 
 ## Getting Started
 
