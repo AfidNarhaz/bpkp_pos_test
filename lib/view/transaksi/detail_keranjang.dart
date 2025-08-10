@@ -242,7 +242,8 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                 ),
                 onPressed: () {
                   // Logika hapus produk: kembali dengan flag deleted
-                  Navigator.pop(context, {'deleted': true});
+                  Navigator.pop(context,
+                      {'deleted': true}); // Kirim sinyal bahwa produk dihapus
                 },
                 child: const Text(
                   'Hapus Produk',

@@ -31,9 +31,9 @@ class TransaksiPageState extends State<TransaksiPage>
     super.initState();
     _tabController = TabController(
         length: 3, vsync: this, initialIndex: widget.initialTabIndex);
-    _loadKeranjang();
+    _loadKeranjang(); // Muat keranjang dari SharedPreferences
     _loadNamaKasir();
-    _loadUsername(); // Tambahkan ini
+    _loadUsername();
   }
 
   @override
@@ -64,7 +64,7 @@ class TransaksiPageState extends State<TransaksiPage>
 
   Future<void> resetKeranjang() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('keranjang');
+    await prefs.remove('keranjang'); // Hapus keranjang dari SharedPreferences
     setState(() {
       keranjang.clear();
     });
@@ -144,14 +144,9 @@ class TransaksiPageState extends State<TransaksiPage>
                 scrollController: scrollController,
                 keranjang: keranjang,
                 onToggle: () {},
-                onUpdateKeranjang: (index, updatedProduk) {
-                  setState(() {
-                    if (updatedProduk == null) {
-                      keranjang.removeAt(index);
-                    } else {
-                      keranjang[index] = updatedProduk;
-                    }
-                  });
+                onUpdateKeranjang: (index, updatedProduk) async {
+                  // Pastikan fungsi ini async agar bisa menunggu _saveKeranjang
+                  onUpdateKeranjang(index, updatedProduk);
                 },
                 namaKasir: namaKasir, // Tambahkan ini
               );
@@ -186,15 +181,15 @@ class TransaksiPageState extends State<TransaksiPage>
   }
 
   // Update/hapus produk di keranjang
-  void onUpdateKeranjang(int index, Map<String, dynamic>? updatedProduk) {
+  void onUpdateKeranjang(int index, Map<String, dynamic>? updatedProduk) async {
     setState(() {
       if (updatedProduk == null) {
         keranjang.removeAt(index);
       } else {
         keranjang[index] = updatedProduk;
       }
-      _saveKeranjang(); // Simpan keranjang setelah diubah
     });
+    await _saveKeranjang(); // Pastikan selalu simpan perubahan
   }
 }
 
