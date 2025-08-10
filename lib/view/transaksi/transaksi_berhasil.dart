@@ -154,7 +154,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (onTransaksiBaru != null) {
-                        await onTransaksiBaru!();
+                        await onTransaksiBaru!(); // <-- ini akan menghapus keranjang
                       }
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(

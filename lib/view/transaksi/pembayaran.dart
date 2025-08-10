@@ -5,13 +5,15 @@ import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
 class PembayaranPage extends StatefulWidget {
   final List<Map<String, dynamic>> keranjang;
   final num totalTagihan;
-  final String namaKasir; // <-- tambahkan ini
+  final String namaKasir;
+  final Future<void> Function()? onResetKeranjang; // <-- Tambahkan ini
 
   const PembayaranPage({
     super.key,
     required this.keranjang,
     required this.totalTagihan,
-    required this.namaKasir, // <-- tambahkan ini
+    required this.namaKasir,
+    this.onResetKeranjang, // <-- Tambahkan ini
   });
 
   @override
@@ -178,7 +180,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     // Ambil nilai uang diterima dari input
                     final text =
                         tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
@@ -197,19 +199,25 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       return;
                     }
 
-                    Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TransaksiBerhasilPage(
                           totalTagihan: totalTagihan,
                           uangDiterima: uangDiterima,
                           keranjang: keranjang,
-                          namaKasir: widget
-                              .namaKasir, // <-- gunakan namaKasir dari widget
-                          onTransaksiBaru: _clearKeranjang,
+                          namaKasir: namaKasir,
+                          onTransaksiBaru:
+                              widget.onResetKeranjang, // <-- Perbaiki ini
                         ),
                       ),
                     );
+
+                    // Jika perlu, lakukan sesuatu dengan hasilnya
+                    if (result == true) {
+                      // Misalnya, jika ingin mengosongkan keranjang setelah transaksi berhasil
+                      _clearKeranjang();
+                    }
                   },
                   child: const Text('Terima',
                       style: TextStyle(fontWeight: FontWeight.bold)),

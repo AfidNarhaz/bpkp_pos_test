@@ -10,21 +10,14 @@ android {
     compileSdk = 36 // Pastikan compileSdk sesuai dengan versi Android terbaru
     ndkVersion = "29.0.13599879"
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     defaultConfig {
         applicationId = "com.example.bpkp_pos_test"
         minSdk = 21 // Minimal versi Android (ubah sesuai kebutuhan)
         targetSdk = 36 // Target SDK sesuai dengan compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        multiDexEnabled true
 
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
@@ -36,26 +29,49 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
 
-            // Optimalkan file release
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+
+    signingConfigs {
+        debug {
+            // Debug pakai key bawaan
+            storeFile file("${rootDir}/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+        release {
+            // Untuk release, ganti sesuai file keystore milikmu nanti
+            storeFile file("your-release-key.jks")
+            storePassword "your-store-password"
+            keyAlias "your-key-alias"
+            keyPassword "your-key-password"
         }
     }
 
-    // Mengaktifkan view binding (opsional, jika diperlukan)
-    buildFeatures {
-        viewBinding true
+    buildTypes {
+    release {
+        minifyEnabled false // matikan dulu biar gampang debug kalau build release
+        shrinkResources false
+        proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
     }
 }
+}
 
-task renameApk(type: Copy) {
+flutter {
+    source = "../.."
+}
+
+// Task untuk mengganti nama APK release
+tasks.register("renameApk", Copy) {
     from 'build/outputs/apk/release/app-release.apk'
     into 'build/outputs/apk/release/'
     rename { String fileName ->
@@ -63,8 +79,21 @@ task renameApk(type: Copy) {
     }
 }
 
-build.dependsOn renameApk
+// Jalankan rename hanya kalau assembleRelease ada
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(":app:assembleRelease")) {
+        tasks.named("assembleRelease").configure {
+            finalizedBy("renameApk")
+        }
+    }
+}
 
-flutter {
-    source = "../.."
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
+
+    // Desugar untuk kompatibilitas API lama
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+    // MultiDex (biar aman kalau method > 64k)
+    implementation "androidx.multidex:multidex:2.0.1"
 }
