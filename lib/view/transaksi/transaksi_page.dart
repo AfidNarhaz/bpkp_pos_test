@@ -1,48 +1,31 @@
 import 'dart:convert';
 import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
-import 'package:bpkp_pos_test/view/transaksi/tab_favorite.dart';
-import 'package:bpkp_pos_test/view/transaksi/tab_manual.dart';
-import 'package:bpkp_pos_test/view/transaksi/tab_produk.dart';
 import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
-import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransaksiPage extends StatefulWidget {
   final bool showBackButton;
-  // ignore: use_super_parameters
-  const TransaksiPage({Key? key, this.showBackButton = true}) : super(key: key);
+  const TransaksiPage({super.key, this.showBackButton = true});
 
   @override
   State<TransaksiPage> createState() => TransaksiPageState();
 }
 
-class TransaksiPageState extends State<TransaksiPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
+class TransaksiPageState extends State<TransaksiPage> {
   List<Map<String, dynamic>> keranjang = [];
   String namaKasir = 'Kasir';
-  String username = ''; // Tambahkan ini
+  String username = '';
+  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 3,
-      vsync: this,
-    );
-    _loadKeranjang(); // Muat keranjang dari SharedPreferences
+    _loadKeranjang();
     _loadNamaKasir();
     _loadUsername();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   String displayText = 'Rp0';
@@ -67,7 +50,7 @@ class TransaksiPageState extends State<TransaksiPage>
 
   Future<void> resetKeranjang() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('keranjang'); // Hapus keranjang dari SharedPreferences
+    await prefs.remove('keranjang');
     setState(() {
       keranjang.clear();
     });
@@ -88,17 +71,44 @@ class TransaksiPageState extends State<TransaksiPage>
     });
   }
 
+  void _onSearchChanged(String value) {
+    setState(() {
+      searchQuery = value;
+    });
+  }
+
+  void _onBarcodeScan() {
+    // TODO: Implementasi barcode scanner
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => BarcodeScannerPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: widget.showBackButton,
-        title: const Text(
-          'Transaksi',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: SizedBox(
+          height: 40,
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Cari nama produk...',
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onChanged: _onSearchChanged,
+          ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _onBarcodeScan,
+          ),
           if (!widget.showBackButton)
             IconButton(
               icon: const Icon(Icons.logout),
@@ -111,33 +121,12 @@ class TransaksiPageState extends State<TransaksiPage>
               },
             ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicator: const UnderlineTabIndicator(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: AppColors.text,
-            ),
-          ),
-          labelColor: AppColors.text,
-          unselectedLabelColor: AppColors.hidden,
-          tabs: const [
-            Tab(text: 'Manual'),
-            Tab(text: 'Produk'),
-            Tab(text: 'Favorite'),
-          ],
-        ),
       ),
       body: Stack(
         children: [
-          TabBarView(
-            controller: _tabController,
-            children: [
-              const ManualTab(),
-              ProdukTab(onAddToCart: tambahKeKeranjang), // <-- oper fungsi
-              FavoriteTab(onAddToCart: tambahKeKeranjang), // <-- oper fungsi
-            ],
+          ProdukTab(
+            onAddToCart: tambahKeKeranjang,
+            searchQuery: searchQuery,
           ),
           DraggableScrollableSheet(
             initialChildSize: 0.17,
@@ -149,10 +138,9 @@ class TransaksiPageState extends State<TransaksiPage>
                 keranjang: keranjang,
                 onToggle: () {},
                 onUpdateKeranjang: (index, updatedProduk) async {
-                  // Pastikan fungsi ini async agar bisa menunggu _saveKeranjang
                   onUpdateKeranjang(index, updatedProduk);
                 },
-                namaKasir: namaKasir, // Tambahkan ini
+                namaKasir: namaKasir,
               );
             },
           ),
@@ -161,30 +149,25 @@ class TransaksiPageState extends State<TransaksiPage>
     );
   }
 
-  // Fungsi untuk menambah produk ke keranjang
   void tambahKeKeranjang(Map<String, dynamic> produk) {
     setState(() {
-      // Cari produk di keranjang berdasarkan id/barcode
       final index = keranjang.indexWhere((item) => item['id'] == produk['id']);
       if (index != -1) {
-        // Jika sudah ada, tambah qty dan update total
         keranjang[index]['qty'] = (keranjang[index]['qty'] ?? 1) + 1;
         final hargaSatuan =
             keranjang[index]['hargaNego'] ?? keranjang[index]['hargaJual'] ?? 0;
         keranjang[index]['total'] = keranjang[index]['qty'] * hargaSatuan;
       } else {
-        // Jika belum ada, tambahkan dengan qty = 1
         keranjang.add({
           ...produk,
           'qty': 1,
           'total': produk['hargaJual'] ?? 0,
         });
       }
-      _saveKeranjang(); // Simpan keranjang setelah diubah
+      _saveKeranjang();
     });
   }
 
-  // Update/hapus produk di keranjang
   void onUpdateKeranjang(int index, Map<String, dynamic>? updatedProduk) async {
     setState(() {
       if (updatedProduk == null) {
@@ -193,7 +176,7 @@ class TransaksiPageState extends State<TransaksiPage>
         keranjang[index] = updatedProduk;
       }
     });
-    await _saveKeranjang(); // Pastikan selalu simpan perubahan
+    await _saveKeranjang();
   }
 }
 
@@ -222,14 +205,14 @@ class DraggableSheetContent extends StatelessWidget {
   final VoidCallback onToggle;
   final List<Map<String, dynamic>> keranjang;
   final Function(int, Map<String, dynamic>?) onUpdateKeranjang;
-  final String namaKasir; // Tambahkan ini
+  final String namaKasir;
 
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
     required this.keranjang,
     required this.onUpdateKeranjang,
-    required this.namaKasir, // Tambahkan ini
+    required this.namaKasir,
     super.key,
   });
 
@@ -269,7 +252,6 @@ class DraggableSheetContent extends StatelessWidget {
                     child: Icon(Icons.drag_handle),
                   ),
                 ),
-                // Tambahan: Row info produk, diskon, pelanggan
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -389,16 +371,18 @@ class DraggableSheetContent extends StatelessWidget {
   }
 }
 
-class FavoriteTabContent extends StatelessWidget {
-  const FavoriteTabContent({super.key});
+class ProdukTab extends StatelessWidget {
+  final Function(Map<String, dynamic>) onAddToCart;
+  final String searchQuery;
+
+  const ProdukTab({
+    required this.onAddToCart,
+    required this.searchQuery,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Favorite',
-        style: TextStyle(fontSize: 24),
-      ),
-    );
+    return Container();
   }
 }

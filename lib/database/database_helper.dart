@@ -95,10 +95,9 @@ class DatabaseHelper {
         kategori TEXT NOT NULL,
         merek TEXT NOT NULL,
         hargaJual REAL NOT NULL,
-        hargaModal REAL NOT NULL,
+        hargaBeli REAL NOT NULL,
         barcode TEXT NOT NULL,
         tglExpired TEXT,
-        isFavorite INTEGER NOT NULL DEFAULT 0,
         stok INTEGER,
         minStok INTEGER,
         satuan TEXT,
@@ -187,15 +186,14 @@ class DatabaseHelper {
         hargaJual: maps[i]['hargaJual'] is int
             ? maps[i]['hargaJual'].toDouble()
             : maps[i]['hargaJual'], // Handle hargaJual
-        hargaModal: maps[i]['hargaModal'] is int
-            ? maps[i]['hargaModal'].toDouble()
-            : maps[i]['hargaModal'], // Handle hargaModal
+        hargaBeli: maps[i]['hargaBeli'] is int
+            ? maps[i]['hargaBeli'].toDouble()
+            : maps[i]['hargaBeli'], // Handle hargaBeli
         barcode: maps[i]['barcode'], // Handle barcode
         tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
         stok: maps[i]['stok'], // Handle stok
         minStok: maps[i]['minStok'], // Handle minStok
         satuan: maps[i]['satuan'], // Handle satuan
-        isFavorite: maps[i]['isFavorite'] == 1, // Handle isFavorite
         sendNotification:
             maps[i]['sendNotification'] == 1, // Handle sendNotification
       );
@@ -510,17 +508,6 @@ class DatabaseHelper {
     } catch (e) {
       throw Exception("Error closing database: $e");
     }
-  }
-
-  // Tambahkan pada DatabaseHelper
-  Future<List<Produk>> getFavoriteProduk() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableProduk,
-      where: 'isFavorite = ?',
-      whereArgs: [1],
-    );
-    return maps.map((map) => Produk.fromMap(map)).toList();
   }
 
   Future<void> updateUser(String oldUsername, User updatedUser) async {

@@ -229,10 +229,9 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
           kategori: result['category'] as String? ?? '',
           merek: result['brand'] as String? ?? '',
           barcode: result['barcode'] as String? ?? '',
-          hargaModal: _parsePrice(result['hargaModal'] as String? ?? '0'),
+          hargaBeli: _parsePrice(result['hargaBeli'] as String? ?? '0'),
           hargaJual: _parsePrice(result['price'] as String? ?? '0'),
           tglExpired: result['tglExpired'] as String? ?? '',
-          isFavorite: result['isFavorite'] as bool? ?? false,
           imagePath: result['imagePath'] as String? ?? '',
         );
 
@@ -375,13 +374,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage> {
                               : null,
                           color: Colors.blue[100],
                         ),
-                      ),
-                      title: Row(
-                        children: [
-                          if (filteredProdukList[index].isFavorite)
-                            const Icon(Icons.star, color: Colors.yellow),
-                          Text(filteredProdukList[index].nama),
-                        ],
                       ),
                       subtitle: Text(
                           'Rp.${_formatCurrency(filteredProdukList[index].hargaJual)}'),

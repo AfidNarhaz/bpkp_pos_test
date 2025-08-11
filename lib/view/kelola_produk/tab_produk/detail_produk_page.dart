@@ -31,14 +31,13 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _kategoriController;
   late TextEditingController _merekController;
   late TextEditingController _barcodeController;
-  late TextEditingController _hargaModalController;
+  late TextEditingController _hargaBeliController;
   late TextEditingController _hargaJualController;
   late TextEditingController _tanggalController;
   late TextEditingController _stokController;
   late TextEditingController _minStokController;
   late TextEditingController _satuanController;
 
-  bool isFavorite = false;
   bool _sendNotification = false;
 
   String? stok;
@@ -54,9 +53,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _kategoriController = TextEditingController(text: widget.produk.kategori);
     _merekController = TextEditingController(text: widget.produk.merek);
     _barcodeController = TextEditingController(text: widget.produk.barcode);
-    _hargaModalController = TextEditingController(
+    _hargaBeliController = TextEditingController(
         text: NumberFormat('#,###', 'en_US')
-            .format(widget.produk.hargaModal)
+            .format(widget.produk.hargaBeli)
             .replaceAll(',', '.'));
     _hargaJualController = TextEditingController(
         text: NumberFormat('#,###', 'en_US')
@@ -68,7 +67,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         TextEditingController(text: widget.produk.stok?.toString());
     _minStokController =
         TextEditingController(text: widget.produk.minStok?.toString());
-    isFavorite = widget.produk.isFavorite;
     if (widget.produk.imagePath != null) {
       _image = File(widget.produk.imagePath!);
     }
@@ -84,7 +82,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _kategoriController.dispose();
     _merekController.dispose();
     _barcodeController.dispose();
-    _hargaModalController.dispose();
+    _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
     _stokController.dispose(); // Dispose _stokController
@@ -112,14 +110,13 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         kategori: _kategoriController.text,
         merek: _merekController.text,
         barcode: _barcodeController.text,
-        hargaModal:
-            double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
+        hargaBeli:
+            double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
                 0.0,
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
         tglExpired: _tanggalController.text,
-        isFavorite: isFavorite,
         imagePath: _image?.path ?? widget.produk.imagePath,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ??
             0, // Use _stokController
@@ -311,10 +308,10 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                   ],
                 ),
 
-                // Harga Modal
+                // Harga Beli
                 _buildTextField(
-                  controller: _hargaModalController,
-                  label: 'Harga Modal',
+                  controller: _hargaBeliController,
+                  label: 'Harga Beli',
                   keyboardType: TextInputType.number,
                   inputFormatter: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -449,28 +446,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     ),
                   ],
                 ),
-
-                // Jadikan Favorit Switch
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Jadikan favorit?',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Switch(
-                      value: isFavorite,
-                      onChanged: (value) {
-                        if (!mounted) return;
-                        setState(() {
-                          isFavorite = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 20),
-
                 // Tombol Hapus dan Simpan
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -35,15 +35,14 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _merekController = TextEditingController();
   final TextEditingController _barcodeController = TextEditingController();
-  final TextEditingController _hargaModalController = TextEditingController();
+  final TextEditingController _hargaBeliController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
   final TextEditingController _tanggalController = TextEditingController();
   final TextEditingController _stokController = TextEditingController();
   final TextEditingController _minStokController = TextEditingController();
   final TextEditingController _satuanController = TextEditingController();
 
-  bool isFavorite = false;
-  bool _sendNotification = false;
+  final bool _sendNotification = false;
 
   @override
   void dispose() {
@@ -51,7 +50,7 @@ class AddProdukPageState extends State<AddProdukPage> {
     _kategoriController.dispose();
     _merekController.dispose();
     _barcodeController.dispose();
-    _hargaModalController.dispose();
+    _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _tanggalController.dispose();
     _stokController.dispose();
@@ -101,15 +100,14 @@ class AddProdukPageState extends State<AddProdukPage> {
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
-        hargaModal:
-            double.tryParse(_hargaModalController.text.replaceAll('.', '')) ??
+        hargaBeli:
+            double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
                 0.0,
         barcode: _barcodeController.text,
         tglExpired: _tanggalController.text,
         stok: int.tryParse(_stokController.text.replaceAll('.', '')) ?? 0,
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
         satuan: _satuanController.text,
-        isFavorite: isFavorite,
         sendNotification: _sendNotification,
       );
       await DatabaseHelper().insertProduk(newProduk);
@@ -275,8 +273,8 @@ class AddProdukPageState extends State<AddProdukPage> {
                   ],
                 ),
                 _buildTextField(
-                  controller: _hargaModalController,
-                  label: 'Harga Modal',
+                  controller: _hargaBeliController,
+                  label: 'Harga Beli',
                   keyboardType: TextInputType.number,
                   inputFormatter: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -381,46 +379,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _sendNotification,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _sendNotification = value ?? false;
-                        });
-                      },
-                      activeColor: AppColors.accent,
-                    ),
-                    Expanded(
-                      child: const Text(
-                        'Kirimkan notifikasi saat stok mencapai batas minimum',
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Jadikan favorit?',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Switch(
-                      value: isFavorite,
-                      activeColor: AppColors.favorit,
-                      onChanged: (value) {
-                        if (mounted) {
-                          setState(() {
-                            isFavorite = value;
-                          });
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: _saveProduk,
                   style: OutlinedButton.styleFrom(

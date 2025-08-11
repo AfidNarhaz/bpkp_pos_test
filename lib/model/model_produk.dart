@@ -9,10 +9,9 @@ class Produk {
   String kategori;
   String merek;
   double hargaJual;
-  double hargaModal;
+  double hargaBeli;
   String barcode;
   String tglExpired;
-  bool isFavorite;
   int? stok;
   int? minStok;
   String? satuan;
@@ -26,10 +25,9 @@ class Produk {
     required this.kategori,
     required this.merek,
     required this.hargaJual,
-    required this.hargaModal,
+    required this.hargaBeli,
     required this.barcode,
     required this.tglExpired,
-    this.isFavorite = false,
     this.stok,
     this.minStok,
     this.satuan,
@@ -45,10 +43,9 @@ class Produk {
       kategori: map['kategori'] as String? ?? '',
       merek: map['merek'] as String? ?? '',
       hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
-      hargaModal: (map['hargaModal'] as num?)?.toDouble() ?? 0.0,
+      hargaBeli: (map['hargaBeli'] as num?)?.toDouble() ?? 0.0,
       barcode: map['barcode'] as String? ?? '',
       tglExpired: map['tglExpired'] as String? ?? '',
-      isFavorite: map['isFavorite'] == 1, // 1 untuk true, 0 untuk false
       stok: map['stok'] as int?,
       minStok: map['minStok'] as int?,
       satuan: map['satuan'] as String?,
@@ -65,10 +62,9 @@ class Produk {
       'kategori': kategori,
       'merek': merek,
       'hargaJual': hargaJual,
-      'hargaModal': hargaModal,
+      'hargaBeli': hargaBeli,
       'barcode': barcode,
       'tglExpired': tglExpired,
-      'isFavorite': isFavorite ? 1 : 0,
       'stok': stok,
       'minStok': minStok,
       'satuan': satuan,
