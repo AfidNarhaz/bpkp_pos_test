@@ -24,6 +24,32 @@ class _PembayaranPageState extends State<PembayaranPage> {
   final NumberFormat formatCurrency =
       NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   final TextEditingController tunaiController = TextEditingController();
+  bool isButtonEnabled = false;
+  bool _isFormatting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    tunaiController.addListener(() {
+      if (_isFormatting) return;
+      final text = tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final uangDiterima = text.isEmpty ? 0 : int.parse(text);
+      setState(() {
+        isButtonEnabled = uangDiterima >= widget.totalTagihan;
+      });
+
+      // Format otomatis
+      if (tunaiController.text != formatCurrency.format(uangDiterima)) {
+        _isFormatting = true;
+        tunaiController.text =
+            uangDiterima == 0 ? '' : formatCurrency.format(uangDiterima);
+        tunaiController.selection = TextSelection.fromPosition(
+          TextPosition(offset: tunaiController.text.length),
+        );
+        _isFormatting = false;
+      }
+    });
+  }
 
   Future<void> _clearKeranjang() async {
     setState(() {
@@ -64,23 +90,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    tunaiController.addListener(() {
-      final text = tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
-      if (text.isEmpty) {
-        tunaiController.value = TextEditingValue(text: '');
-        return;
-      }
-      final formatted = formatCurrency.format(int.parse(text));
-      tunaiController.value = TextEditingValue(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length),
-      );
-    });
   }
 
   @override
@@ -173,52 +182,42 @@ class _PembayaranPageState extends State<PembayaranPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor:
+                        isButtonEnabled ? Colors.blue : Colors.grey,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () async {
-                    // Ambil nilai uang diterima dari input
-                    final text =
-                        tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
-                    final uangDiterima = text.isEmpty ? 0 : int.parse(text);
-                    final totalTagihan = widget.totalTagihan;
-                    final keranjang = widget.keranjang;
-                    // ignore: unused_local_variable
-                    final namaKasir = widget.namaKasir;
+                  onPressed: isButtonEnabled
+                      ? () async {
+                          final text = tunaiController.text
+                              .replaceAll(RegExp(r'[^0-9]'), '');
+                          final uangDiterima =
+                              text.isEmpty ? 0 : int.parse(text);
+                          final totalTagihan = widget.totalTagihan;
+                          final keranjang = widget.keranjang;
+                          final namaKasir = widget.namaKasir;
 
-                    if (uangDiterima < totalTagihan) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Uang diterima kurang dari total tagihan!')),
-                      );
-                      return;
-                    }
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransaksiBerhasilPage(
+                                totalTagihan: totalTagihan,
+                                uangDiterima: uangDiterima,
+                                keranjang: keranjang,
+                                namaKasir: namaKasir,
+                                onTransaksiBaru: widget.onResetKeranjang,
+                              ),
+                            ),
+                          );
 
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TransaksiBerhasilPage(
-                          totalTagihan: totalTagihan,
-                          uangDiterima: uangDiterima,
-                          keranjang: keranjang,
-                          namaKasir: namaKasir,
-                          onTransaksiBaru:
-                              widget.onResetKeranjang, // <-- Perbaiki ini
-                        ),
-                      ),
-                    );
-
-                    // Jika perlu, lakukan sesuatu dengan hasilnya
-                    if (result == true) {
-                      // Misalnya, jika ingin mengosongkan keranjang setelah transaksi berhasil
-                      _clearKeranjang();
-                    }
-                  },
+                          if (result == true) {
+                            _clearKeranjang();
+                          }
+                        }
+                      : null, // Disable jika tidak memenuhi syarat
                   child: const Text('Terima',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                 ),

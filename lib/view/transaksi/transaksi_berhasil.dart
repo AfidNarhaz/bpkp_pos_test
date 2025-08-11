@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/transaksi/struk.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
+// Pastikan ada model user
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<String> getUserRole() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('role') ?? '';
+}
 
 class TransaksiBerhasilPage extends StatelessWidget {
   final num totalTagihan;
   final num uangDiterima;
   final List<Map<String, dynamic>> keranjang;
   final String namaKasir;
-  final Future<void> Function()?
-      onTransaksiBaru; // Ubah tipe menjadi Future<void> Function()?
+  final Future<void> Function()? onTransaksiBaru;
 
   const TransaksiBerhasilPage({
     super.key,
@@ -17,7 +23,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
     required this.uangDiterima,
     required this.keranjang,
     required this.namaKasir,
-    this.onTransaksiBaru, // Tambahkan ini di konstruktor
+    this.onTransaksiBaru,
   });
 
   @override
@@ -35,147 +41,164 @@ class TransaksiBerhasilPage extends StatelessWidget {
       return '#INV-${random.substring(random.length - 8)}';
     }
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Transaksi Berhasil',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '$tanggal, $jam',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total Tagihan', style: TextStyle(fontSize: 18)),
-                Text(formatCurrency.format(totalTagihan),
-                    style: const TextStyle(fontSize: 18)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Diterima', style: TextStyle(fontSize: 18)),
-                Text(formatCurrency.format(uangDiterima),
-                    style: const TextStyle(fontSize: 18)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Kembalian', style: TextStyle(fontSize: 18)),
-                Text(formatCurrency.format(kembalian),
-                    style: const TextStyle(fontSize: 18)),
-              ],
-            ),
-            const Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Cetak Struk
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Cetak Struk'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => KirimStrukPage(
-                            namaKasir: namaKasir,
-                            waktuTransaksi: now,
-                            noStruk: generateStrukCode(),
-                            jenisPembayaran: 'Tunai',
-                            keranjang: keranjang,
-                            totalTagihan: totalTagihan,
-                            uangDiterima: uangDiterima,
-                          ),
+    // Widget utama dengan PopScope
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          if (onTransaksiBaru != null) {
+            await onTransaksiBaru!();
+          } else {
+            keranjang.clear();
+          }
+          final role = await getUserRole();
+          Widget page;
+          if (role == 'admin') {
+            page = const TransaksiPage(showBackButton: true);
+          } else {
+            page = const TransaksiPage(showBackButton: false);
+          }
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => page),
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Tidak ada tombol back
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Transaksi Berhasil',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '$tanggal, $jam',
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Tagihan', style: TextStyle(fontSize: 18)),
+                  Text(formatCurrency.format(totalTagihan),
+                      style: const TextStyle(fontSize: 18)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Diterima', style: TextStyle(fontSize: 18)),
+                  Text(formatCurrency.format(uangDiterima),
+                      style: const TextStyle(fontSize: 18)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Kembalian', style: TextStyle(fontSize: 18)),
+                  Text(formatCurrency.format(kembalian),
+                      style: const TextStyle(fontSize: 18)),
+                ],
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // TODO: Cetak Struk need terhubung ke printer
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: const Text('Cetak Struk'),
                     ),
-                    child: const Text('Kirim Struk'),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Cetak Pesanan
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => KirimStrukPage(
+                              namaKasir: namaKasir,
+                              waktuTransaksi: now,
+                              noStruk: generateStrukCode(),
+                              jenisPembayaran: 'Tunai',
+                              keranjang: keranjang,
+                              totalTagihan: totalTagihan,
+                              uangDiterima: uangDiterima,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: const Text('Kirim Struk'),
                     ),
-                    child: const Text('Cetak Pesanan'),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (onTransaksiBaru != null) {
-                        await onTransaksiBaru!(); // <-- ini akan menghapus keranjang
-                      }
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => const TransaksiPage()),
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (onTransaksiBaru != null) {
+                          await onTransaksiBaru!(); // Reset keranjang
+                        } else {
+                          keranjang.clear();
+                        }
+                        final role = await getUserRole();
+                        Widget page;
+                        if (role == 'admin') {
+                          page = const TransaksiPage(showBackButton: true);
+                        } else {
+                          page = const TransaksiPage(showBackButton: false);
+                        }
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => page),
+                          (route) => false,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: const Text('Transaksi Baru'),
                     ),
-                    child: const Text('Transaksi Baru'),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

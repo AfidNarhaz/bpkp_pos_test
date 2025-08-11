@@ -11,11 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransaksiPage extends StatefulWidget {
-  final int initialTabIndex;
-  const TransaksiPage({super.key, this.initialTabIndex = 0});
+  final bool showBackButton;
+  // ignore: use_super_parameters
+  const TransaksiPage({Key? key, this.showBackButton = true}) : super(key: key);
 
   @override
-  TransaksiPageState createState() => TransaksiPageState();
+  State<TransaksiPage> createState() => TransaksiPageState();
 }
 
 class TransaksiPageState extends State<TransaksiPage>
@@ -30,7 +31,9 @@ class TransaksiPageState extends State<TransaksiPage>
   void initState() {
     super.initState();
     _tabController = TabController(
-        length: 3, vsync: this, initialIndex: widget.initialTabIndex);
+      length: 3,
+      vsync: this,
+    );
     _loadKeranjang(); // Muat keranjang dari SharedPreferences
     _loadNamaKasir();
     _loadUsername();
@@ -90,14 +93,15 @@ class TransaksiPageState extends State<TransaksiPage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Transaksi',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        automaticallyImplyLeading: widget.showBackButton,
+        // title: const Text(
+        //   'Transaksi',
+        //   style: TextStyle(fontWeight: FontWeight.bold),
+        // ),
         actions: [
-          if (username != 'admin') // Hanya tampil jika bukan admin
+          if (!widget.showBackButton)
             IconButton(
-              icon: const Icon(Icons.logout, color: Colors.black),
+              icon: const Icon(Icons.logout),
               onPressed: () async {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
