@@ -94,10 +94,10 @@ class TransaksiPageState extends State<TransaksiPage>
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: widget.showBackButton,
-        // title: const Text(
-        //   'Transaksi',
-        //   style: TextStyle(fontWeight: FontWeight.bold),
-        // ),
+        title: const Text(
+          'Transaksi',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           if (!widget.showBackButton)
             IconButton(

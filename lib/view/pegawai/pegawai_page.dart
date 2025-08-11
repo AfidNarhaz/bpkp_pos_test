@@ -37,7 +37,10 @@ class PegawaiPageState extends State<PegawaiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pegawai'),
+        title: const Text(
+          'Pegawai',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Column(
         children: [
