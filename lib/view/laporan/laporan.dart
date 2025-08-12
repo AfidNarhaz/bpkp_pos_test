@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/home/home_page.dart';
 import 'package:bpkp_pos_test/view/laporan/drawer.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:bpkp_pos_test/view/laporan/date_range_picker_widget.dart';
 
 class LaporanPage extends StatefulWidget {
   const LaporanPage({super.key});
@@ -14,127 +14,9 @@ class LaporanPage extends StatefulWidget {
 
 class _LaporanPageState extends State<LaporanPage> {
   String selectedDateRange = 'Pilih Tanggal';
-  String comparisonDateRange = ''; // untuk "Dibandingkan ..."
+  String comparisonDateRange = '';
   DateTime? startDate;
   DateTime? endDate;
-
-  void _showDateRangePicker() {
-    final now = DateTime.now();
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    PickerDateRange? selectedRange;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateModal) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Preset filter
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      _presetButton("Hari Ini", () {
-                        setStateModal(() {
-                          selectedRange = PickerDateRange(now, now);
-                        });
-                      }),
-                      _presetButton("Kemarin", () {
-                        final yesterday = now.subtract(const Duration(days: 1));
-                        setStateModal(() {
-                          selectedRange = PickerDateRange(yesterday, yesterday);
-                        });
-                      }),
-                      _presetButton("1 Minggu", () {
-                        setStateModal(() {
-                          selectedRange = PickerDateRange(
-                            now.subtract(const Duration(days: 7)),
-                            now,
-                          );
-                        });
-                      }),
-                      _presetButton("1 Bulan", () {
-                        setStateModal(() {
-                          selectedRange = PickerDateRange(
-                            DateTime(now.year, now.month - 1, now.day),
-                            now,
-                          );
-                        });
-                      }),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Kalender
-                  SfDateRangePicker(
-                    selectionMode: DateRangePickerSelectionMode.range,
-                    initialSelectedRange:
-                        selectedRange ?? PickerDateRange(now, now),
-                    onSelectionChanged: (args) {
-                      setStateModal(() {
-                        selectedRange = args.value;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (selectedRange != null) {
-                            final start = selectedRange!.startDate!;
-                            final end = selectedRange!.endDate ?? start;
-
-                            // Simpan periode utama
-                            startDate = start;
-                            endDate = end;
-
-                            // Hitung periode pembanding
-                            final diffDays = end.difference(start).inDays;
-                            final comparisonEnd =
-                                start.subtract(const Duration(days: 1));
-                            final comparisonStart = comparisonEnd
-                                .subtract(Duration(days: diffDays));
-
-                            setState(() {
-                              final dateFormat = DateFormat('dd/MM/yyyy');
-                              selectedDateRange =
-                                  '${dateFormat.format(start)} - ${dateFormat.format(end)}';
-                              comparisonDateRange =
-                                  '${dateFormat.format(comparisonStart)} - ${dateFormat.format(comparisonEnd)}';
-                            });
-                          }
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Apply"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _presetButton(String label, VoidCallback onTap) {
-    return OutlinedButton(
-      onPressed: onTap,
-      child: Text(label),
-    );
-  }
 
   Widget _buildReportCard(String title, String value, String growth) {
     return Container(
@@ -209,30 +91,18 @@ class _LaporanPageState extends State<LaporanPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Filter tanggal
-                GestureDetector(
-                  onTap: _showDateRangePicker,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 18, color: Colors.grey),
-                        const SizedBox(width: 8),
-                        Text(
-                          selectedDateRange,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
+                // Ganti filter tanggal dengan DateRangePickerWidget
+                DateRangePickerWidget(
+                  onDateRangeChanged: (start, end) {
+                    setState(() {
+                      startDate = start;
+                      endDate = end;
+                      final dateFormat = DateFormat('dd/MM/yyyy');
+                      selectedDateRange =
+                          '${dateFormat.format(start)} - ${dateFormat.format(end)}';
+                      // Update comparisonDateRange jika perlu
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -244,11 +114,11 @@ class _LaporanPageState extends State<LaporanPage> {
                 const SizedBox(height: 12),
 
                 // Kartu laporan
-                _buildReportCard("Total Penjualan", "Rp560.000", "↑ 833,33%"),
+                _buildReportCard("Total Penjualan", "Rp0", "↑ 100,00%"),
                 const SizedBox(height: 8),
-                _buildReportCard("Total Keuntungan", "Rp447.000", "↑ 893,33%"),
+                _buildReportCard("Total Keuntungan", "Rp0", "↑ 100,00%"),
                 const SizedBox(height: 8),
-                _buildReportCard("Total Transaksi", "12", "↑ 1100,00%"),
+                _buildReportCard("Total Transaksi", "0", "↑ 100,00%"),
               ],
             ),
           ),

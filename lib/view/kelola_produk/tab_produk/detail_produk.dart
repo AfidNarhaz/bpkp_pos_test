@@ -2,7 +2,7 @@ import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/pop_up_satuan.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner_page.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
@@ -426,27 +426,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-
-                // Checkbox for notification
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _sendNotification,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _sendNotification = value ?? false;
-                        });
-                      },
-                    ),
-                    Expanded(
-                      child: const Text(
-                        'Kirimkan notifikasi saat stok mencapai batas minimum',
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 // Tombol Hapus dan Simpan
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
