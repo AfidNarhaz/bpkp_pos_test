@@ -116,7 +116,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Cetak Struk need terhubung ke printer
+                        // TODO: Hubungkan cetak struk ke printer
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

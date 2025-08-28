@@ -1,4 +1,3 @@
-import 'package:bpkp_pos_test/view/kelola_produk/tab_kategori/kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/add_produk.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/atur_stok.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
@@ -22,7 +21,7 @@ class KelolaProdukPage extends StatefulWidget {
 class KelolaProdukPageState extends State<KelolaProdukPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _currentTabIndex = 0;
+  final int _currentTabIndex = 0;
   List<Produk> produkList = [];
   List<Produk> filteredProdukList = [];
   final TextEditingController _searchController = TextEditingController();
@@ -32,14 +31,19 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this); // Ubah jadi 2 tab
+
     _tabController.addListener(() {
-      setState(() {
-        _currentTabIndex = _tabController.index;
+      if (_tabController.indexIsChanging) return; // hindari trigger berulang
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
       });
     });
+
     _searchController.addListener(_filterProduk);
-    _loadProdukAsync(); // Kembalikan pemanggilan ini agar data produk di-load saat init
+    _loadProdukAsync();
   }
 
   void _filterProductsByCategory(List<String> selectedCategories) {
@@ -57,18 +61,16 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
   }
 
   Future<void> _loadProdukAsync() async {
-    setState(() {});
-
     try {
       List<Produk> products = await dbHelper.getProduks();
-      setState(() {
-        produkList = products;
-        filteredProdukList = produkList;
-      });
+      if (mounted) {
+        setState(() {
+          produkList = products;
+          filteredProdukList = produkList;
+        });
+      }
     } catch (e) {
       _logger.severe('Error loading products: $e');
-    } finally {
-      setState(() {});
     }
   }
 
@@ -114,12 +116,10 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
     return ProdukTabBarView(
       tabs: const [
         Tab(text: 'Produk'),
-        Tab(text: 'Kategori'),
         Tab(text: 'Stok'),
       ],
       tabViews: [
         _buildProdukTab(),
-        _buildKategoriTab(),
         _buildStokTab(),
       ],
       tabController: _tabController,
@@ -159,10 +159,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
     return StokTab();
   }
 
-  Widget _buildKategoriTab() {
-    return KategoriTab(); // Use the existing KelolaStokPage content
-  }
-
   Widget? _buildFabByTab() {
     if (_currentTabIndex == 0) {
       // FAB untuk tambah produk
@@ -180,57 +176,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
           );
         },
         tooltip: 'Tambah Produk',
-        child: const Icon(Icons.add),
-      );
-    } else if (_currentTabIndex == 1) {
-      // FAB untuk tambah kategori
-      return FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              final TextEditingController kategoriController =
-                  TextEditingController();
-              String? errorMessage;
-              return StatefulBuilder(
-                builder: (context, setState) {
-                  return AlertDialog(
-                    title: const Text('Tambah Kategori'),
-                    content: TextField(
-                      controller: kategoriController,
-                      decoration: InputDecoration(
-                        labelText: 'Nama Kategori',
-                        errorText: errorMessage,
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final newKategori = kategoriController.text.trim();
-                          if (newKategori.isEmpty) {
-                            setState(() {
-                              errorMessage = 'Nama Kategori wajib diisi';
-                            });
-                          } else {
-                            await DatabaseHelper().insertKategori(newKategori);
-                            Navigator.pop(context);
-                            setState(() {});
-                          }
-                        },
-                        child: const Text('Simpan'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          );
-        },
-        tooltip: 'Tambah Kategori',
         child: const Icon(Icons.add),
       );
     }

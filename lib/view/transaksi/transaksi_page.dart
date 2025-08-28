@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
 import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
+import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:flutter/material.dart';
@@ -77,9 +81,30 @@ class TransaksiPageState extends State<TransaksiPage> {
     });
   }
 
-  void _onBarcodeScan() {
-    // TODO: Implementasi barcode scanner
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => BarcodeScannerPage()));
+  void _onBarcodeScan() async {
+    final barcode = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
+    );
+    if (barcode != null && barcode is String) {
+      final produkList = await DatabaseHelper().getProduks();
+      final produk = produkList.firstWhere(
+        (p) => p.barcode == barcode,
+        // orElse: () => null,
+      );
+      tambahKeKeranjang({
+        'id': produk.id,
+        'nama': produk.nama,
+        'hargaJual': produk.hargaJual,
+        'barcode': produk.barcode,
+        // tambahkan field lain jika perlu
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Produk "${produk.nama}" ditambahkan ke keranjang'),
+        ),
+      );
+    }
   }
 
   @override
@@ -371,7 +396,7 @@ class DraggableSheetContent extends StatelessWidget {
   }
 }
 
-class ProdukTab extends StatelessWidget {
+class ProdukTab extends StatefulWidget {
   final Function(Map<String, dynamic>) onAddToCart;
   final String searchQuery;
 
@@ -382,7 +407,66 @@ class ProdukTab extends StatelessWidget {
   });
 
   @override
+  State<ProdukTab> createState() => _ProdukTabState();
+}
+
+class _ProdukTabState extends State<ProdukTab> {
+  List<Produk> produkList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProduk();
+  }
+
+  Future<void> _loadProduk() async {
+    final list = await DatabaseHelper().getProduks();
+    setState(() {
+      produkList = list;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container();
+    final filteredProduk = produkList
+        .where((produk) => produk.nama
+            .toLowerCase()
+            .contains(widget.searchQuery.toLowerCase()))
+        .toList();
+
+    if (filteredProduk.isEmpty) {
+      return const Center(child: Text('Tidak ada produk ditemukan'));
+    }
+
+    return ListView.builder(
+      itemCount: filteredProduk.length,
+      itemBuilder: (context, index) {
+        final produk = filteredProduk[index];
+        return ListTile(
+          leading: produk.imagePath != null
+              ? Image.file(File(produk.imagePath!),
+                  width: 50, height: 50, fit: BoxFit.cover)
+              : const Icon(Icons.image, size: 50),
+          title:
+              Text(produk.nama, maxLines: 2, overflow: TextOverflow.ellipsis),
+          subtitle: Text('Rp${produk.hargaJual.toStringAsFixed(0)}'),
+          trailing: Text('Stok: ${produk.stok ?? 0}'),
+          onTap: () {
+            widget.onAddToCart({
+              'id': produk.id,
+              'nama': produk.nama,
+              'hargaJual': produk.hargaJual,
+              'barcode': produk.barcode,
+              // tambahkan field lain jika perlu
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text('Produk "${produk.nama}" ditambahkan ke keranjang')),
+            );
+          },
+        );
+      },
+    );
   }
 }
