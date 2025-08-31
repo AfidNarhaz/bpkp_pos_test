@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/laporan/katalog_produk.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
 import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
@@ -58,7 +59,14 @@ class LaporanDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.inventory),
             title: const Text('Katalog Produk'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                parentContext,
+                MaterialPageRoute(
+                  builder: (context) => const KatalogProduk(),
+                ),
+              );
+            },
           ),
         ],
       ),

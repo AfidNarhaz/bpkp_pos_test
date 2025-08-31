@@ -23,7 +23,7 @@ android {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
         }
 
-        // Tambahkan konfigurasi untuk mendukung kamera dan penyimpanan
+        // Konfigurasi untuk mendukung kamera dan penyimpanan
         vectorDrawables {
             useSupportLibrary = true
         }

@@ -114,11 +114,11 @@ class _LaporanPageState extends State<LaporanPage> {
                 const SizedBox(height: 12),
 
                 // Kartu laporan
-                _buildReportCard("Total Penjualan", "Rp0", "↑ 100,00%"),
+                _buildReportCard("Total Penjualan", "Rp0", "0%"),
                 const SizedBox(height: 8),
-                _buildReportCard("Total Keuntungan", "Rp0", "↑ 100,00%"),
+                _buildReportCard("Total Keuntungan", "Rp0", "0%"),
                 const SizedBox(height: 8),
-                _buildReportCard("Total Transaksi", "0", "↑ 100,00%"),
+                _buildReportCard("Total Transaksi", "0", "0%"),
               ],
             ),
           ),

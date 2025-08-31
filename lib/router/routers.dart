@@ -27,7 +27,7 @@ class Routers {
     ),
     GetPage(
       name: transaksi,
-      page: () => const TransaksiPage(),
+      page: () => const TransaksiPage(showBackButton: false),
     ),
   ];
 }

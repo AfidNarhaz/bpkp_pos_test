@@ -111,6 +111,7 @@ class TransaksiPageState extends State<TransaksiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: widget.showBackButton,
         title: SizedBox(
@@ -149,25 +150,30 @@ class TransaksiPageState extends State<TransaksiPage> {
       ),
       body: Stack(
         children: [
-          ProdukTab(
-            onAddToCart: tambahKeKeranjang,
-            searchQuery: searchQuery,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 80), // Tambah padding bawah
+            child: ProdukTab(
+              onAddToCart: tambahKeKeranjang,
+              searchQuery: searchQuery,
+            ),
           ),
-          DraggableScrollableSheet(
-            initialChildSize: 0.17,
-            minChildSize: minChildSize,
-            maxChildSize: 1,
-            builder: (context, scrollController) {
-              return DraggableSheetContent(
-                scrollController: scrollController,
-                keranjang: keranjang,
-                onToggle: () {},
-                onUpdateKeranjang: (index, updatedProduk) async {
-                  onUpdateKeranjang(index, updatedProduk);
-                },
-                namaKasir: namaKasir,
-              );
-            },
+          SafeArea(
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.17,
+              minChildSize: minChildSize,
+              maxChildSize: 1,
+              builder: (context, scrollController) {
+                return DraggableSheetContent(
+                  scrollController: scrollController,
+                  keranjang: keranjang,
+                  onToggle: () {},
+                  onUpdateKeranjang: (index, updatedProduk) async {
+                    onUpdateKeranjang(index, updatedProduk);
+                  },
+                  namaKasir: namaKasir,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -252,7 +258,9 @@ class DraggableSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Container(
+      padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),

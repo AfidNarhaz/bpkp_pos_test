@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -5,6 +6,7 @@ import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StokTab extends StatefulWidget {
   const StokTab({super.key});
@@ -107,8 +109,25 @@ class StokTabState extends State<StokTab> {
                         if (stokBaru != null) {
                           produk.stok = stokBaru;
                           await DatabaseHelper().updateProduk(produk);
-                          if (!mounted) return;
-                          setState(() {});
+
+                          // Tambahkan history update stok
+                          final prefs = await SharedPreferences.getInstance();
+                          final username =
+                              prefs.getString('username') ?? 'Unknown';
+                          final role = prefs.getString('role') ?? 'Unknown';
+                          await DatabaseHelper().insertHistoryProduk(
+                            HistoryProduk(
+                              aksi: 'Update Stok',
+                              namaProduk: produk.nama,
+                              user: username,
+                              role: role,
+                              waktu: DateTime.now(),
+                              detail: 'Stok diubah menjadi ${produk.stok}',
+                            ),
+                          );
+
+                          Navigator.pop(context);
+                          setState(() {}); // refresh tampilan
                         }
                       } else {
                         if (!mounted) return;
@@ -368,6 +387,8 @@ class StokTabState extends State<StokTab> {
                                                       ? stokBaru != produk.stok
                                                       : stokBaru > 0)
                                                   ? () async {
+                                                      int stokLama =
+                                                          produk.stok ?? 0;
                                                       if (stokMode ==
                                                           'Stok Disesuaikan') {
                                                         produk.stok = stokBaru;
@@ -383,6 +404,33 @@ class StokTabState extends State<StokTab> {
                                                       }
                                                       await DatabaseHelper()
                                                           .updateProduk(produk);
+
+                                                      // Tambahkan history update stok
+                                                      final prefs =
+                                                          await SharedPreferences
+                                                              .getInstance();
+                                                      final username =
+                                                          prefs.getString(
+                                                                  'username') ??
+                                                              'Unknown';
+                                                      final role =
+                                                          prefs.getString(
+                                                                  'role') ??
+                                                              'Unknown';
+                                                      await DatabaseHelper()
+                                                          .insertHistoryProduk(
+                                                        HistoryProduk(
+                                                          aksi: 'Update Stok',
+                                                          namaProduk:
+                                                              produk.nama,
+                                                          user: username,
+                                                          role: role,
+                                                          waktu: DateTime.now(),
+                                                          detail:
+                                                              'Stok dari $stokLama menjadi ${produk.stok}',
+                                                        ),
+                                                      );
+
                                                       Navigator.pop(context);
                                                       setState(
                                                           () {}); // refresh tampilan
@@ -413,54 +461,6 @@ class StokTabState extends State<StokTab> {
                 );
               },
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Cancel changes
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black),
-                      foregroundColor: AppColors.text,
-                    ),
-                    child: Text(
-                      'Batal',
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Save changes
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black),
-                      backgroundColor: AppColors.primary,
-                    ),
-                    child: Text(
-                      'Simpan',
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:bpkp_pos_test/model/user.dart';
+import 'package:bpkp_pos_test/model/model_history_produk.dart';
 
 class DatabaseHelper {
   // Singleton instance
@@ -153,6 +154,19 @@ class DatabaseHelper {
         password TEXT
       )
     ''');
+
+    // Tabel history_produk
+    await db.execute('''
+      CREATE TABLE history_produk (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        aksi TEXT,
+        namaProduk TEXT,
+        user TEXT,
+        role TEXT,
+        waktu TEXT,
+        detail TEXT
+      )
+    ''');
   }
 
   // Fungsi untuk mengupgrade database
@@ -230,9 +244,9 @@ class DatabaseHelper {
     final existing = await db.query('users');
     if (existing.isEmpty) {
       await insertUser(
-          User(username: 'admin', password: 'admin123', role: 'admin'));
+          User(username: 'Difa', password: 'Difa123', role: 'admin'));
       await insertUser(
-          User(username: 'kasir', password: 'kasir123', role: 'kasir'));
+          User(username: 'Ansel', password: 'Ansel123', role: 'kasir'));
     }
   }
 
@@ -522,5 +536,16 @@ class DatabaseHelper {
       where: 'username = ?',
       whereArgs: [oldUsername],
     );
+  }
+
+  Future<void> insertHistoryProduk(HistoryProduk history) async {
+    final db = await database;
+    await db.insert('history_produk', history.toMap());
+  }
+
+  Future<List<HistoryProduk>> getAllHistoryProduk() async {
+    final db = await database;
+    final result = await db.query('history_produk', orderBy: 'waktu DESC');
+    return result.map((e) => HistoryProduk.fromMap(e)).toList();
   }
 }

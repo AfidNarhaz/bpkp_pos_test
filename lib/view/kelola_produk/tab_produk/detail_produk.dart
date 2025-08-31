@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProdukPage extends StatefulWidget {
   final Produk produk;
@@ -103,7 +105,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
 
   void _saveChanges() async {
     if (_formKey.currentState!.validate()) {
-      // Perbarui objek produk dengan nilai baru
       Produk updatedProduct = Produk(
         id: widget.produk.id,
         nama: _namaController.text,
@@ -126,14 +127,27 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         sendNotification: _sendNotification, // Include sendNotification
       );
 
-      await DatabaseHelper()
-          .updateProduk(updatedProduct); // Save changes to database
+      await DatabaseHelper().updateProduk(updatedProduct);
+
+      // Tambahkan history edit produk
+      final prefs = await SharedPreferences.getInstance();
+      final username = prefs.getString('username') ?? 'Unknown';
+      final role = prefs.getString('role') ?? 'Unknown';
+      await DatabaseHelper().insertHistoryProduk(
+        HistoryProduk(
+          aksi: 'Edit Produk',
+          namaProduk: updatedProduct.nama,
+          user: username,
+          role: role,
+          waktu: DateTime.now(),
+          detail: 'Produk diubah',
+        ),
+      );
 
       _checkStockAndNotify();
 
       if (mounted) {
-        Navigator.pop(
-            context, updatedProduct); // Kembali dengan produk yang diperbarui
+        Navigator.pop(context, updatedProduct);
       }
     }
   }
@@ -454,12 +468,31 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                                     if (widget.produk.id != null) {
                                       await DatabaseHelper()
                                           .deleteProduk(widget.produk.id!);
+
+                                      // Tambahkan history hapus produk
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      final username =
+                                          prefs.getString('username') ??
+                                              'Unknown';
+                                      final role =
+                                          prefs.getString('role') ?? 'Unknown';
+                                      await DatabaseHelper()
+                                          .insertHistoryProduk(
+                                        HistoryProduk(
+                                          aksi: 'Hapus Produk',
+                                          namaProduk: widget.produk.nama,
+                                          user: username,
+                                          role: role,
+                                          waktu: DateTime.now(),
+                                          detail: 'Produk dihapus',
+                                        ),
+                                      );
+
                                       if (!mounted) return;
                                       if (context.mounted) {
-                                        Navigator.of(context)
-                                            .pop(); // Tutup dialog
-                                        Navigator.pop(context,
-                                            'deleted'); // Kembali ke halaman sebelumnya
+                                        Navigator.of(context).pop();
+                                        Navigator.pop(context, 'deleted');
                                       }
                                     }
                                   },

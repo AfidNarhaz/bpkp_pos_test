@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/pop_up_merek.dart';
@@ -11,10 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProdukPage extends StatefulWidget {
   const AddProdukPage({super.key, this.produk, required this.onProdukAdded});
@@ -111,6 +112,19 @@ class AddProdukPageState extends State<AddProdukPage> {
         sendNotification: _sendNotification,
       );
       await DatabaseHelper().insertProduk(newProduk);
+
+      final username = await getCurrentUsername();
+      final role = await getCurrentUserRole();
+      await DatabaseHelper().insertHistoryProduk(
+        HistoryProduk(
+          aksi: 'Tambah Produk',
+          namaProduk: newProduk.nama,
+          user: username ?? 'Unknown',
+          role: role ?? 'Unknown', // Tambahkan ini
+          waktu: DateTime.now(),
+          detail: 'Produk baru ditambahkan',
+        ),
+      );
       if (mounted) {
         widget.onProdukAdded();
         Navigator.pop(this.context, newProduk);
@@ -468,4 +482,16 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: newString.length),
     );
   }
+}
+
+// Fungsi untuk ambil username user yang sedang login
+Future<String?> getCurrentUsername() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('username');
+}
+
+// Fungsi untuk ambil role user yang sedang login
+Future<String?> getCurrentUserRole() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('role');
 }

@@ -21,7 +21,6 @@ class KelolaProdukPage extends StatefulWidget {
 class KelolaProdukPageState extends State<KelolaProdukPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final int _currentTabIndex = 0;
   List<Produk> produkList = [];
   List<Produk> filteredProdukList = [];
   final TextEditingController _searchController = TextEditingController();
@@ -181,4 +180,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
     }
     return null;
   }
+
+  int get _currentTabIndex => _tabController.index;
 }
