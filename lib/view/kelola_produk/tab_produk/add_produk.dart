@@ -35,6 +35,7 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _merekController = TextEditingController();
+  final TextEditingController _kodeProdukController = TextEditingController();
   final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _hargaBeliController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
@@ -106,7 +107,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                 0.0,
         barcode: _barcodeController.text,
         tglExpired: _tanggalController.text,
-        stok: int.tryParse(_stokController.text.replaceAll('.', '')) ?? 0,
+        stok: 0, // Set stok selalu 0
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
         satuan: _satuanController.text,
         sendNotification: _sendNotification,
@@ -184,10 +185,12 @@ class AddProdukPageState extends State<AddProdukPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Nama Produk
                 _buildTextField(
                   controller: _namaController,
                   label: 'Nama Produk',
                 ),
+                // Pilih Kategori
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getKategori(),
                   builder: (context, snapshot) {
@@ -233,6 +236,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
+                // Pilih Merek
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getMerek(),
                   builder: (context, snapshot) {
@@ -277,24 +281,12 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
+                // Kode Produk
                 _buildTextField(
-                  controller: _hargaJualController,
-                  label: 'Harga Jual',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
+                  controller: _kodeProdukController,
+                  label: 'Kode Produk',
                 ),
-                _buildTextField(
-                  controller: _hargaBeliController,
-                  label: 'Harga Beli',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
+                // Barcode
                 _buildTextField(
                   controller: _barcodeController,
                   label: 'Barcode',
@@ -313,6 +305,27 @@ class AddProdukPageState extends State<AddProdukPage> {
                     }
                   },
                 ),
+                // Harga Jual
+                _buildTextField(
+                  controller: _hargaJualController,
+                  label: 'Harga Jual',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+                // Harga Beli
+                _buildTextField(
+                  controller: _hargaBeliController,
+                  label: 'Harga Beli',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+                // Tanggal Kadaluwarsa
                 _buildTextField(
                   controller: _tanggalController,
                   label: 'Tanggal Kadaluwarsa',
@@ -331,15 +344,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-                _buildTextField(
-                  controller: _stokController,
-                  label: 'Stok Produk',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
+                // Stok Minimal
                 _buildTextField(
                   controller: _minStokController,
                   label: 'Stok Minimal',
@@ -349,6 +354,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
+                // Pilih Satuan
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getSatuan(),
                   builder: (context, snapshot) {
@@ -394,6 +400,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                   },
                 ),
                 const SizedBox(height: 10),
+                // Tombol Simpan
                 OutlinedButton(
                   onPressed: _saveProduk,
                   style: OutlinedButton.styleFrom(
