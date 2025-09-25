@@ -71,7 +71,7 @@ class _KatalogProdukState extends State<KatalogProduk> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Katalog Produk'),
+        title: const Text('Pembelian'),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
@@ -91,7 +91,7 @@ class _KatalogProdukState extends State<KatalogProduk> {
           children: [
             // Info Ringkas
             Text(
-              'Total Produk: $totalProduk   Total Stok: $totalStok',
+              'Total Pembelian: ${formatRupiah(nilaiModal)}',
               style: const TextStyle(fontSize: 15, color: Colors.grey),
             ),
             const SizedBox(height: 16),

@@ -92,16 +92,19 @@ class DatabaseHelper {
       CREATE TABLE $tableProduk(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         imagePath TEXT,
+        codeProduk TEXT NOT NULL,
+        barcode TEXT,
         nama TEXT NOT NULL,
         kategori TEXT NOT NULL,
         merek TEXT NOT NULL,
-        hargaJual REAL NOT NULL,
-        hargaBeli REAL NOT NULL,
-        barcode TEXT NOT NULL,
         tglExpired TEXT,
-        stok INTEGER,
+        satuanBeli TEXT NOT NULL,
+        satuanJual TEXT NOT NULL,
+        isi INTEGER,
+        hargaBeli REAL NOT NULL,
+        hargaJual REAL NOT NULL,
         minStok INTEGER,
-        satuan TEXT,
+        stok INTEGER,
         sendNotification INTEGER NOT NULL DEFAULT 0
       )
     ''');
@@ -194,20 +197,23 @@ class DatabaseHelper {
       return Produk(
         id: maps[i]['id'], // Handle id
         imagePath: maps[i]['imagePath'], // Handle imagePath
+        codeProduk: maps[i]['codeProduk'], // Handle codeProduk
+        barcode: maps[i]['barcode'], // Handle barcode
         nama: maps[i]['nama'], // Handle nama
         kategori: maps[i]['kategori'], // Handle kategori
         merek: maps[i]['merek'], // Handle merek
-        hargaJual: maps[i]['hargaJual'] is int
-            ? maps[i]['hargaJual'].toDouble()
-            : maps[i]['hargaJual'], // Handle hargaJual
+        tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
+        satuanBeli: maps[i]['satuanBeli'], // Handle satuanBeli
+        satuanJual: maps[i]['satuanJual'], // Handle satuanJ
+        isi: maps[i]['isi'], // Handle isi
         hargaBeli: maps[i]['hargaBeli'] is int
             ? maps[i]['hargaBeli'].toDouble()
             : maps[i]['hargaBeli'], // Handle hargaBeli
-        barcode: maps[i]['barcode'], // Handle barcode
-        tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
-        stok: maps[i]['stok'], // Handle stok
+        hargaJual: maps[i]['hargaJual'] is int
+            ? maps[i]['hargaJual'].toDouble()
+            : maps[i]['hargaJual'], // Handle hargaJual
         minStok: maps[i]['minStok'], // Handle minStok
-        satuan: maps[i]['satuan'], // Handle satuan
+        stok: maps[i]['stok'], // Handle stok
         sendNotification:
             maps[i]['sendNotification'] == 1, // Handle sendNotification
       );

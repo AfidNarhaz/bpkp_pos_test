@@ -222,7 +222,7 @@ class StokTabState extends State<StokTab> {
                       ),
                       subtitle: Text(
                         'Min stok: ${filteredStocks[index].minStok ?? 0}, '
-                        'Satuan: ${filteredStocks[index].satuan ?? ''}',
+                        'Satuan Jual: ${filteredStocks[index].satuanJual ?? ''}',
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),

@@ -5,33 +5,39 @@ import 'dart:io';
 class Produk {
   final int? id;
   final String? imagePath;
+  String codeProduk;
+  String barcode;
   String nama;
   String kategori;
   String merek;
-  double hargaJual;
-  double hargaBeli;
-  String barcode;
   String tglExpired;
-  int? stok;
+  String? satuanBeli;
+  String? satuanJual;
+  int? isi;
+  double hargaBeli;
+  double hargaJual;
   int? minStok;
-  String? satuan;
+  int? stok;
   bool? sendNotification;
 
   // Constructor
   Produk({
     this.id,
     this.imagePath,
+    required this.codeProduk,
+    required this.barcode,
     required this.nama,
     required this.kategori,
     required this.merek,
-    required this.hargaJual,
-    required this.hargaBeli,
-    required this.barcode,
     required this.tglExpired,
-    this.stok,
+    required this.satuanBeli,
+    required this.satuanJual,
+    required this.isi,
+    required this.hargaBeli,
+    required this.hargaJual,
     this.minStok,
-    this.satuan,
-    this.sendNotification, // Added field to constructor
+    this.stok,
+    this.sendNotification,
   });
 
   // Konversi dari map (Database ke Produk)
@@ -39,17 +45,20 @@ class Produk {
     return Produk(
       id: map['id'] as int?,
       imagePath: map['imagePath'] as String?,
+      codeProduk: map['codeProduk'] as String? ?? '',
+      barcode: map['barcode'] as String? ?? '',
       nama: map['nama'] as String? ?? '',
       kategori: map['kategori'] as String? ?? '',
       merek: map['merek'] as String? ?? '',
-      hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
-      hargaBeli: (map['hargaBeli'] as num?)?.toDouble() ?? 0.0,
-      barcode: map['barcode'] as String? ?? '',
       tglExpired: map['tglExpired'] as String? ?? '',
-      stok: map['stok'] as int?,
+      satuanBeli: map['satuanBeli'] as String?,
+      satuanJual: map['satuanJual'] as String?,
+      isi: map['isi'] as int?,
+      hargaBeli: (map['hargaBeli'] as num?)?.toDouble() ?? 0.0,
+      hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
       minStok: map['minStok'] as int?,
-      satuan: map['satuan'] as String?,
-      sendNotification: map['sendNotification'] == 1, // Added field to fromMap
+      stok: map['stok'] as int?,
+      sendNotification: map['sendNotification'] == 1,
     );
   }
 
@@ -58,18 +67,20 @@ class Produk {
     return {
       'id': id,
       'imagePath': imagePath,
+      'codeProduk': codeProduk,
+      'barcode': barcode,
       'nama': nama,
       'kategori': kategori,
       'merek': merek,
-      'hargaJual': hargaJual,
-      'hargaBeli': hargaBeli,
-      'barcode': barcode,
       'tglExpired': tglExpired,
-      'stok': stok,
+      'satuanBeli': satuanBeli,
+      'satuanJual': satuanJual,
+      'isi': isi,
+      'hargaBeli': hargaBeli,
+      'hargaJual': hargaJual,
       'minStok': minStok,
-      'satuan': satuan,
-      'sendNotification':
-          sendNotification == true ? 1 : 0, // Added field to toMap
+      'stok': stok,
+      'sendNotification': sendNotification == true ? 1 : 0,
     };
   }
 

@@ -1,8 +1,8 @@
-import 'package:bpkp_pos_test/view/laporan/katalog_produk.dart';
+import 'package:bpkp_pos_test/view/laporan/riwayat_pembelian.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
-import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
-import 'package:bpkp_pos_test/view/laporan/date_range_state.dart';
+// import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
+// import 'package:bpkp_pos_test/view/laporan/date_range_state.dart';
 
 class LaporanDrawer extends StatelessWidget {
   final BuildContext parentContext;
@@ -36,29 +36,29 @@ class LaporanDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.description),
-            title: const Text('Ringkasan Penjualan'),
-            onTap: () {
-              Navigator.pushReplacement(
-                parentContext,
-                MaterialPageRoute(
-                  builder: (context) => RingkasanPenjualanPage(
-                    startDate: GlobalDateRange.startDate,
-                    endDate: GlobalDateRange.endDate,
-                  ),
-                ),
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.description),
+          //   title: const Text('Ringkasan Penjualan'),
+          //   onTap: () {
+          //     Navigator.pushReplacement(
+          //       parentContext,
+          //       MaterialPageRoute(
+          //         builder: (context) => RingkasanPenjualanPage(
+          //           startDate: GlobalDateRange.startDate,
+          //           endDate: GlobalDateRange.endDate,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
           ListTile(
             leading: const Icon(Icons.history),
-            title: const Text('Riwayat Transaksi'),
+            title: const Text('Riwayat Penjualan'),
             onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.inventory),
-            title: const Text('Katalog Produk'),
+            title: const Text('Riwayat Pembelian'),
             onTap: () {
               Navigator.pushReplacement(
                 parentContext,

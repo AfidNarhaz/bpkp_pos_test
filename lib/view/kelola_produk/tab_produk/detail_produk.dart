@@ -24,21 +24,21 @@ class DetailProdukPage extends StatefulWidget {
 
 class DetailProdukPageState extends State<DetailProdukPage> {
   final _formKey = GlobalKey<FormState>();
-
-  // Kontrol gambar dan service image
-  File? _image;
   final ImageService _imageService = ImageService();
+  File? _image;
 
+  late TextEditingController _kodeProdukController;
+  late TextEditingController _barcodeController;
   late TextEditingController _namaController;
   late TextEditingController _kategoriController;
   late TextEditingController _merekController;
-  late TextEditingController _barcodeController;
+  late TextEditingController _tanggalController;
+  late TextEditingController _satuanBeliController;
+  late TextEditingController _satuanJualController;
+  late TextEditingController _isiController;
   late TextEditingController _hargaBeliController;
   late TextEditingController _hargaJualController;
-  late TextEditingController _tanggalController;
-  late TextEditingController _stokController;
   late TextEditingController _minStokController;
-  late TextEditingController _satuanController;
 
   bool _sendNotification = false;
 
@@ -49,12 +49,22 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   @override
   void initState() {
     super.initState();
-    _imageService.initDb(); // Inisialisasi database gambar
+    // Inisialisasi database gambar
+    _imageService.initDb();
+
     // Inisialisasi dengan nilai produk yang ada
+    _kodeProdukController =
+        TextEditingController(text: widget.produk.codeProduk);
+    _barcodeController = TextEditingController(text: widget.produk.barcode);
     _namaController = TextEditingController(text: widget.produk.nama);
     _kategoriController = TextEditingController(text: widget.produk.kategori);
     _merekController = TextEditingController(text: widget.produk.merek);
-    _barcodeController = TextEditingController(text: widget.produk.barcode);
+    _tanggalController = TextEditingController(text: widget.produk.tglExpired);
+    _satuanBeliController =
+        TextEditingController(text: widget.produk.satuanBeli);
+    _satuanJualController =
+        TextEditingController(text: widget.produk.satuanJual);
+    _isiController = TextEditingController(text: widget.produk.isi?.toString());
     _hargaBeliController = TextEditingController(
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaBeli)
@@ -63,33 +73,29 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaJual)
             .replaceAll(',', '.'));
-    _tanggalController = TextEditingController(text: widget.produk.tglExpired);
-    _satuanController = TextEditingController(text: widget.produk.satuan);
-    _stokController =
-        TextEditingController(text: widget.produk.stok?.toString());
     _minStokController =
         TextEditingController(text: widget.produk.minStok?.toString());
     if (widget.produk.imagePath != null) {
       _image = File(widget.produk.imagePath!);
     }
-    stok = widget.produk.stok?.toString();
     minStok = widget.produk.minStok?.toString();
-    satuan = widget.produk.satuan;
     _sendNotification = widget.produk.sendNotification ?? false;
   }
 
   @override
   void dispose() {
+    _kodeProdukController.dispose();
+    _barcodeController.dispose();
     _namaController.dispose();
     _kategoriController.dispose();
     _merekController.dispose();
-    _barcodeController.dispose();
+    _tanggalController.dispose();
+    _satuanBeliController.dispose();
+    _satuanJualController.dispose();
+    _isiController.dispose();
     _hargaBeliController.dispose();
     _hargaJualController.dispose();
-    _tanggalController.dispose();
-    _stokController.dispose(); // Dispose _stokController
-    _minStokController.dispose(); // Dispose _minStokController
-    _satuanController.dispose(); // Dispose _satuanController
+    _minStokController.dispose();
     super.dispose();
   }
 
@@ -107,26 +113,25 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     if (_formKey.currentState!.validate()) {
       Produk updatedProduct = Produk(
         id: widget.produk.id,
+        codeProduk: _kodeProdukController.text,
+        barcode: _barcodeController.text,
         nama: _namaController.text,
         kategori: _kategoriController.text,
         merek: _merekController.text,
-        barcode: _barcodeController.text,
+        tglExpired: _tanggalController.text,
+        satuanBeli: _satuanBeliController.text,
+        satuanJual: _satuanJualController.text,
+        isi: int.tryParse(_isiController.text.replaceAll('.', '')) ?? 0,
         hargaBeli:
             double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
                 0.0,
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
-        tglExpired: _tanggalController.text,
-        imagePath: _image?.path ?? widget.produk.imagePath,
-        stok: int.tryParse(_stokController.text.replaceAll('.', '')) ??
-            0, // Use _stokController
-        minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ??
-            0, // Use _minStokController
-        satuan: _satuanController.text, // Use _satuanController
-        sendNotification: _sendNotification, // Include sendNotification
+        minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
+        stok: 0, // Set stok selalu 0
+        sendNotification: _sendNotification,
       );
-
       await DatabaseHelper().updateProduk(updatedProduct);
 
       // Tambahkan history edit produk
@@ -140,7 +145,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
           user: username,
           role: role,
           waktu: DateTime.now(),
-          detail: 'Produk diubah',
+          detail: 'Data Produk diubah',
         ),
       );
 
@@ -186,10 +191,10 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                 GestureDetector(
                   onTap: _pickImage,
                   child: Container(
-                    height: 150,
-                    width: 150,
+                    height: 100,
+                    width: 100,
                     decoration: BoxDecoration(
-                      color: Colors.blue[100],
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(10),
                       image: _image != null
                           ? DecorationImage(
@@ -204,20 +209,43 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     child: (_image == null && widget.produk.imagePath == null)
                         ? const Icon(
                             Icons.camera_alt,
-                            size: 50,
+                            size: 25,
                             color: Colors.black54,
                           )
                         : null,
                   ),
                 ),
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 10),
+                // Kode Produk
+                _buildTextField(
+                  controller: _kodeProdukController,
+                  label: 'Kode Produk',
+                ),
+                // Barcode
+                _buildTextField(
+                  controller: _barcodeController,
+                  label: 'Barcode',
+                  suffixIcon: Icons.barcode_reader,
+                  onTap: () async {
+                    final barcode = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BarcodeScannerPage(),
+                      ),
+                    );
+                    if (barcode != null && barcode.isNotEmpty) {
+                      if (!mounted) return;
+                      setState(() {
+                        _barcodeController.text = barcode;
+                      });
+                    }
+                  },
+                ),
                 // Nama Produk
                 _buildTextField(
                   controller: _namaController,
                   label: 'Nama Produk',
                 ),
-
                 // Pilih Kategori
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getKategori(),
@@ -264,7 +292,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-
                 // Pilih Merek
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getMerek(),
@@ -310,50 +337,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-
-                // Harga Jual
-                _buildTextField(
-                  controller: _hargaJualController,
-                  label: 'Harga Jual',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
-
-                // Harga Beli
-                _buildTextField(
-                  controller: _hargaBeliController,
-                  label: 'Harga Beli',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
-
-                // Kode Produk / Barcode
-                _buildTextField(
-                  controller: _barcodeController,
-                  label: 'Barcode',
-                  suffixIcon: Icons.barcode_reader,
-                  onTap: () async {
-                    final barcode = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BarcodeScannerPage(),
-                      ),
-                    );
-                    if (barcode != null && barcode.isNotEmpty) {
-                      if (!mounted) return;
-                      setState(() {
-                        _barcodeController.text = barcode;
-                      });
-                    }
-                  },
-                ),
-
                 // Tanggal Kadaluwarsa
                 _buildTextField(
                   controller: _tanggalController,
@@ -372,19 +355,129 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-
-                //Stok Produk
+                // Pilih Satuan Jual
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getSatuan(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final satuanJualList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _satuanJualController,
+                      label: 'Pilih Satuan Jual',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        SatuanDialog.showSatuanDialog(
+                          context,
+                          satuanJualList,
+                          (newSatuanJual) async {
+                            if (newSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .insertSatuan(newSatuanJual);
+                              setState(() {});
+                              _satuanJualController.text = newSatuanJual;
+                            }
+                          },
+                          (id, updatedSatuanJual) async {
+                            if (updatedSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateSatuan(id, updatedSatuanJual);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteSatuan(id);
+                            setState(() {});
+                          },
+                          (selectedSatuanJual) {
+                            setState(() {
+                              _satuanJualController.text = selectedSatuanJual;
+                            });
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                // Pilih Satuan Beli
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getSatuan(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final satuanBeliList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _satuanBeliController,
+                      label: 'Pilih Satuan Beli',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        SatuanDialog.showSatuanDialog(
+                          context,
+                          satuanBeliList,
+                          (newSatuanBeli) async {
+                            if (newSatuanBeli.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .insertSatuan(newSatuanBeli);
+                              setState(() {});
+                              _satuanBeliController.text = newSatuanBeli;
+                            }
+                          },
+                          (id, updatedSatuanBeli) async {
+                            if (updatedSatuanBeli.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateSatuan(id, updatedSatuanBeli);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteSatuan(id);
+                            setState(() {});
+                          },
+                          (selectedSatuanBeli) {
+                            setState(() {
+                              _satuanBeliController.text = selectedSatuanBeli;
+                            });
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                // Isi
                 _buildTextField(
-                  controller: _stokController,
-                  label: 'Stok Produk',
+                  controller: _isiController,
+                  label: 'Isi',
                   keyboardType: TextInputType.number,
                   inputFormatter: [
                     FilteringTextInputFormatter.digitsOnly,
                     ThousandsSeparatorInputFormatter(),
                   ],
                 ),
-
-                //Stok Minimal
+                // Harga Beli
+                _buildTextField(
+                  controller: _hargaBeliController,
+                  label: 'Harga Beli',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+                // Harga Jual
+                _buildTextField(
+                  controller: _hargaJualController,
+                  label: 'Harga Jual',
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                ),
+                // Stok Minimal
                 _buildTextField(
                   controller: _minStokController,
                   label: 'Stok Minimal',
@@ -393,52 +486,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     FilteringTextInputFormatter.digitsOnly,
                     ThousandsSeparatorInputFormatter(),
                   ],
-                ),
-
-                // Pilih Satuan
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper().getSatuan(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    final satuanList = snapshot.data ?? [];
-                    return _buildTextField(
-                      controller: _satuanController,
-                      label: 'Pilih Satuan',
-                      suffixIcon: Icons.arrow_forward_ios,
-                      readOnly: true,
-                      onTap: () {
-                        SatuanDialog.showSatuanDialog(
-                          context,
-                          satuanList,
-                          (newSatuan) async {
-                            if (newSatuan.isNotEmpty) {
-                              await DatabaseHelper().insertSatuan(newSatuan);
-                              setState(() {});
-                              _satuanController.text = newSatuan;
-                            }
-                          },
-                          (id, updatedSatuan) async {
-                            if (updatedSatuan.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .updateSatuan(id, updatedSatuan);
-                              setState(() {});
-                            }
-                          },
-                          (id) async {
-                            await DatabaseHelper().deleteSatuan(id);
-                            setState(() {});
-                          },
-                          (selectedSatuan) {
-                            setState(() {
-                              _satuanController.text = selectedSatuan;
-                            });
-                          },
-                        );
-                      },
-                    );
-                  },
                 ),
                 const SizedBox(height: 10),
                 // Tombol Hapus dan Simpan
