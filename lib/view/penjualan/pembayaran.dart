@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:bpkp_pos_test/view/transaksi/transaksi_berhasil.dart';
+import 'package:bpkp_pos_test/view/penjualan/transaksi_berhasil.dart';
 
 class PembayaranPage extends StatefulWidget {
   final List<Map<String, dynamic>> keranjang;

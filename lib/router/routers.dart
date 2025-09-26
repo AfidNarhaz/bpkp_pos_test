@@ -1,7 +1,7 @@
 import 'package:bpkp_pos_test/view/auth/login_page.dart';
 import 'package:bpkp_pos_test/view/home/home_page.dart';
 import 'package:bpkp_pos_test/view/splash_page.dart';
-import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
+import 'package:bpkp_pos_test/view/penjualan/transaksi_page.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get.dart';
 

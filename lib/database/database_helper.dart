@@ -170,6 +170,30 @@ class DatabaseHelper {
         detail TEXT
       )
     ''');
+
+    // Tabel Pembelian
+    await db.execute('''
+      CREATE TABLE pembelian (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produkId INTEGER,
+        jumlah INTEGER,
+        totalHarga REAL,
+        tanggal TEXT,
+        FOREIGN KEY (produkId) REFERENCES produk(id) ON DELETE CASCADE
+      )
+    ''');
+
+    // Tabel Penjualan
+    await db.execute('''
+      CREATE TABLE penjualan (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produkId INTEGER,
+        jumlah INTEGER,
+        totalHarga REAL,
+        tanggal TEXT,
+        FOREIGN KEY (produkId) REFERENCES produk(id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   // Fungsi untuk mengupgrade database

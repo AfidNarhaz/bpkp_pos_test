@@ -773,6 +773,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  smart_search_dropdown:
+    dependency: "direct main"
+    description:
+      name: smart_search_dropdown
+      sha256: f700457a9c1dde90015617371fc71fdd9b5919cabe6d503a284b99f4810ef723
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   snapping_sheet:
     dependency: "direct main"
     description:

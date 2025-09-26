@@ -1,6 +1,7 @@
 import 'package:bpkp_pos_test/view/home/bantuan.dart';
+import 'package:bpkp_pos_test/view/pembelian/pembelian.dart';
 import 'package:bpkp_pos_test/view/produk/kelola_produk_page.dart';
-import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
+import 'package:bpkp_pos_test/view/penjualan/transaksi_page.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
@@ -26,6 +27,17 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BantuanPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded),
             onPressed: () {
@@ -57,8 +69,9 @@ class _HomePageState extends State<HomePage> {
                   _buildIconWithLabel(Icons.inventory_2_outlined, 'Produk'),
                   _buildIconWithLabel(Icons.badge_outlined, 'Pegawai'),
                   _buildIconWithLabel(
-                      Icons.point_of_sale_outlined, 'Transaksi'),
-                  _buildIconWithLabel(Icons.help_center_outlined, 'Bantuan'),
+                      Icons.point_of_sale_outlined, 'Penjualan'),
+                  _buildIconWithLabel(
+                      Icons.point_of_sale_outlined, 'Pembelian'),
                 ],
               ),
             ),
@@ -127,7 +140,7 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => const PegawaiPage()),
           );
         }
-        if (label == 'Transaksi') {
+        if (label == 'Penjualan') {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -135,11 +148,11 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         }
-        if (label == 'Bantuan') {
+        if (label == 'Pembelian') {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const BantuanPage(),
+              builder: (context) => const Pembelian(),
             ),
           );
         }

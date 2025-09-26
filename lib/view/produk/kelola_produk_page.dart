@@ -134,6 +134,21 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
           onFilter: () {
             _showFilterDialog(context);
           },
+          onSearchByName: (query) {
+            setState(() {
+              filteredProdukList = produkList
+                  .where((produk) =>
+                      produk.nama.toLowerCase().contains(query.toLowerCase()))
+                  .toList();
+            });
+          },
+          onSearchByBarcode: (barcode) {
+            setState(() {
+              filteredProdukList = produkList
+                  .where((produk) => produk.barcode == barcode)
+                  .toList();
+            });
+          },
         ),
         Expanded(
           child: filteredProdukList.isNotEmpty
