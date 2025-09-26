@@ -42,6 +42,7 @@ dependencies:
   intl: ^0.20.1
   logging: ^1.0.2
   material_design_icons_flutter: ^7.0.7296
+  material_symbols_icons: ^4.2780.0
   mobile_scanner: ^7.0.0
   path: ^1.9.0
   path_provider: ^2.1.2

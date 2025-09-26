@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/detail_produk.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/detail_produk.dart';
 
 class ListTileProduk extends StatelessWidget {
   final Produk produk;

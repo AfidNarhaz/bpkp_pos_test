@@ -1,5 +1,5 @@
 import 'package:bpkp_pos_test/model/model_history_produk.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner.dart';
+import 'package:bpkp_pos_test/view/produk/widget/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';

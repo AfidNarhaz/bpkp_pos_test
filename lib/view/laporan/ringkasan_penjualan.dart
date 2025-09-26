@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/drawer.dart';
-import 'package:bpkp_pos_test/view/laporan/date_range_picker_widget.dart';
+import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 
 class RingkasanPenjualanPage extends StatefulWidget {
   final DateTime startDate;

@@ -1,5 +1,5 @@
 import 'package:bpkp_pos_test/view/home/bantuan.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/kelola_produk_page.dart';
+import 'package:bpkp_pos_test/view/produk/kelola_produk_page.dart';
 import 'package:bpkp_pos_test/view/transaksi/transaksi_page.dart';
 import 'package:bpkp_pos_test/view/home/notification_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';

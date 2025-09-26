@@ -1,4 +1,4 @@
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/image_service.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/image_service.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:bpkp_pos_test/model/user.dart';

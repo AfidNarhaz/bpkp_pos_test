@@ -1,13 +1,13 @@
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/add_produk.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_stok/atur_stok.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/add_produk.dart';
+import 'package:bpkp_pos_test/view/produk/tab_stok/stok.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/list_tile_produk.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/searchfilter_bar.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/filter_dialog.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/tab_produk/produk_tab_bar_view.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/list_tile_produk.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/searchfilter_bar.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/filter_dialog.dart';
+import 'package:bpkp_pos_test/view/produk/tab_produk/produk_tab_bar_view.dart';
 
 final Logger _logger = Logger('KelolaProdukLogger');
 

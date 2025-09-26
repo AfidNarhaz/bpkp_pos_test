@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/transaksi/detail_keranjang.dart';
 import 'package:bpkp_pos_test/view/transaksi/pembayaran.dart';
-import 'package:bpkp_pos_test/view/kelola_produk/barcode_scanner.dart';
+import 'package:bpkp_pos_test/view/produk/widget/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
