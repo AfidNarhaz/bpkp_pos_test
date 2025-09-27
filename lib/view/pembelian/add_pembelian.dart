@@ -1,5 +1,6 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
+import 'package:bpkp_pos_test/view/pembelian/pop_up_edit_produk.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_tambah_produk.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_kategori.dart';
@@ -15,14 +16,31 @@ class AddPembelian extends StatefulWidget {
 
 class _AddPembelianState extends State<AddPembelian> {
   List<Map<String, dynamic>> barangs = [];
-  void insertBarang(int idBarang, int stok, double hargaBeli) {
+
+  String formatNumber(double number) {
+    return number.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
+  }
+
+  void insertBarang(
+    int idBarang,
+    String nama,
+    int stok,
+    String satuan,
+    double hargaBeli,
+  ) {
     Map<String, dynamic> barang = {
       'id_barang': idBarang,
+      'nama': nama,
       'stok': stok,
+      'satuan': satuan,
       'harga_beli': hargaBeli,
     };
-
-    barangs.add(barang);
+    setState(() {
+      barangs.add(barang);
+    });
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -161,7 +179,13 @@ class _AddPembelianState extends State<AddPembelian> {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () {
-                      showTambahProdukDialog(context, insertBarang);
+                      showTambahProdukDialog(
+                        context,
+                        (int id, String nama, int stok, String satuan,
+                            double harga) {
+                          insertBarang(id, nama, stok, satuan, harga);
+                        },
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: AppColors.accent,
@@ -180,6 +204,49 @@ class _AddPembelianState extends State<AddPembelian> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // Widget untuk menampilkan daftar produk yang sudah ditambahkan
+                Column(
+                  children: barangs.map((barang) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: ListTile(
+                        title: Text(barang['nama']),
+                        subtitle: Text(
+                          '${barang['stok']} ${barang['satuan']} @Rp${formatRupiah(barang['harga_beli'])}',
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                showEditProdukDialog(
+                                  context,
+                                  barang,
+                                  (int stokBaru, double hargaBaru) {
+                                    setState(() {
+                                      barang['stok'] = stokBaru;
+                                      barang['harga_beli'] = hargaBaru;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                setState(() {
+                                  barangs.remove(barang);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
 
                 // Simpan Button
                 SizedBox(
