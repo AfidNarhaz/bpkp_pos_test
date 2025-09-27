@@ -74,18 +74,4 @@ class _PembelianState extends State<Pembelian> {
       child: const Icon(Icons.add),
     );
   }
-
-  // Future<void> _loadProdukAsync() async {
-  //   try {
-  //     List<Produk> products = await dbHelper.getProduks();
-  //     if (mounted) {
-  //       setState(() {
-  //         produkList = products;
-  //         filteredProdukList = produkList;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     _logger.severe('Error loading products: $e');
-  //   }
-  // }
 }

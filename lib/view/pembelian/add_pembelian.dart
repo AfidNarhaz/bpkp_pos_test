@@ -2,9 +2,9 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/helper/format_rupiah.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_edit_produk.dart';
+import 'package:bpkp_pos_test/view/pembelian/pop_up_supplier.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_tambah_produk.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_expired.dart';
-import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_kategori.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -45,9 +45,33 @@ class _AddPembelianState extends State<AddPembelian> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _kategoriController = TextEditingController();
-  final TextEditingController _kodeProdukController = TextEditingController();
+  final TextEditingController _refNoController = TextEditingController();
   final TextEditingController _tglPembelianController = TextEditingController();
+  final TextEditingController _pilihSupplierController =
+      TextEditingController();
+  final TextEditingController _kodeKasController = TextEditingController();
+  final TextEditingController _keteranganController = TextEditingController();
+  final TextEditingController _pembayaranController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _refNoController.text = _generateRefNo();
+    _tglPembelianController.text = _getTodayDate();
+  }
+
+  String _generateRefNo() {
+    final now = DateTime.now();
+    final tanggal =
+        "${now.day.toString().padLeft(2, '0')}${now.month.toString().padLeft(2, '0')}${now.year.toString().substring(2)}";
+    final random = now.millisecond.toString().padLeft(3, '0');
+    return "R21-$tanggal$random";
+  }
+
+  String _getTodayDate() {
+    final now = DateTime.now();
+    return "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +90,7 @@ class _AddPembelianState extends State<AddPembelian> {
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
-                    controller: _kodeProdukController,
+                    controller: _refNoController,
                     label: 'Ref No',
                   ),
                 ),
@@ -94,45 +118,47 @@ class _AddPembelianState extends State<AddPembelian> {
                 ),
                 // Pilih Suplier
                 FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper().getKategori(),
+                  future: DatabaseHelper()
+                      .getSupplier(), // Pastikan ada fungsi getSupplier
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     }
-                    final kategoriList = snapshot.data ?? [];
+                    final supplierList = snapshot.data ?? [];
                     return SizedBox(
                       width: double.infinity,
                       child: _buildTextField(
-                        controller: _kategoriController,
+                        controller: _pilihSupplierController,
                         label: 'Supplier',
                         suffixIcon: Icons.arrow_forward_ios,
                         readOnly: true,
                         onTap: () {
-                          KategoriDialog.showKategoriDialog(
+                          SupplierDialog.showSupplierDialog(
                             context,
-                            kategoriList,
-                            (newKategori) async {
-                              if (newKategori.isNotEmpty) {
+                            supplierList,
+                            (newSupplier) async {
+                              if (newSupplier.isNotEmpty) {
                                 await DatabaseHelper()
-                                    .insertKategori(newKategori);
+                                    .insertSupplier(newSupplier);
                                 setState(() {});
-                                _kategoriController.text = newKategori;
+                                _pilihSupplierController.text = newSupplier;
                               }
                             },
-                            (id, updatedKategori) async {
-                              if (updatedKategori.isNotEmpty) {
+                            (id, updatedSupplier) async {
+                              if (updatedSupplier.isNotEmpty) {
                                 await DatabaseHelper()
-                                    .updateKategori(id, updatedKategori);
+                                    .updateSupplier(id, updatedSupplier);
                                 setState(() {});
                               }
                             },
                             (id) async {
-                              await DatabaseHelper().deleteKategori(id);
+                              await DatabaseHelper().deleteSupplier(id);
                               setState(() {});
                             },
-                            (selectedKategori) {
+                            (selectedSupplier) {
                               setState(() {
-                                _kategoriController.text = selectedKategori;
+                                _pilihSupplierController.text =
+                                    selectedSupplier;
                               });
                             },
                           );
@@ -145,7 +171,7 @@ class _AddPembelianState extends State<AddPembelian> {
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
-                    controller: _kodeProdukController,
+                    controller: _kodeKasController,
                     label: 'Kode Kas',
                   ),
                 ),
@@ -153,7 +179,7 @@ class _AddPembelianState extends State<AddPembelian> {
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
-                    controller: _kodeProdukController,
+                    controller: _keteranganController,
                     label: 'Keterangan',
                   ),
                 ),
@@ -161,7 +187,7 @@ class _AddPembelianState extends State<AddPembelian> {
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
-                    controller: _kodeProdukController,
+                    controller: _pembayaranController,
                     label: 'Pembayaran',
                   ),
                 ),
