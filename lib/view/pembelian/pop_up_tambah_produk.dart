@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:intl/intl.dart';
+import 'package:bpkp_pos_test/helper/format_rupiah.dart';
 
 String formatRupiah(num number) {
   final formatter = NumberFormat('#,##0', 'id_ID');
@@ -168,11 +169,8 @@ void showTambahProdukDialog(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      hintText: formatRupiah(
-                                        double.tryParse(hargaController.text
-                                                .replaceAll('.', '')) ??
-                                            0,
-                                      ),
+                                      hintText: FormatRupiah(value: 1000000)
+                                          .formatted,
                                     ),
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,

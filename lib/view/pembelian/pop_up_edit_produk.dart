@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
+import 'package:intl/intl.dart';
+import 'package:bpkp_pos_test/helper/format_rupiah.dart';
+
+String formatRupiah(num number) {
+  final formatter = NumberFormat('#,##0', 'id_ID');
+  return formatter.format(number);
+}
 
 void showEditProdukDialog(
   BuildContext context,
   Map<String, dynamic> barang,
   Function(int stok, double harga) onUpdate,
 ) {
-  final jumlahController =
-      TextEditingController(text: barang['stok'].toString());
-  final hargaController =
-      TextEditingController(text: barang['harga_beli'].toString());
+  final jumlahController = TextEditingController(
+    text: barang['stok'].toString(),
+  );
+  final hargaController = TextEditingController(
+    text: FormatRupiah(value: barang['harga_beli'])
+        .formatted
+        .replaceAll('Rp', '')
+        .trim(),
+  );
 
   showDialog(
     context: context,
@@ -45,6 +57,18 @@ void showEditProdukDialog(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
+                      onChanged: (value) {
+                        final raw = value.replaceAll('.', '');
+                        final numVal = int.tryParse(raw) ?? 0;
+                        final formatted = formatRupiah(numVal);
+                        if (value != formatted) {
+                          jumlahController.value = TextEditingValue(
+                            text: formatted,
+                            selection: TextSelection.collapsed(
+                                offset: formatted.length),
+                          );
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -68,7 +92,21 @@ void showEditProdukDialog(
                         labelText: "Harga Satuan",
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10)),
+                        hintText: FormatRupiah(value: 1000000)
+                            .formatted, // contoh hint
                       ),
+                      onChanged: (value) {
+                        final raw = value.replaceAll('.', '');
+                        final numVal = int.tryParse(raw) ?? 0;
+                        final formatted = formatRupiah(numVal);
+                        if (value != formatted) {
+                          hargaController.value = TextEditingValue(
+                            text: formatted,
+                            selection: TextSelection.collapsed(
+                                offset: formatted.length),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -84,9 +122,11 @@ void showEditProdukDialog(
                         borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
-                    final stok =
-                        int.tryParse(jumlahController.text) ?? barang['stok'];
-                    final harga = double.tryParse(hargaController.text) ??
+                    final stok = int.tryParse(
+                            jumlahController.text.replaceAll('.', '')) ??
+                        barang['stok'];
+                    final harga = double.tryParse(
+                            hargaController.text.replaceAll('.', '')) ??
                         barang['harga_beli'];
                     onUpdate(stok, harga);
                     Navigator.pop(context);

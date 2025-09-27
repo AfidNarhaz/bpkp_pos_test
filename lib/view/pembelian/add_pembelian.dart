@@ -1,4 +1,5 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:bpkp_pos_test/helper/format_rupiah.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_edit_produk.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_tambah_produk.dart';
@@ -212,8 +213,11 @@ class _AddPembelianState extends State<AddPembelian> {
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       child: ListTile(
                         title: Text(barang['nama']),
-                        subtitle: Text(
-                          '${barang['stok']} ${barang['satuan']} @Rp${formatRupiah(barang['harga_beli'])}',
+                        subtitle: Row(
+                          children: [
+                            Text('${barang['stok']} ${barang['satuan']} @'),
+                            FormatRupiah(value: barang['harga_beli']),
+                          ],
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
