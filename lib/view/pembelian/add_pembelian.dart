@@ -14,6 +14,17 @@ class AddPembelian extends StatefulWidget {
 }
 
 class _AddPembelianState extends State<AddPembelian> {
+  List<Map<String, dynamic>> barangs = [];
+  void insertBarang(int idBarang, int stok, double hargaBeli) {
+    Map<String, dynamic> barang = {
+      'id_barang': idBarang,
+      'stok': stok,
+      'harga_beli': hargaBeli,
+    };
+
+    barangs.add(barang);
+  }
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _kodeProdukController = TextEditingController();
@@ -144,12 +155,13 @@ class _AddPembelianState extends State<AddPembelian> {
                   ],
                 ),
                 const SizedBox(height: 10),
+
                 // Tambah Produk
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () {
-                      showTambahProdukDialog(context);
+                      showTambahProdukDialog(context, insertBarang);
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: AppColors.accent,
@@ -168,6 +180,7 @@ class _AddPembelianState extends State<AddPembelian> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 // Simpan Button
                 SizedBox(
                   width: double.infinity,
