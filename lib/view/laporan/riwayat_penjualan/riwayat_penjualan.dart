@@ -1,5 +1,6 @@
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
+import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/detail_riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/drawer.dart';
 
@@ -134,6 +135,16 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                   kode: '468156ND',
                   status: 'Lunas',
                   jam: '15:41',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailRiwayatPenjualanPage(
+                            // Kirim data jika diperlukan
+                            ),
+                      ),
+                    );
+                  },
                 ),
                 SizedBox(height: 12),
                 _TransaksiItem(
@@ -141,6 +152,16 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                   kode: '46815UBZ',
                   status: 'Lunas',
                   jam: '15:39',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailRiwayatPenjualanPage(
+                            // Kirim data jika diperlukan
+                            ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -166,45 +187,52 @@ class _TransaksiItem extends StatelessWidget {
   final String kode;
   final String status;
   final String jam;
+  final VoidCallback? onTap; // Tambahkan callback
 
   const _TransaksiItem({
     required this.nominal,
     required this.kode,
     required this.status,
     required this.jam,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(Icons.receipt_long, color: Colors.grey, size: 32),
-        SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(nominal,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Text(kode, style: TextStyle(color: Colors.grey)),
-            ],
+    return InkWell(
+      onTap: onTap, // Tambahkan onTap
+      child: Row(
+        children: [
+          Icon(Icons.receipt_long, color: Colors.grey, size: 32),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nominal,
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(kode, style: TextStyle(color: Colors.grey)),
+              ],
+            ),
           ),
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.green.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.green),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.green),
+            ),
+            child: Text(
+              status,
+              style:
+                  TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
           ),
-          child: Text(
-            status,
-            style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-          ),
-        ),
-        SizedBox(width: 12),
-        Text(jam, style: TextStyle(color: Colors.grey)),
-      ],
+          SizedBox(width: 12),
+          Text(jam, style: TextStyle(color: Colors.grey)),
+        ],
+      ),
     );
   }
 }
