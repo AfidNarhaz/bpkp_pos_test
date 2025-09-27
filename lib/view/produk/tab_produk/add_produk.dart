@@ -2,7 +2,7 @@ import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_merek.dart';
-import 'package:bpkp_pos_test/view/produk/tab_stok/pop_up_satuan.dart';
+import 'package:bpkp_pos_test/view/produk/widget/pop_up_satuan.dart';
 import 'package:bpkp_pos_test/view/produk/widget/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
@@ -331,52 +331,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-                // Pilih Satuan Jual
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper().getSatuan(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    final satuanJualList = snapshot.data ?? [];
-                    return _buildTextField(
-                      controller: _satuanJualController,
-                      label: 'Pilih Satuan Jual',
-                      suffixIcon: Icons.arrow_forward_ios,
-                      readOnly: true,
-                      onTap: () {
-                        SatuanDialog.showSatuanDialog(
-                          context,
-                          satuanJualList,
-                          (newSatuanJual) async {
-                            if (newSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .insertSatuan(newSatuanJual);
-                              setState(() {});
-                              _satuanJualController.text = newSatuanJual;
-                            }
-                          },
-                          (id, updatedSatuanJual) async {
-                            if (updatedSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .updateSatuan(id, updatedSatuanJual);
-                              setState(() {});
-                            }
-                          },
-                          (id) async {
-                            await DatabaseHelper().deleteSatuan(id);
-                            setState(() {});
-                          },
-                          (selectedSatuanJual) {
-                            setState(() {
-                              _satuanJualController.text = selectedSatuanJual;
-                            });
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
                 // Pilih Satuan Beli
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getSatuan(),
@@ -416,6 +370,52 @@ class AddProdukPageState extends State<AddProdukPage> {
                           (selectedSatuanBeli) {
                             setState(() {
                               _satuanBeliController.text = selectedSatuanBeli;
+                            });
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                // Pilih Satuan Jual
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getSatuan(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final satuanJualList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _satuanJualController,
+                      label: 'Pilih Satuan Jual',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        SatuanDialog.showSatuanDialog(
+                          context,
+                          satuanJualList,
+                          (newSatuanJual) async {
+                            if (newSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .insertSatuan(newSatuanJual);
+                              setState(() {});
+                              _satuanJualController.text = newSatuanJual;
+                            }
+                          },
+                          (id, updatedSatuanJual) async {
+                            if (updatedSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateSatuan(id, updatedSatuanJual);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteSatuan(id);
+                            setState(() {});
+                          },
+                          (selectedSatuanJual) {
+                            setState(() {
+                              _satuanJualController.text = selectedSatuanJual;
                             });
                           },
                         );

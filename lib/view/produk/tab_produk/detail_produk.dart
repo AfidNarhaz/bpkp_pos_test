@@ -2,7 +2,7 @@ import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_kategori.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_expired.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_merek.dart';
-import 'package:bpkp_pos_test/view/produk/tab_stok/pop_up_satuan.dart';
+import 'package:bpkp_pos_test/view/produk/widget/pop_up_satuan.dart';
 import 'package:bpkp_pos_test/view/produk/widget/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';

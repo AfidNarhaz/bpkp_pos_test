@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/pegawai/add_pegawai_page.dart';
 import 'package:bpkp_pos_test/view/pegawai/detail_pegawai_page.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
@@ -36,6 +37,7 @@ class PegawaiPageState extends State<PegawaiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Pegawai',

@@ -5,6 +5,7 @@ import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,7 +54,10 @@ class StokTabState extends State<StokTab> {
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
+                  icon: Icon(
+                    MdiIcons.barcodeScan,
+                    size: 30,
+                  ),
                   onPressed: () async {
                     final barcode = await Navigator.push(
                       context,

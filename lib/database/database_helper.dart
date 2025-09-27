@@ -34,6 +34,7 @@ class DatabaseHelper {
   static const String tableMerek = 'merek';
   static const String tableSatuan = 'satuan';
   static const String tablePegawai = 'pegawai';
+  static const String tableSupplier = 'supplier';
 
   // Getter database
   Future<Database> get database async {
@@ -173,14 +174,13 @@ class DatabaseHelper {
 
     // Tabel Pembelian
     await db.execute('''
-      CREATE TABLE pembelian (
+      CREATE TABLE $tableSupplier (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        produkId INTEGER,
-        jumlah INTEGER,
-        totalHarga REAL,
-        tanggal TEXT,
-        FOREIGN KEY (produkId) REFERENCES produk(id) ON DELETE CASCADE
-      )
+        code TEXT,
+        supplier TEXT,
+        product_id INTEGER NOT NULL,
+        FOREIGN KEY (product_id) REFERENCES produk(id) ON DELETE CASCADE
+    )
     ''');
 
     // Tabel Penjualan
@@ -214,6 +214,7 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk mengambil semua produk
   Future<List<Produk>> getProduk() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('produk');
@@ -484,6 +485,7 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk memperbarui kategori produk ketika kategori diubah
   Future<void> updateProdukKategori(String oldName, String newName) async {
     try {
       final db = await database;
@@ -496,6 +498,86 @@ class DatabaseHelper {
       debugPrint("Kategori produk diperbarui dari $oldName ke $newName");
     } catch (e) {
       throw Exception("Error updating produk kategori: $e");
+    }
+  }
+
+  // Fungsi untuk memasukkan pembelian baru
+  Future<void> insertPembelian(
+      List<Map<String, dynamic>> barangList, String supplier) async {
+    final db = await database;
+
+    String timestamp = DateTime.now().toString();
+    String formattedDate = timestamp
+        .replaceAll("-", "")
+        .replaceAll(":", "")
+        .replaceAll(" ", "_")
+        .split(".")[0];
+    String code = 'PEMBELIAN_$formattedDate';
+
+    await db.transaction((txn) async {
+      for (var barang in barangList) {
+        await txn.insert(
+          'pembelian',
+          {
+            'code': code,
+            'supplier': supplier,
+            'product_id': barang['product_id'],
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+  // Fungsi untuk mengambil semua supplier dari database
+  Future<List<Map<String, dynamic>>> getSupplier() async {
+    try {
+      final db = await database;
+      return await db.query(tableSupplier);
+    } catch (e) {
+      throw Exception("Error fetching supplier: $e");
+    }
+  }
+
+  // Fungsi untuk menambahkan supplier baru
+  Future<int> insertSupplier(String namaSupplier) async {
+    try {
+      final db = await database;
+      return await db.insert(
+        tableSupplier,
+        {'name': namaSupplier},
+      );
+    } catch (e) {
+      throw Exception("Error inserting supplier: $e");
+    }
+  }
+
+  // Fungsi untuk mengedit supplier
+  Future<int> updateSupplier(int id, String name) async {
+    try {
+      final db = await database;
+      return await db.update(
+        tableSupplier,
+        {'name': name},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error updating supplier: $e");
+    }
+  }
+
+  // Fungsi untuk menghapus supplier
+  Future<int> deleteSupplier(int id) async {
+    try {
+      final db = await database;
+      return await db.delete(
+        tableSupplier,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception("Error deleting supplier: $e");
     }
   }
 
@@ -542,6 +624,7 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk menutup database
   Future<void> closeDatabase() async {
     try {
       if (_database != null) {
@@ -554,6 +637,7 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk memperbarui user
   Future<void> updateUser(String oldUsername, User updatedUser) async {
     final db = await database;
     await db.update(
@@ -568,11 +652,13 @@ class DatabaseHelper {
     );
   }
 
+  // Fungsi untuk menambahkan history produk
   Future<void> insertHistoryProduk(HistoryProduk history) async {
     final db = await database;
     await db.insert('history_produk', history.toMap());
   }
 
+  // Fungsi untuk mengambil semua history produk
   Future<List<HistoryProduk>> getAllHistoryProduk() async {
     final db = await database;
     final result = await db.query('history_produk', orderBy: 'waktu DESC');

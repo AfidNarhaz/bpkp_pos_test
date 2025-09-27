@@ -1,12 +1,10 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 import 'package:bpkp_pos_test/view/pembelian/add_pembelian.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
-
-final Logger _logger = Logger('KelolaProdukLogger');
 
 class Pembelian extends StatefulWidget {
   const Pembelian({super.key});
@@ -27,6 +25,7 @@ class _PembelianState extends State<Pembelian> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Pembelian'),
       ),

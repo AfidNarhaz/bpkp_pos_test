@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:bpkp_pos_test/model/model_produk.dart';
+import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/penjualan/detail_keranjang.dart';
 import 'package:bpkp_pos_test/view/penjualan/pembayaran.dart';
 import 'package:bpkp_pos_test/view/produk/widget/barcode_scanner.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +112,7 @@ class TransaksiPageState extends State<TransaksiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: widget.showBackButton,
@@ -132,7 +134,10 @@ class TransaksiPageState extends State<TransaksiPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.qr_code_scanner),
+            icon: Icon(
+              MdiIcons.barcodeScan,
+              size: 30,
+            ),
             onPressed: _onBarcodeScan,
           ),
           if (!widget.showBackButton)
