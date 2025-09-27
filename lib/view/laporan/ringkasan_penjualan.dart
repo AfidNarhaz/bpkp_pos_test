@@ -78,6 +78,7 @@ class _RingkasanPenjualanPageState extends State<RingkasanPenjualanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Date Range Picker
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {
                 setState(() {
@@ -140,7 +141,7 @@ class _RingkasanPenjualanPageState extends State<RingkasanPenjualanPage> {
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     const Divider(),
-                    _buildRow("Total Penjualan", 0),
+                    _buildRow("Total Penjualan Bersih", 0),
                     _buildRow("Total Harga Pokok Penjualan", 0,
                         isNegative: true),
                     const Divider(),

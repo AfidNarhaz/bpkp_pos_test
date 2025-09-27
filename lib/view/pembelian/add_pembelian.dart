@@ -2,7 +2,6 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/helper/format_rupiah.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_edit_produk.dart';
-import 'package:bpkp_pos_test/view/pembelian/pop_up_supplier.dart';
 import 'package:bpkp_pos_test/view/pembelian/pop_up_tambah_produk.dart';
 import 'package:bpkp_pos_test/view/produk/tab_produk/pop_up_expired.dart';
 import 'package:flutter/material.dart';
@@ -45,33 +44,8 @@ class _AddPembelianState extends State<AddPembelian> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _refNoController = TextEditingController();
+  final TextEditingController _supplierController = TextEditingController();
   final TextEditingController _tglPembelianController = TextEditingController();
-  final TextEditingController _pilihSupplierController =
-      TextEditingController();
-  final TextEditingController _kodeKasController = TextEditingController();
-  final TextEditingController _keteranganController = TextEditingController();
-  final TextEditingController _pembayaranController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _refNoController.text = _generateRefNo();
-    _tglPembelianController.text = _getTodayDate();
-  }
-
-  String _generateRefNo() {
-    final now = DateTime.now();
-    final tanggal =
-        "${now.day.toString().padLeft(2, '0')}${now.month.toString().padLeft(2, '0')}${now.year.toString().substring(2)}";
-    final random = now.millisecond.toString().padLeft(3, '0');
-    return "R21-$tanggal$random";
-  }
-
-  String _getTodayDate() {
-    final now = DateTime.now();
-    return "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,15 +60,13 @@ class _AddPembelianState extends State<AddPembelian> {
             key: _formKey,
             child: Column(
               children: [
-                //Ref No
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
-                    controller: _refNoController,
-                    label: 'Ref No',
+                    controller: _supplierController,
+                    label: 'Supplier',
                   ),
                 ),
-                // Tanggal Pembelian
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
@@ -116,82 +88,6 @@ class _AddPembelianState extends State<AddPembelian> {
                     },
                   ),
                 ),
-                // Pilih Suplier
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper()
-                      .getSupplier(), // Pastikan ada fungsi getSupplier
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    final supplierList = snapshot.data ?? [];
-                    return SizedBox(
-                      width: double.infinity,
-                      child: _buildTextField(
-                        controller: _pilihSupplierController,
-                        label: 'Supplier',
-                        suffixIcon: Icons.arrow_forward_ios,
-                        readOnly: true,
-                        onTap: () {
-                          SupplierDialog.showSupplierDialog(
-                            context,
-                            supplierList,
-                            (newSupplier) async {
-                              if (newSupplier.isNotEmpty) {
-                                await DatabaseHelper()
-                                    .insertSupplier(newSupplier);
-                                setState(() {});
-                                _pilihSupplierController.text = newSupplier;
-                              }
-                            },
-                            (id, updatedSupplier) async {
-                              if (updatedSupplier.isNotEmpty) {
-                                await DatabaseHelper()
-                                    .updateSupplier(id, updatedSupplier);
-                                setState(() {});
-                              }
-                            },
-                            (id) async {
-                              await DatabaseHelper().deleteSupplier(id);
-                              setState(() {});
-                            },
-                            (selectedSupplier) {
-                              setState(() {
-                                _pilihSupplierController.text =
-                                    selectedSupplier;
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-                //Kode Kas
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildTextField(
-                    controller: _kodeKasController,
-                    label: 'Kode Kas',
-                  ),
-                ),
-                //Keterangan
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildTextField(
-                    controller: _keteranganController,
-                    label: 'Keterangan',
-                  ),
-                ),
-                //Pembayaran
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildTextField(
-                    controller: _pembayaranController,
-                    label: 'Pembayaran',
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Row(
                   children: [
                     const Text('Produk yang dibeli',
@@ -200,8 +96,6 @@ class _AddPembelianState extends State<AddPembelian> {
                   ],
                 ),
                 const SizedBox(height: 10),
-
-                // Tambah Produk
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
@@ -231,8 +125,6 @@ class _AddPembelianState extends State<AddPembelian> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // Widget untuk menampilkan daftar produk yang sudah ditambahkan
                 Column(
                   children: barangs.map((barang) {
                     return Card(
@@ -277,22 +169,13 @@ class _AddPembelianState extends State<AddPembelian> {
                     );
                   }).toList(),
                 ),
-
-                // Simpan Button
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () async {
-                      List<Map<String, dynamic>> barangList = [
-                        {'product_id': 1},
-                        {'product_id': 2},
-                        {'product_id': 3},
-                      ];
-
-                      String supplier = 'Supplier A';
-
                       await DatabaseHelper()
-                          .insertPembelian(barangList, supplier);
+                          .insertPembelian(barangs, _supplierController.text, _tglPembelianController.text);
+                      Navigator.pop(context, true);
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: AppColors.accent,

@@ -1,5 +1,4 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
-import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 import 'package:bpkp_pos_test/view/pembelian/add_pembelian.dart';
@@ -15,29 +14,39 @@ class Pembelian extends StatefulWidget {
 
 class _PembelianState extends State<Pembelian> {
   String selectedDateRange = 'Pilih Tanggal';
-  String comparisonDateRange = '';
   DateTime? startDate;
   DateTime? endDate;
-  List<Produk> produkList = [];
-  List<Produk> filteredProdukList = [];
+
   final dbHelper = DatabaseHelper();
+  late Future<List<Map<String, dynamic>>>? _fetchListPembelian;
+
+  @override
+  void initState() {
+    super.initState();
+    loadPembelian();
+  }
+
+  void loadPembelian() {
+    print(startDate);
+    print(endDate);
+    setState(() {
+      _fetchListPembelian = dbHelper.getListPembelian(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Pembelian'),
-      ),
+      appBar: AppBar(title: const Text('Pembelian')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(
-              children: [
-                const Text('Total Pembelian: 0'),
-              ],
-            ),
+            Row(children: [Text('Total Pembelian: 0')]),
             SizedBox(height: 10),
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {
@@ -47,12 +56,41 @@ class _PembelianState extends State<Pembelian> {
                   final dateFormat = DateFormat('dd/MM/yyyy');
                   selectedDateRange =
                       '${dateFormat.format(start)} - ${dateFormat.format(end)}';
-                  // Update comparisonDateRange jika perlu
                 });
+                loadPembelian();
               },
             ),
             SizedBox(height: 10),
-            ListTile()
+            Expanded(
+              child: FutureBuilder(
+                future: _fetchListPembelian,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final list = snapshot.data ?? [];
+                    if (list.isEmpty) {
+                      return Center(child: Text('Data pembelian kosong'));
+                    }
+                    return ListView.builder(
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        final item = list[index];
+                        return ListTile(
+                          title: Text(item['code'] ?? '-'),
+                          subtitle: Text(
+                            'Supplier: ${item['supplier'] ?? '-'}\n'
+                            'Tanggal: ${item['tanggal'] ?? '-'}',
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -60,15 +98,19 @@ class _PembelianState extends State<Pembelian> {
     );
   }
 
-  Widget? _buildFabByTab() {
+  Widget _buildFabByTab() {
     return FloatingActionButton(
       onPressed: () async {
-        await Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AddPembelian(),
           ),
         );
+
+        if (result == true) {
+          loadPembelian(); // Refresh after adding
+        }
       },
       tooltip: 'Tambah Produk',
       child: const Icon(Icons.add),

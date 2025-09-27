@@ -113,6 +113,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     if (_formKey.currentState!.validate()) {
       Produk updatedProduct = Produk(
         id: widget.produk.id,
+        imagePath: _image?.path ?? widget.produk.imagePath,
         codeProduk: _kodeProdukController.text,
         barcode: _barcodeController.text,
         nama: _namaController.text,

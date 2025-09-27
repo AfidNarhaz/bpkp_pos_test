@@ -35,6 +35,7 @@ class DatabaseHelper {
   static const String tableSatuan = 'satuan';
   static const String tablePegawai = 'pegawai';
   static const String tableSupplier = 'supplier';
+  static const String tablePembelian = 'pembelian';
 
   // Getter database
   Future<Database> get database async {
@@ -174,11 +175,14 @@ class DatabaseHelper {
 
     // Tabel Pembelian
     await db.execute('''
-      CREATE TABLE $tableSupplier (
+      CREATE TABLE $tablePembelian (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         code TEXT,
         supplier TEXT,
         product_id INTEGER NOT NULL,
+        jumlah INTEGER,
+        harga_satuan REAL,
+        tanggal TEXT,
         FOREIGN KEY (product_id) REFERENCES produk(id) ON DELETE CASCADE
     )
     ''');
@@ -501,9 +505,44 @@ class DatabaseHelper {
     }
   }
 
+  // Fungsi untuk ambil list data pembelian
+  Future<List<Map<String, dynamic>>> getListPembelian({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final db = await database;
+
+    String? start = startDate?.toIso8601String();
+    String? end = endDate?.toIso8601String();
+
+    String whereClause = '';
+    List<String> whereArgs = [];
+
+    if (start != null && end != null) {
+      whereClause = 'WHERE tanggal >= ? AND tanggal <= ?';
+      whereArgs = [start, end];
+    } else if (start != null) {
+      whereClause = 'WHERE tanggal >= ?';
+      whereArgs = [start];
+    } else if (end != null) {
+      whereClause = 'WHERE tanggal <= ?';
+      whereArgs = [end];
+    }
+
+    final result = await db.rawQuery('''
+    SELECT code, supplier, MAX(tanggal) AS tanggal
+    FROM $tablePembelian
+    $whereClause
+    GROUP BY code
+    ORDER BY tanggal DESC
+  ''', whereArgs);
+
+    return result;
+  }
+
   // Fungsi untuk memasukkan pembelian baru
-  Future<void> insertPembelian(
-      List<Map<String, dynamic>> barangList, String supplier) async {
+  Future<void> insertPembelian(List<Map<String, dynamic>> barangList,
+      String supplier, String tanggalPembelian) async {
     final db = await database;
 
     String timestamp = DateTime.now().toString();
@@ -517,14 +556,23 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       for (var barang in barangList) {
         await txn.insert(
-          'pembelian',
+          tablePembelian,
           {
             'code': code,
             'supplier': supplier,
-            'product_id': barang['product_id'],
+            'product_id': barang['id_barang'],
+            'tanggal': tanggalPembelian,
+            'jumlah': barang['stok'],
+            'harga_satuan': barang['harga_beli'],
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
+
+        await txn.rawUpdate('''
+          UPDATE $tableProduk
+          SET stok = COALESCE(stok, 0) + ?
+          WHERE id = ?
+        ''', [barang['stok'], barang['id_barang']]);
       }
     });
   }

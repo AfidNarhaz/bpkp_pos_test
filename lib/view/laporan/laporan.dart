@@ -71,7 +71,9 @@ class _LaporanPageState extends State<LaporanPage> {
           automaticallyImplyLeading: false,
           title: const Text(
             'Beranda',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           leading: Builder(
             builder: (context) => IconButton(
@@ -91,7 +93,7 @@ class _LaporanPageState extends State<LaporanPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Ganti filter tanggal dengan DateRangePickerWidget
+                // Date Range Picker
                 DateRangePickerWidget(
                   onDateRangeChanged: (start, end) {
                     setState(() {

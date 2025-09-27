@@ -1,4 +1,7 @@
+import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_state.dart';
+import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_pembelian.dart';
+import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
 // import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
@@ -36,25 +39,35 @@ class LaporanDrawer extends StatelessWidget {
               );
             },
           ),
-          // ListTile(
-          //   leading: const Icon(Icons.description),
-          //   title: const Text('Ringkasan Penjualan'),
-          //   onTap: () {
-          //     Navigator.pushReplacement(
-          //       parentContext,
-          //       MaterialPageRoute(
-          //         builder: (context) => RingkasanPenjualanPage(
-          //           startDate: GlobalDateRange.startDate,
-          //           endDate: GlobalDateRange.endDate,
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // ),
+          ListTile(
+            leading: const Icon(Icons.description),
+            title: const Text('Ringkasan Penjualan'),
+            onTap: () {
+              Navigator.pushReplacement(
+                parentContext,
+                MaterialPageRoute(
+                  builder: (context) => RingkasanPenjualanPage(
+                    startDate: GlobalDateRange.startDate,
+                    endDate: GlobalDateRange.endDate,
+                  ),
+                ),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.history),
             title: const Text('Riwayat Penjualan'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                parentContext,
+                MaterialPageRoute(
+                  builder: (context) => RiwayatPenjualanPage(
+                    startDate: GlobalDateRange.startDate,
+                    endDate: GlobalDateRange.endDate,
+                  ),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.inventory),
