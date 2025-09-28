@@ -606,6 +606,37 @@ class DatabaseHelper {
     return result;
   }
 
+  // Fungsi untuk mengambil daftar barang di pembelian
+  Future<List<Map<String, dynamic>>> getDetailBarangPembelian(
+      String code) async {
+    final db = await database;
+
+    String query = '''
+    SELECT 
+        p.codeProduk, 
+        p.nama, 
+        p.kategori, 
+        p.merek, 
+        p.satuanBeli, 
+        p.satuanJual, 
+        p.isi, 
+        p.hargaBeli, 
+        p.hargaJual, 
+        p.minStok, 
+        pb.jumlah, 
+        pb.harga_satuan, 
+        pb.tanggal
+    FROM pembelian pb
+    JOIN produk p ON pb.product_id = p.id
+    WHERE pb.code = ?
+  ''';
+
+    List<Map<String, dynamic>> result = await db.rawQuery(query, [code]);
+    print('Result : $result');
+
+    return result;
+  }
+
   // Fungsi untuk memasukkan pembelian baru
   Future<void> insertPembelian(List<Map<String, dynamic>> barangList,
       String supplier, String tanggalPembelian) async {
@@ -648,8 +679,8 @@ class DatabaseHelper {
     final db = await database;
 
     final now = DateTime.now();
-    final formattedTimestamp = DateFormat('ddMMyyyy_ssmmHH').format(now);
-    final formattedTanggal = DateFormat('dd-MM-yyyy ss:mm:HH').format(now);
+    final formattedTimestamp = DateFormat('yyyyMMdd_HHmmss').format(now);
+    final formattedTanggal = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
     final invoice = 'INVOICE_$formattedTimestamp';
 
