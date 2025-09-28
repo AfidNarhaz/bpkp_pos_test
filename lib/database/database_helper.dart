@@ -202,7 +202,18 @@ class DatabaseHelper {
         FOREIGN KEY (produkId) REFERENCES produk(id) ON DELETE CASCADE
       )
     ''');
+
+    // Tabel notifikasi
+    await db.execute('''
+      CREATE TABLE notifikasi (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        judul TEXT,
+        isi TEXT,
+        tanggal TEXT
+      )
+    ''');
   }
+  //---------------------------------------------------------------------------
 
   // Fungsi untuk mengupgrade database
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -821,5 +832,21 @@ class DatabaseHelper {
       ],
     );
     return result.map((e) => Produk.fromMap(e)).toList();
+  }
+
+  // Fungsi untuk memasukkan notifikasi baru
+  Future<void> insertNotifikasi(String judul, String isi) async {
+    final db = await database;
+    await db.insert('notifikasi', {
+      'judul': judul,
+      'isi': isi,
+      'tanggal': DateTime.now().toIso8601String(),
+    });
+  }
+
+  // Fungsi untuk mengambil semua notifikasi
+  Future<List<Map<String, dynamic>>> getNotifikasi() async {
+    final db = await database;
+    return await db.query('notifikasi', orderBy: 'tanggal DESC');
   }
 }

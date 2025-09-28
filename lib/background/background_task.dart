@@ -23,11 +23,14 @@ void callbackDispatcher() {
       final dbHelper = DatabaseHelper();
       final expiredProduk = await dbHelper.getProdukHampirExpired();
       if (expiredProduk.isNotEmpty) {
+        final judul = "Produk Hampir Kadaluwarsa";
+        final isi =
+            "Ada ${expiredProduk.length} produk yang akan kadaluwarsa dalam 7 hari.";
         await NotificationService.showNotification(
-          title: "Produk Hampir Kadaluwarsa",
-          body:
-              "Ada ${expiredProduk.length} produk yang akan kadaluwarsa dalam 7 hari.",
+          title: judul,
+          body: isi,
         );
+        await dbHelper.insertNotifikasi(judul, isi);
       }
     }
 
