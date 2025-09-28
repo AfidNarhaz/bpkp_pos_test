@@ -1,6 +1,10 @@
+import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/penjualan/transaksi_berhasil.dart';
+import 'package:logger/logger.dart';
+
+final logger = Logger();
 
 class PembayaranPage extends StatefulWidget {
   final List<Map<String, dynamic>> keranjang;
@@ -200,21 +204,26 @@ class _PembayaranPageState extends State<PembayaranPage> {
                           final keranjang = widget.keranjang;
                           final namaKasir = widget.namaKasir;
 
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TransaksiBerhasilPage(
-                                totalTagihan: totalTagihan,
-                                uangDiterima: uangDiterima,
-                                keranjang: keranjang,
-                                namaKasir: namaKasir,
-                                onTransaksiBaru: widget.onResetKeranjang,
-                              ),
-                            ),
-                          );
-
-                          if (result == true) {
+                          try {
+                            await DatabaseHelper().insertPenjualan(keranjang);
                             _clearKeranjang();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TransaksiBerhasilPage(
+                                  totalTagihan: totalTagihan,
+                                  uangDiterima: uangDiterima,
+                                  keranjang: keranjang,
+                                  namaKasir: namaKasir,
+                                  onTransaksiBaru: widget.onResetKeranjang,
+                                ),
+                              ),
+                            );
+                          } catch (err) {
+                            logger.e(err);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Terjadi kesalahan saat transaksi: $err')));
                           }
                         }
                       : null, // Disable jika tidak memenuhi syarat
@@ -235,26 +244,33 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     final totalTagihan = widget.totalTagihan;
                     final uangDiterima = widget.totalTagihan;
                     final keranjang = widget.keranjang;
-                    // ignore: unused_local_variable
                     final namaKasir = widget.namaKasir;
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TransaksiBerhasilPage(
-                          totalTagihan: totalTagihan,
-                          uangDiterima: uangDiterima,
-                          keranjang: keranjang,
-                          namaKasir: widget
-                              .namaKasir, // <-- gunakan namaKasir dari widget
-                          onTransaksiBaru: _clearKeranjang,
+                    try {
+                      await DatabaseHelper().insertPenjualan(keranjang);
+                      _clearKeranjang();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TransaksiBerhasilPage(
+                            totalTagihan: totalTagihan,
+                            uangDiterima: uangDiterima,
+                            keranjang: keranjang,
+                            namaKasir: namaKasir,
+                            onTransaksiBaru: _clearKeranjang,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } catch (err) {
+                      logger.e(err);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('Terjadi kesalahan saat transaksi: $err')));
+                    }
                   },
                   child: const Text('Uang Pas',
                       style: TextStyle(fontWeight: FontWeight.bold)),

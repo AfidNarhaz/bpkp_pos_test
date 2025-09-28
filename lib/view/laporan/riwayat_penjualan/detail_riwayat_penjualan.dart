@@ -64,7 +64,7 @@ class DetailRiwayatPenjualanPage extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image.asset(
-                          'assets/Splash.png', // Pastikan path sesuai dengan lokasi file
+                          'assets/Splash.png',
                           fit: BoxFit.cover,
                         ),
                       ),

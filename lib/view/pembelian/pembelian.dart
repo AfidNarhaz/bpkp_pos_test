@@ -27,8 +27,6 @@ class _PembelianState extends State<Pembelian> {
   }
 
   void loadPembelian() {
-    print(startDate);
-    print(endDate);
     setState(() {
       _fetchListPembelian = dbHelper.getListPembelian(
         startDate: startDate,

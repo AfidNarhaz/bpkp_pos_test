@@ -186,6 +186,14 @@ class TransaksiPageState extends State<TransaksiPage> {
   }
 
   void tambahKeKeranjang(Map<String, dynamic> produk) {
+    // Cek stok, jika 0 atau null, tampilkan pesan dan return
+    if ((produk['stok'] ?? 0) <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Stok produk habis, tidak bisa ditambahkan!')),
+      );
+      return;
+    }
     setState(() {
       final index = keranjang.indexWhere((item) => item['id'] == produk['id']);
       if (index != -1) {
@@ -384,8 +392,7 @@ class DraggableSheetContent extends StatelessWidget {
               );
 
               // Navigasi ke halaman pembayaran
-              // ignore: unused_local_variable
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PembayaranPage(
@@ -395,8 +402,6 @@ class DraggableSheetContent extends StatelessWidget {
                   ),
                 ),
               );
-
-              // Jika pembayaran sukses, bisa lakukan sesuatu di sini (opsional)
             },
             child: Text(
               'Tagih = ${_formatCurrency(keranjang.fold<double>(0, (sum, item) => sum + ((item['total'] ?? 0) as num).toDouble()))}',
@@ -470,13 +475,8 @@ class _ProdukTabState extends State<ProdukTab> {
               'nama': produk.nama,
               'hargaJual': produk.hargaJual,
               'barcode': produk.barcode,
-              // tambahkan field lain jika perlu
+              'stok': produk.stok,
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content:
-                      Text('Produk "${produk.nama}" ditambahkan ke keranjang')),
-            );
           },
         );
       },

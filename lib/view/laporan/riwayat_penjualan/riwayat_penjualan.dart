@@ -1,8 +1,11 @@
+import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/detail_riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/drawer.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 class RiwayatPenjualanPage extends StatefulWidget {
   final DateTime startDate;
@@ -22,11 +25,27 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
   late DateTime startDate;
   late DateTime endDate;
 
+  final dbHelper = DatabaseHelper();
+  late Future<List<Map<String, dynamic>>> _fetchListPenjualan;
+
+  final logger = Logger();
+
   @override
   void initState() {
     super.initState();
     startDate = widget.startDate;
     endDate = widget.endDate;
+    loadPenjualan();
+  }
+
+  void loadPenjualan() {
+    setState(() {
+      _fetchListPenjualan = dbHelper.getListPenjualan(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    });
+    logger.i('Future for penjualan loaded: $_fetchListPenjualan');
   }
 
   @override
@@ -36,9 +55,7 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
       appBar: AppBar(
         title: Text(
           'Riwayat Penjualan',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: Builder(
           builder: (context) => IconButton(
@@ -52,12 +69,11 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
       drawer: Drawer(
         child: LaporanDrawer(parentContext: context),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date Range Picker
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {
                 setState(() {
@@ -68,7 +84,6 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
             ),
             SizedBox(height: 16),
 
-            // Kartu Ringkasan
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -113,65 +128,80 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
             ),
             SizedBox(height: 16),
 
-            // Date & Total
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Kamis, 25 September 2025',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text('Rp40.000',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ],
-            ),
-            SizedBox(height: 16),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text('Kamis, 25 September 2025',
+            //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            //     Text('Rp40.000',
+            //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            //   ],
+            // ),
+            // SizedBox(height: 16),
 
-            // List Transaksi
-            Column(
-              children: [
-                _TransaksiItem(
-                  nominal: 'Rp10.000',
-                  kode: '468156ND',
-                  status: 'Lunas',
-                  jam: '15:41',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailRiwayatPenjualanPage(
-                            // Kirim data jika diperlukan
-                            ),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: 12),
-                _TransaksiItem(
-                  nominal: 'Rp30.000',
-                  kode: '46815UBZ',
-                  status: 'Lunas',
-                  jam: '15:39',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailRiwayatPenjualanPage(
-                            // Kirim data jika diperlukan
-                            ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
+            Expanded(
+              child: FutureBuilder(
+                future: _fetchListPenjualan,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final list = snapshot.data ?? [];
 
-            // Ujung List
-            Center(
-              child: Text(
-                'Sudah menampilkan semua data.',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    // Print the data here
+                    logger.i('List of penjualan: $list');
+
+                    if (list.isEmpty) {
+                      return Center(child: Text('Data penjualan kosong'));
+                    }
+
+                    return ListView.builder(
+                      itemCount:
+                          list.length + 1, // +1 untuk item keterangan di bawah
+                      itemBuilder: (context, index) {
+                        if (index == list.length) {
+                          // Ini item terakhir: tampilkan keterangan
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: Text(
+                                'Sudah menampilkan semua data.',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ),
+                          );
+                        }
+
+                        // Item transaksi biasa
+                        final item = list[index];
+                        final formatter = NumberFormat.currency(
+                            locale: 'id_ID', symbol: 'Rp');
+                        DateTime tanggal = DateTime.parse(item['tanggal']);
+                        final jam =
+                            '${tanggal.hour.toString().padLeft(2, '0')}:${tanggal.minute.toString().padLeft(2, '0')}';
+
+                        return _TransaksiItem(
+                          nominal: formatter.format(item['total_transaksi']),
+                          kode: item['noInvoice'],
+                          status: 'Lunas',
+                          jam: jam,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailRiwayatPenjualanPage(),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
             SizedBox(height: 16),
