@@ -10,7 +10,7 @@ class Produk {
   String nama;
   String kategori;
   String merek;
-  DateTime tglExpired;
+  String tglExpired; // Ubah dari DateTime ke String
   String? satuanBeli;
   String? satuanJual;
   int? isi;
@@ -29,7 +29,7 @@ class Produk {
     required this.nama,
     required this.kategori,
     required this.merek,
-    required this.tglExpired,
+    required this.tglExpired, // Ubah dari DateTime ke String
     required this.satuanBeli,
     required this.satuanJual,
     required this.isi,
@@ -50,11 +50,8 @@ class Produk {
       nama: map['nama'] as String? ?? '',
       kategori: map['kategori'] as String? ?? '',
       merek: map['merek'] as String? ?? '',
-      tglExpired: map['tglExpired'] is String
-          ? DateTime.tryParse(map['tglExpired']) ?? DateTime.now()
-          : map['tglExpired'] is int
-              ? DateTime.fromMillisecondsSinceEpoch(map['tglExpired'])
-              : DateTime.now(),
+      tglExpired:
+          map['tglExpired'] as String? ?? '', // Ubah dari DateTime ke String
       satuanBeli: map['satuanBeli'] as String?,
       satuanJual: map['satuanJual'] as String?,
       isi: map['isi'] as int?,
@@ -76,7 +73,7 @@ class Produk {
       'nama': nama,
       'kategori': kategori,
       'merek': merek,
-      'tglExpired': tglExpired,
+      'tglExpired': tglExpired, // Ubah dari DateTime ke String
       'satuanBeli': satuanBeli,
       'satuanJual': satuanJual,
       'isi': isi,

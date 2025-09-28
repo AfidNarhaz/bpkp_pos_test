@@ -105,8 +105,8 @@ class AddProdukPageState extends State<AddProdukPage> {
         kategori: _kategoriController.text,
         merek: _merekController.text,
         tglExpired: _tanggalController.text.isNotEmpty
-            ? DateFormat('dd-MM-yyyy').parse(_tanggalController.text)
-            : DateTime.now(),
+            ? _tanggalController.text
+            : DateFormat('dd-MM-yyyy').format(DateTime.now()),
         satuanBeli: _satuanBeliController.text,
         satuanJual: _satuanJualController.text,
         isi: int.tryParse(_isiController.text.replaceAll('.', '')) ?? 0,

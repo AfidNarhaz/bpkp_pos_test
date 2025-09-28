@@ -59,10 +59,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _namaController = TextEditingController(text: widget.produk.nama);
     _kategoriController = TextEditingController(text: widget.produk.kategori);
     _merekController = TextEditingController(text: widget.produk.merek);
-    _tanggalController = TextEditingController(
-        text: widget.produk.tglExpired is String
-            ? widget.produk.tglExpired as String
-            : DateFormat('dd-MM-yyyy').format(widget.produk.tglExpired));
+    _tanggalController = TextEditingController(text: widget.produk.tglExpired);
     _satuanBeliController =
         TextEditingController(text: widget.produk.satuanBeli);
     _satuanJualController =
@@ -122,10 +119,9 @@ class DetailProdukPageState extends State<DetailProdukPage> {
         nama: _namaController.text,
         kategori: _kategoriController.text,
         merek: _merekController.text,
-        tglExpired: _tanggalController.text.isNotEmpty &&
-                DateTime.tryParse(_tanggalController.text) != null
-            ? DateTime.parse(_tanggalController.text)
-            : DateTime.now(),
+        tglExpired: _tanggalController.text.isNotEmpty
+            ? _tanggalController.text
+            : DateFormat('dd-MM-yyyy').format(DateTime.now()),
         satuanBeli: _satuanBeliController.text,
         satuanJual: _satuanJualController.text,
         isi: int.tryParse(_isiController.text.replaceAll('.', '')) ?? 0,

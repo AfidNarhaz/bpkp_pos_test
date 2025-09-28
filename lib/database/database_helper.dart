@@ -527,8 +527,10 @@ class DatabaseHelper {
   }) async {
     final db = await database;
 
-    String? start = startDate?.toIso8601String();
-    String? end = endDate?.toIso8601String();
+    String? start =
+        startDate != null ? DateFormat('dd-MM-yyyy').format(startDate) : null;
+    String? end =
+        endDate != null ? DateFormat('dd-MM-yyyy').format(endDate) : null;
 
     String whereClause = '';
     List<String> whereArgs = [];
@@ -562,8 +564,10 @@ class DatabaseHelper {
   }) async {
     final db = await database;
 
-    String? start = startDate?.toIso8601String();
-    String? end = endDate?.toIso8601String();
+    String? start =
+        startDate != null ? DateFormat('dd-MM-yyyy').format(startDate) : null;
+    String? end =
+        endDate != null ? DateFormat('dd-MM-yyyy').format(endDate) : null;
 
     String whereClause = '';
     List<String> whereArgs = [];
@@ -648,7 +652,7 @@ class DatabaseHelper {
         .replaceAll(":", "")
         .replaceAll(" ", "_")
         .split(".")[0];
-    String code = 'PO_$formattedDate';
+    String code = 'RN_$formattedDate';
 
     await db.transaction((txn) async {
       for (var barang in barangList) {

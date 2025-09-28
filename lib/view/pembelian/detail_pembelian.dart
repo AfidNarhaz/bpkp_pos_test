@@ -14,7 +14,7 @@ class DetailPembelian extends StatefulWidget {
     return value
         .toString()
         .replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')
         .replaceAll(',', '.');
   }
 }
@@ -47,20 +47,20 @@ class _DetailPembelianState extends State<DetailPembelian> {
       'no_hp': widget.item['no_hp'] ?? '6289998184858',
     };
 
-    final aktivitas = [
-      {
-        'waktu': '26 Sep 2025, 14:33',
-        'oleh': 'Difa',
-        'order': widget.item['code'] ?? '-',
-        'status': 'Order Diproses',
-      },
-      {
-        'waktu': '26 Sep 2025, 07:33',
-        'oleh': 'Difa',
-        'order': widget.item['code'] ?? '-',
-        'status': 'Selesai',
-      },
-    ];
+    // final aktivitas = [
+    //   {
+    //     'waktu': '26 Sep 2025, 14:33',
+    //     'oleh': 'Difa',
+    //     'order': widget.item['code'] ?? '-',
+    //     'status': 'Order Diproses',
+    //   },
+    //   {
+    //     'waktu': '26 Sep 2025, 07:33',
+    //     'oleh': 'Difa',
+    //     'order': widget.item['code'] ?? '-',
+    //     'status': 'Selesai',
+    //   },
+    // ];
 
     return Scaffold(
       appBar: AppBar(
@@ -96,7 +96,8 @@ class _DetailPembelianState extends State<DetailPembelian> {
                       children: [
                         const Text('Informasi Pembelian',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black)),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -120,7 +121,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        _infoRow('No. Order', informasi['no_order']),
+                        _infoRow('Ref No.', informasi['no_order']),
                         _infoRow('Dibuat Tanggal', informasi['tanggal']),
                         _infoRow('Dibuat Oleh', informasi['dibuat_oleh']),
                         _infoRow('Email', informasi['email']),
@@ -129,40 +130,43 @@ class _DetailPembelianState extends State<DetailPembelian> {
                     ),
                   ),
                 ),
-                // Section Aktivitas Pembelian
-                Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Aktifitas Pembelian',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black)),
-                        const SizedBox(height: 8),
-                        ...aktivitas.map((a) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(Icons.circle,
-                                  color: Colors.red, size: 14),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Pada Tanggal ${a['waktu']} oleh ${a['oleh']}, #${a['order']} ${a['status']}.',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
+
+                // // Section Aktivitas Pembelian
+                // Card(
+                //   margin: const EdgeInsets.only(bottom: 16),
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         const Text('Aktifitas Pembelian',
+                //             style: TextStyle(
+                //                 fontWeight: FontWeight.bold,
+                //                 color: Colors.black)),
+                //         const SizedBox(height: 8),
+                //         ...aktivitas.map((a) => Padding(
+                //               padding: const EdgeInsets.only(bottom: 8),
+                //               child: Row(
+                //                 crossAxisAlignment: CrossAxisAlignment.start,
+                //                 children: [
+                //                   const Icon(Icons.circle,
+                //                       color: Colors.red, size: 14),
+                //                   const SizedBox(width: 8),
+                //                   Expanded(
+                //                     child: Text(
+                //                       'Pada Tanggal ${a['waktu']} oleh ${a['oleh']}, #${a['order']} ${a['status']}.',
+                //                       style: const TextStyle(
+                //                           fontSize: 14, color: Colors.black),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //             )),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+
                 // Section Rincian Pembelian
                 const Text('Rincian Pembelian',
                     style: TextStyle(
@@ -203,9 +207,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
                     return ExpansionTile(
                       tilePadding: const EdgeInsets.symmetric(horizontal: 0),
                       title: Text(
-                        '${r['nama']}\nRp${DetailPembelian._formatRupiah(
-                            (r['harga_satuan'] as num).toDouble().round() * (r['jumlah'] as int?)!
-                        )}',
+                        '${r['nama']}\nRp${DetailPembelian._formatRupiah((r['harga_satuan'] as num).toDouble().round() * (r['jumlah'] as int?)!)}',
                         style: const TextStyle(
                             fontWeight: FontWeight.w600, color: Colors.black),
                       ),
@@ -221,11 +223,6 @@ class _DetailPembelianState extends State<DetailPembelian> {
                               _detailRow(
                                 'Jumlah Pembelian',
                                 r['jumlah']?.toString() ?? '-',
-                                textColor: Colors.black,
-                              ),
-                              _detailRow(
-                                'Grade',
-                                r['grade']?.toString() ?? '-',
                                 textColor: Colors.black,
                               ),
                               _detailRow(
