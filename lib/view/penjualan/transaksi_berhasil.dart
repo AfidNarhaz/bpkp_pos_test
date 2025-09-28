@@ -30,7 +30,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final tanggal = DateFormat('dd/MM/yyyy').format(now);
-    final jam = DateFormat('HH:mm').format(now);
+    final jam = DateFormat('mm:HH').format(now);
     final kembalian = uangDiterima - totalTagihan;
     final formatCurrency =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);

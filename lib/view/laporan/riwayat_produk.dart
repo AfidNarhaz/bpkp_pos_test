@@ -30,7 +30,7 @@ class _RiwayatProdukPageState extends State<RiwayatProdukPage> {
   }
 
   String formatWaktu(DateTime waktu) {
-    return DateFormat('dd-MM-yyyy HH:mm:ss').format(waktu);
+    return DateFormat('dd-MM-yyyy ss:mm:HH').format(waktu);
   }
 
   @override

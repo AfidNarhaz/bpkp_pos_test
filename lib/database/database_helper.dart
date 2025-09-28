@@ -648,8 +648,8 @@ class DatabaseHelper {
     final db = await database;
 
     final now = DateTime.now();
-    final formattedTimestamp = DateFormat('yyyyMMdd_HHmmss').format(now);
-    final formattedTanggal = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    final formattedTimestamp = DateFormat('ddMMyyyy_ssmmHH').format(now);
+    final formattedTanggal = DateFormat('dd-MM-yyyy ss:mm:HH').format(now);
 
     final invoice = 'INVOICE_$formattedTimestamp';
 
