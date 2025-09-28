@@ -10,7 +10,7 @@ class Produk {
   String nama;
   String kategori;
   String merek;
-  String tglExpired;
+  DateTime tglExpired;
   String? satuanBeli;
   String? satuanJual;
   int? isi;
@@ -50,7 +50,11 @@ class Produk {
       nama: map['nama'] as String? ?? '',
       kategori: map['kategori'] as String? ?? '',
       merek: map['merek'] as String? ?? '',
-      tglExpired: map['tglExpired'] as String? ?? '',
+      tglExpired: map['tglExpired'] is String
+          ? DateTime.tryParse(map['tglExpired']) ?? DateTime.now()
+          : map['tglExpired'] is int
+              ? DateTime.fromMillisecondsSinceEpoch(map['tglExpired'])
+              : DateTime.now(),
       satuanBeli: map['satuanBeli'] as String?,
       satuanJual: map['satuanJual'] as String?,
       isi: map['isi'] as int?,

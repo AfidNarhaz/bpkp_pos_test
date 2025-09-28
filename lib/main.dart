@@ -17,18 +17,14 @@ Future<void> main() async {
   // Inisialisasi layanan notifikasi
   await NotificationService.init();
 
-  if (!kDebugMode) {
-    // Workmanager hanya di non-debug
-    await Workmanager().initialize(callbackDispatcher);
-    await Workmanager().registerPeriodicTask(
-      "1",
-      dailyReportTask,
-      frequency: const Duration(minutes: 15),
-      constraints: Constraints(
-        networkType: NetworkType.notRequired,
-      ),
-    );
-  }
+  Workmanager().initialize(
+    callbackDispatcher,
+  );
+  Workmanager().registerPeriodicTask(
+    "expiredProdukTaskId",
+    expiredProdukTask,
+    frequency: const Duration(hours: 24), // cek setiap hari
+  );
 
   // Setup logging
   setupLogging();

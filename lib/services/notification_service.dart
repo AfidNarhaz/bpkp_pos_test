@@ -1,17 +1,15 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await _notificationsPlugin.initialize(initializationSettings);
+    const InitializationSettings settings =
+        InitializationSettings(android: androidSettings);
+    await _plugin.initialize(settings);
   }
 
   static Future<void> showNotification({
@@ -19,22 +17,16 @@ class NotificationService {
     required String body,
   }) async {
     const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'pos_channel_id',
-      'POS Notifications',
-      channelDescription: 'Channel for POS reminders',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformDetails =
+        AndroidNotificationDetails('expired_channel', 'Produk Expired',
+            importance: Importance.max, priority: Priority.high);
+    const NotificationDetails details =
         NotificationDetails(android: androidDetails);
 
-    await _notificationsPlugin.show(
+    await _plugin.show(
       0,
       title,
       body,
-      platformDetails,
+      details,
     );
   }
 }

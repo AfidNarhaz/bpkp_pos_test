@@ -805,4 +805,21 @@ class DatabaseHelper {
     final result = await db.query('history_produk', orderBy: 'waktu DESC');
     return result.map((e) => HistoryProduk.fromMap(e)).toList();
   }
+
+  // Fungsi untuk mengambil produk yang hampir kadaluarsa
+  Future<List<Produk>> getProdukHampirExpired() async {
+    final db = await database;
+    final now = DateTime.now();
+    final nextWeek = now.add(const Duration(days: 7));
+    final result = await db.query(
+      'produk',
+      where:
+          'tglExpired IS NOT NULL AND tglExpired != "" AND tglExpired BETWEEN ? AND ?',
+      whereArgs: [
+        DateFormat('dd-MM-yyyy').format(now),
+        DateFormat('dd-MM-yyyy').format(nextWeek),
+      ],
+    );
+    return result.map((e) => Produk.fromMap(e)).toList();
+  }
 }
