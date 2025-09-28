@@ -580,7 +580,8 @@ class DatabaseHelper {
   }
 
   // Fungsi untuk mengambil daftar barang di penjualan
-  Future<List<Map<String, dynamic>>> getDetailBarangPenjualan(String noInvoice) async {
+  Future<List<Map<String, dynamic>>> getDetailBarangPenjualan(
+      String noInvoice) async {
     final db = await database;
 
     final result = await db.rawQuery('''
@@ -605,7 +606,7 @@ class DatabaseHelper {
         .replaceAll(":", "")
         .replaceAll(" ", "_")
         .split(".")[0];
-    String code = 'PEMBELIAN_$formattedDate';
+    String code = 'PO_$formattedDate';
 
     await db.transaction((txn) async {
       for (var barang in barangList) {
