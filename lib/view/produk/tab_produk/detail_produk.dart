@@ -227,6 +227,11 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                   controller: _barcodeController,
                   label: 'Barcode',
                   suffixIcon: Icons.barcode_reader,
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(13),
+                  ],
                   onTap: () async {
                     final barcode = await Navigator.push(
                       context,

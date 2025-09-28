@@ -202,6 +202,11 @@ class AddProdukPageState extends State<AddProdukPage> {
                   controller: _barcodeController,
                   label: 'Barcode',
                   suffixIcon: Icons.barcode_reader,
+                  keyboardType: TextInputType.number,
+                  inputFormatter: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(13),
+                  ],
                   onSuffixIconTap: () async {
                     final barcode = await Navigator.push(
                       context,

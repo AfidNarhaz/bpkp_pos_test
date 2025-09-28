@@ -30,7 +30,7 @@ class _DetailRiwayatPenjualanPageState
     _loadDetailBarang(widget.noInvoice);
   }
 
-  void _loadDetailBarang(noInvoice) {
+  void _loadDetailBarang(String noInvoice) {
     setState(() {
       _fetchDetailBarang = dbHelper.getDetailBarangPenjualan(noInvoice);
     });

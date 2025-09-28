@@ -67,6 +67,8 @@ class _AddPembelianState extends State<AddPembelian> {
                     label: 'Supplier',
                   ),
                 ),
+
+                // Tanggal Pembelian
                 SizedBox(
                   width: double.infinity,
                   child: _buildTextField(
@@ -88,6 +90,8 @@ class _AddPembelianState extends State<AddPembelian> {
                     },
                   ),
                 ),
+
+                // Produk yang dibeli
                 Row(
                   children: [
                     const Text('Produk yang dibeli',
@@ -96,6 +100,8 @@ class _AddPembelianState extends State<AddPembelian> {
                   ],
                 ),
                 const SizedBox(height: 10),
+
+                // Tombol Tambah Produk
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
@@ -125,6 +131,8 @@ class _AddPembelianState extends State<AddPembelian> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // List Produk
                 Column(
                   children: barangs.map((barang) {
                     return Card(
@@ -169,12 +177,17 @@ class _AddPembelianState extends State<AddPembelian> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 10),
+
+                // Tombol Simpan
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () async {
-                      await DatabaseHelper()
-                          .insertPembelian(barangs, _supplierController.text, _tglPembelianController.text);
+                      await DatabaseHelper().insertPembelian(
+                          barangs,
+                          _supplierController.text,
+                          _tglPembelianController.text);
                       Navigator.pop(context, true);
                     },
                     style: OutlinedButton.styleFrom(

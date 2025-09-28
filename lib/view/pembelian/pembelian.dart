@@ -2,6 +2,7 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 import 'package:bpkp_pos_test/view/pembelian/add_pembelian.dart';
+import 'package:bpkp_pos_test/view/pembelian/detail_pembelian.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -76,11 +77,42 @@ class _PembelianState extends State<Pembelian> {
                       itemCount: list.length,
                       itemBuilder: (context, index) {
                         final item = list[index];
-                        return ListTile(
-                          title: Text(item['code'] ?? '-'),
-                          subtitle: Text(
-                            'Supplier: ${item['supplier'] ?? '-'}\n'
-                            'Tanggal: ${item['tanggal'] ?? '-'}',
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            title: Text(
+                              item['code'] ?? '-',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              'Supplier: ${item['supplier'] ?? '-'}\n'
+                              'Tanggal: ${item['tanggal'] ?? '-'}',
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailPembelian(item: item),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
