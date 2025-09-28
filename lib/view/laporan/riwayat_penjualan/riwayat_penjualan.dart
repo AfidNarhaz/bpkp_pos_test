@@ -22,8 +22,9 @@ class RiwayatPenjualanPage extends StatefulWidget {
 }
 
 class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
-  late DateTime startDate;
-  late DateTime endDate;
+  String selectedDateRange = 'Pilih Tanggal';
+  DateTime? startDateWidget;
+  DateTime? endDateWidget;
 
   final dbHelper = DatabaseHelper();
   late Future<List<Map<String, dynamic>>> _fetchListPenjualan;
@@ -33,16 +34,14 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
   @override
   void initState() {
     super.initState();
-    startDate = widget.startDate;
-    endDate = widget.endDate;
     loadPenjualan();
   }
 
   void loadPenjualan() {
     setState(() {
       _fetchListPenjualan = dbHelper.getListPenjualan(
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDateWidget,
+        endDate: endDateWidget,
       );
     });
     logger.i('Future for penjualan loaded: $_fetchListPenjualan');
@@ -77,68 +76,16 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {
                 setState(() {
-                  startDate = start;
-                  endDate = end;
+                  startDateWidget = start;
+                  endDateWidget = end;
+                  final dateFormat = DateFormat('dd/MM/yyyy');
+                  selectedDateRange =
+                      '${dateFormat.format(start)} - ${dateFormat.format(end)}';
                 });
+                loadPenjualan();
               },
             ),
             SizedBox(height: 16),
-
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFED6EA0), Color(0xFFFFA99F)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: EdgeInsets.all(24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Transaksi',
-                          style: TextStyle(color: Colors.white70)),
-                      SizedBox(height: 8),
-                      Text('2',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Total Penjualan',
-                          style: TextStyle(color: Colors.white70)),
-                      SizedBox(height: 8),
-                      Text('Rp40.000',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     Text('Kamis, 25 September 2025',
-            //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            //     Text('Rp40.000',
-            //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            //   ],
-            // ),
-            // SizedBox(height: 16),
-
             Expanded(
               child: FutureBuilder(
                 future: _fetchListPenjualan,
@@ -179,9 +126,16 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                         final item = list[index];
                         final formatter = NumberFormat.currency(
                             locale: 'id_ID', symbol: 'Rp');
-                        DateTime tanggal = DateTime.parse(item['tanggal']);
-                        final jam =
-                            '${tanggal.hour.toString().padLeft(2, '0')}:${tanggal.minute.toString().padLeft(2, '0')}';
+                        String noInvoice = item['noInvoice'];
+
+                        String datePart = noInvoice.substring(8, 16);
+                        String timePart = noInvoice.substring(17);
+
+                        DateTime dateTime = DateTime.parse(
+                            '${datePart.substring(0, 4)}-${datePart.substring(4, 6)}-${datePart.substring(6, 8)} ${timePart.substring(0, 2)}:${timePart.substring(2, 4)}:${timePart.substring(4, 6)}');
+
+                        String jam =
+                            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
 
                         return _TransaksiItem(
                           nominal: formatter.format(item['total_transaksi']),
@@ -194,9 +148,9 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     DetailRiwayatPenjualanPage(
-                                      noInvoice: item['noInvoice'],
-                                      tanggal: item['tanggal'],
-                                    ),
+                                  noInvoice: item['noInvoice'],
+                                  tanggal: item['tanggal'],
+                                ),
                               ),
                             );
                           },

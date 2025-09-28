@@ -684,7 +684,8 @@ class DatabaseHelper {
 
     final now = DateTime.now();
     final formattedTimestamp = DateFormat('yyyyMMdd_HHmmss').format(now);
-    final formattedTanggal = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    final formattedTanggal = DateFormat('dd-MM-yyyy').format(now);
+
 
     final invoice = 'INVOICE_$formattedTimestamp';
 

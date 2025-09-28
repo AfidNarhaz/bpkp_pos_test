@@ -45,7 +45,7 @@ class _PembelianState extends State<Pembelian> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(children: [Text('Total Pembelian: 0')]),
+            // Row(children: [Text('Total Pembelian: 0')]),
             SizedBox(height: 10),
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {

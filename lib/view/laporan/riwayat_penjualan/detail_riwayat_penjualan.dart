@@ -46,162 +46,165 @@ class _DetailRiwayatPenjualanPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Judul
-            Text(
-              'Detail Transaksi',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Email & Kirim Struk
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Masukan Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Judul
+              Text(
+                'Detail Transaksi',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  color: Colors.black87,
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16),
               ),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
-                  foregroundColor: Colors.black87,
-                  textStyle: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                child: Text('Kirim Struk'),
-              ),
-            ),
-            SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-            // Logo & Nama Usaha
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(16),
+              // Logo & Nama Usaha
+              Center(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/Splash.png',
+                      width: 100,
+                      height: 70,
+                      fit: BoxFit.contain,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(
-                        'assets/Splash.png',
-                        fit: BoxFit.cover,
+                    const SizedBox(height: 12),
+                    const Text(
+                      'BPKP POS',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'BPKP POS',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                    Text(
+                      'Jl. Bypass KM 14, Sungai Sapih, Kota Padang',
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
-                  ),
-                  Text(
-                    'Pusat',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Detail Pembelian
+              const Text(
+                'Detail Pembelian',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Kasir: Difa'),
+                  Text(widget.tanggal),
                 ],
               ),
-            ),
-            SizedBox(height: 20),
-
-            // Detail Pembelian
-            Text(
-              'Detail Pembelian',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Invoice: ${widget.noInvoice}'),
+                  const Text('Tunai'),
+                ],
               ),
-            ),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Kasir: Difa'),
-                Text(widget.tanggal),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Invoice: ${widget.noInvoice}'),
-                Text('Tunai'),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Pelanggan: -'),
-                Text('Lunas'),
-              ],
-            ),
-            Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text('Pelanggan: -'),
+                  Text('Lunas'),
+                ],
+              ),
+              const Divider(height: 24),
 
-            FutureBuilder(
+              FutureBuilder(
                 future: _fetchDetailBarang,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Tidak ada barang yang dibeli.'));
+                    return const Center(
+                        child: Text('Tidak ada barang yang dibeli.'));
                   } else {
                     final detailBarang = snapshot.data!;
 
-                    return Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemCount: detailBarang.length,
-                        itemBuilder: (context, index) {
-                          var barang = detailBarang[index];
+                    // Hitung subtotal & total produk
+                    double subtotal = 0;
+                    int totalProduk = 0;
+
+                    for (var barang in detailBarang) {
+                      subtotal += (barang['totalHarga'] as num).toDouble();
+                      totalProduk += (barang['jumlah'] as num).toInt();
+                    }
+
+                    // Untuk sekarang, anggap uang diterima sama dengan subtotal
+                    double diterima = subtotal;
+                    double kembalian = diterima - subtotal;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Daftar produk
+                        ...detailBarang.map((barang) {
                           return _produkItem(
                             barang['nama'],
                             'x${barang['jumlah']} @${_formatHarga(barang['hargaJual'])}',
                             _formatHarga(barang['totalHarga']),
                           );
-                        },
-                      ),
+                        }),
+
+                        const Divider(height: 24),
+
+                        // Subtotal
+                        _summaryItem("Subtotal", _formatHarga(subtotal)),
+
+                        const SizedBox(height: 4),
+
+                        // Total Produk
+                        _summaryItem(
+                          "Total ($totalProduk Produk)",
+                          _formatHarga(subtotal),
+                          isBold: true,
+                        ),
+
+                        const Divider(height: 24),
+
+                        // Diterima
+                        _summaryItem("Diterima", _formatHarga(diterima)),
+
+                        // Kembalian
+                        _summaryItem("Kembalian", _formatHarga(kembalian)),
+                      ],
                     );
                   }
-                }),
-            Divider(height: 24),
-
-            // Tombol Tutup
-            SizedBox(height: 32), // Ganti Spacer() dengan SizedBox
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  textStyle: TextStyle(fontWeight: FontWeight.bold),
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text('Tutup'),
+                },
               ),
-            ),
-          ],
+              const Divider(height: 24),
+
+              // Tombol Tutup
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text('Tutup'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -216,11 +219,37 @@ class _DetailRiwayatPenjualanPageState
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(nama, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(nama, style: const TextStyle(fontWeight: FontWeight.bold)),
               Text(qty, style: TextStyle(color: Colors.grey[700])),
             ],
           ),
-          Text(harga, style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(harga, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  // Tambahkan helper widget di bawah kelas state
+  Widget _summaryItem(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontSize: isBold ? 16 : 14,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontSize: isBold ? 16 : 14,
+            ),
+          ),
         ],
       ),
     );
