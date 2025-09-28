@@ -8,12 +8,6 @@ class DetailPembelian extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Contoh data dummy, ganti dengan data dari item jika sudah ada
-    final penerima = {
-      'nama_outlet': item['nama_outlet'] ?? 'Pusat',
-      'no_hp': item['no_hp'] ?? '6289998184858',
-      'alamat': item['alamat'] ?? 'Jl. Merdeka No. 123, Jakarta',
-      'catatan': item['catatan'] ?? '-',
-    };
 
     final informasi = {
       'status': item['status'] ?? 'Selesai',
@@ -21,7 +15,6 @@ class DetailPembelian extends StatelessWidget {
       'tanggal': item['tanggal'] ?? '-',
       'dibuat_oleh': item['dibuat_oleh'] ?? 'Difa',
       'email': item['email'] ?? 'difazahran@gmail.com',
-      'nama_outlet': item['nama_outlet'] ?? 'Pusat',
       'no_hp': item['no_hp'] ?? '6289998184858',
     };
 
@@ -54,26 +47,6 @@ class DetailPembelian extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section Penerima
-            Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Penerima',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.black)),
-                    const SizedBox(height: 8),
-                    _infoRow('Nama Outlet', penerima['nama_outlet']),
-                    _infoRow('No.HP', penerima['no_hp']),
-                    _infoRow('Alamat Outlet', penerima['alamat']),
-                    _infoRow('Catatan', penerima['catatan']),
-                  ],
-                ),
-              ),
-            ),
             // Section Informasi Pembelian
             Card(
               margin: const EdgeInsets.only(bottom: 16),
@@ -112,7 +85,6 @@ class DetailPembelian extends StatelessWidget {
                     _infoRow('Dibuat Tanggal', informasi['tanggal']),
                     _infoRow('Dibuat Oleh', informasi['dibuat_oleh']),
                     _infoRow('Email', informasi['email']),
-                    _infoRow('Nama Outlet', informasi['nama_outlet']),
                     _infoRow('Nomor Telepon', informasi['no_hp']),
                   ],
                 ),
