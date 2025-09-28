@@ -579,6 +579,21 @@ class DatabaseHelper {
     return result;
   }
 
+  // Fungsi untuk mengambil daftar barang di penjualan
+  Future<List<Map<String, dynamic>>> getDetailBarangPenjualan(String noInvoice) async {
+    final db = await database;
+
+    final result = await db.rawQuery('''
+    SELECT p.id, p.codeProduk, p.nama, p.kategori, p.merek, 
+           p.hargaJual, pp.jumlah, pp.totalHarga
+    FROM $tablePenjualan pp
+    JOIN $tableProduk p ON pp.produkId = p.id
+    WHERE pp.noInvoice = ?
+  ''', [noInvoice]);
+
+    return result;
+  }
+
   // Fungsi untuk memasukkan pembelian baru
   Future<void> insertPembelian(List<Map<String, dynamic>> barangList,
       String supplier, String tanggalPembelian) async {

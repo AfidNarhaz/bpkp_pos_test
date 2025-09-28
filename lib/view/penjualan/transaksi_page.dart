@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/helper/min_child_size.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:bpkp_pos_test/view/home/home_page.dart';
 
 class TransaksiPage extends StatefulWidget {
   final bool showBackButton;
@@ -115,6 +116,26 @@ class TransaksiPageState extends State<TransaksiPage> {
       backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        leading: FutureBuilder<String?>(
+          future: SharedPreferences.getInstance()
+              .then((prefs) => prefs.getString('role')),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data == 'admin') {
+              return IconButton(
+                onPressed: () async {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()),
+                    (Route<dynamic> route) => false,
+                  );
+                },
+                icon: Icon(Icons.arrow_back_outlined),
+              );
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+        ),
         automaticallyImplyLeading: widget.showBackButton,
         title: SizedBox(
           height: 40,
@@ -390,6 +411,15 @@ class DraggableSheetContent extends StatelessWidget {
                 0,
                 (sum, item) => sum + ((item['total'] ?? 0) as num),
               );
+
+              // Tambahkan pengecekan di sini
+              if (keranjang.isEmpty || totalTagihan == 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Tambahkan produk ke keranjang')),
+                );
+                return;
+              }
 
               // Navigasi ke halaman pembayaran
               await Navigator.push(

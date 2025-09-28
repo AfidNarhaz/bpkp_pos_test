@@ -193,7 +193,10 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    DetailRiwayatPenjualanPage(),
+                                    DetailRiwayatPenjualanPage(
+                                      noInvoice: item['noInvoice'],
+                                      tanggal: item['tanggal'],
+                                    ),
                               ),
                             );
                           },

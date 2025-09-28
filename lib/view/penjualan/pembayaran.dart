@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/penjualan/transaksi_berhasil.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final logger = Logger();
 
@@ -56,6 +57,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
   }
 
   Future<void> _clearKeranjang() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('keranjang');
     setState(() {
       widget.keranjang.clear();
       tunaiController.clear();
@@ -206,7 +209,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
                           try {
                             await DatabaseHelper().insertPenjualan(keranjang);
-                            _clearKeranjang();
+                            await _clearKeranjang();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -252,7 +255,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
                     try {
                       await DatabaseHelper().insertPenjualan(keranjang);
-                      _clearKeranjang();
+                      await _clearKeranjang();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
