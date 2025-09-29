@@ -8,7 +8,6 @@ import 'dart:io';
 
 class PegawaiPage extends StatefulWidget {
   const PegawaiPage({super.key});
-
   @override
   PegawaiPageState createState() => PegawaiPageState();
 }
@@ -17,7 +16,6 @@ class PegawaiPageState extends State<PegawaiPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-
   @override
   void initState() {
     super.initState();
@@ -111,7 +109,6 @@ class PegawaiPageState extends State<PegawaiPage> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Kiri: Detail pegawai
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -132,7 +129,6 @@ class PegawaiPageState extends State<PegawaiPage> {
                                     ],
                                   ),
                                 ),
-                                // Kanan: Foto pegawai
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: pegawai.imagePath != null &&
@@ -155,7 +151,6 @@ class PegawaiPageState extends State<PegawaiPage> {
                             ),
                           ),
                         ),
-                        // Divider, jangan tampilkan di bawah item terakhir
                         if (index != filteredPegawaiList.length - 1)
                           const Divider(
                             color: Colors.grey,

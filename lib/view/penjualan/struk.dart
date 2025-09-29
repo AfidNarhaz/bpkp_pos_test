@@ -29,7 +29,7 @@ class KirimStrukPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final formatCurrency =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-    final waktu = DateFormat('dd/MM/yyyy mm:HH').format(waktuTransaksi);
+    final waktu = DateFormat('dd/MM/yyyy HH:mm').format(waktuTransaksi);
     final kembalian = uangDiterima - totalTagihan;
     final totalProduk =
         keranjang.fold<int>(0, (sum, item) => sum + (item['qty'] as int? ?? 1));

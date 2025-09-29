@@ -16,7 +16,6 @@ import 'package:bpkp_pos_test/view/home/home_page.dart';
 class TransaksiPage extends StatefulWidget {
   final bool showBackButton;
   const TransaksiPage({super.key, this.showBackButton = true});
-
   @override
   State<TransaksiPage> createState() => TransaksiPageState();
 }
@@ -26,7 +25,6 @@ class TransaksiPageState extends State<TransaksiPage> {
   String namaKasir = 'Kasir';
   String username = '';
   String searchQuery = '';
-
   @override
   void initState() {
     super.initState();
@@ -38,7 +36,6 @@ class TransaksiPageState extends State<TransaksiPage> {
   String displayText = 'Rp0';
   double total = 0;
   final NumberFormat currencyFormatter = NumberFormat('#,##0', 'id_ID');
-
   Future<void> _saveKeranjang() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('keranjang', jsonEncode(keranjang));
@@ -93,14 +90,12 @@ class TransaksiPageState extends State<TransaksiPage> {
       final produkList = await DatabaseHelper().getProduks();
       final produk = produkList.firstWhere(
         (p) => p.barcode == barcode,
-        // orElse: () => null,
       );
       tambahKeKeranjang({
         'id': produk.id,
         'nama': produk.nama,
         'hargaJual': produk.hargaJual,
         'barcode': produk.barcode,
-        // tambahkan field lain jika perlu
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -177,7 +172,7 @@ class TransaksiPageState extends State<TransaksiPage> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 80), // Tambah padding bawah
+            padding: const EdgeInsets.only(bottom: 80),
             child: ProdukTab(
               onAddToCart: tambahKeKeranjang,
               searchQuery: searchQuery,
@@ -207,7 +202,6 @@ class TransaksiPageState extends State<TransaksiPage> {
   }
 
   void tambahKeKeranjang(Map<String, dynamic> produk) {
-    // Cek stok, jika 0 atau null, tampilkan pesan dan return
     if ((produk['stok'] ?? 0) <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -248,7 +242,6 @@ class TransaksiPageState extends State<TransaksiPage> {
 class KeyButton extends StatelessWidget {
   final String text;
   const KeyButton({required this.text, super.key});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -271,7 +264,6 @@ class DraggableSheetContent extends StatelessWidget {
   final List<Map<String, dynamic>> keranjang;
   final Function(int, Map<String, dynamic>?) onUpdateKeranjang;
   final String namaKasir;
-
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
@@ -280,7 +272,6 @@ class DraggableSheetContent extends StatelessWidget {
     required this.namaKasir,
     super.key,
   });
-
   String _formatCurrency(double? amount) {
     if (amount == null) return '0';
     return NumberFormat.currency(
@@ -326,7 +317,6 @@ class DraggableSheetContent extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          // Ganti keranjang.length dengan penjumlahan qty
                           '${keranjang.fold<int>(0, (sum, item) => sum + ((item['qty'] ?? 1) as int))} Produk',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -375,18 +365,16 @@ class DraggableSheetContent extends StatelessWidget {
                               if (result != null) {
                                 if (result is Map &&
                                     result['deleted'] == true) {
-                                  onUpdateKeranjang(index,
-                                      null); // Hapus produk dari keranjang
+                                  onUpdateKeranjang(index, null);
                                 } else {
-                                  onUpdateKeranjang(
-                                      index, result); // Update produk
+                                  onUpdateKeranjang(index, result);
                                 }
                               }
                             },
                           ),
                           if (index < keranjang.length - 1)
                             const Divider(
-                              color: Colors.grey, // warna abu-abu
+                              color: Colors.grey,
                               height: 1,
                               thickness: 1,
                               indent: 16,
@@ -411,8 +399,6 @@ class DraggableSheetContent extends StatelessWidget {
                 0,
                 (sum, item) => sum + ((item['total'] ?? 0) as num),
               );
-
-              // Tambahkan pengecekan di sini
               if (keranjang.isEmpty || totalTagihan == 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -420,8 +406,6 @@ class DraggableSheetContent extends StatelessWidget {
                 );
                 return;
               }
-
-              // Navigasi ke halaman pembayaran
               await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -447,20 +431,17 @@ class DraggableSheetContent extends StatelessWidget {
 class ProdukTab extends StatefulWidget {
   final Function(Map<String, dynamic>) onAddToCart;
   final String searchQuery;
-
   const ProdukTab({
     required this.onAddToCart,
     required this.searchQuery,
     super.key,
   });
-
   @override
   State<ProdukTab> createState() => _ProdukTabState();
 }
 
 class _ProdukTabState extends State<ProdukTab> {
   List<Produk> produkList = [];
-
   @override
   void initState() {
     super.initState();
@@ -481,11 +462,9 @@ class _ProdukTabState extends State<ProdukTab> {
             .toLowerCase()
             .contains(widget.searchQuery.toLowerCase()))
         .toList();
-
     if (filteredProduk.isEmpty) {
       return const Center(child: Text('Tidak ada produk ditemukan'));
     }
-
     return ListView.builder(
       itemCount: filteredProduk.length,
       itemBuilder: (context, index) {

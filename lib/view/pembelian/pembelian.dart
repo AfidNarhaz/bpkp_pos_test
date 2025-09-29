@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 
 class Pembelian extends StatefulWidget {
   const Pembelian({super.key});
-
   @override
   State<Pembelian> createState() => _PembelianState();
 }
@@ -17,10 +16,8 @@ class _PembelianState extends State<Pembelian> {
   String selectedDateRange = 'Pilih Tanggal';
   DateTime? startDate;
   DateTime? endDate;
-
   final dbHelper = DatabaseHelper();
   late Future<List<Map<String, dynamic>>>? _fetchListPembelian;
-
   @override
   void initState() {
     super.initState();
@@ -45,7 +42,6 @@ class _PembelianState extends State<Pembelian> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Row(children: [Text('Total Pembelian: 0')]),
             SizedBox(height: 10),
             DateRangePickerWidget(
               onDateRangeChanged: (start, end) {
@@ -137,9 +133,8 @@ class _PembelianState extends State<Pembelian> {
             builder: (context) => AddPembelian(),
           ),
         );
-
         if (result == true) {
-          loadPembelian(); // Refresh after adding
+          loadPembelian();
         }
       },
       tooltip: 'Tambah Produk',

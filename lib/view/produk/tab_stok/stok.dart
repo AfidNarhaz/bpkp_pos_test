@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StokTab extends StatefulWidget {
   const StokTab({super.key});
-
   @override
   StokTabState createState() => StokTabState();
 }
@@ -19,7 +18,6 @@ class StokTab extends StatefulWidget {
 class StokTabState extends State<StokTab> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
@@ -67,7 +65,6 @@ class StokTabState extends State<StokTab> {
                     );
                     if (!mounted) return;
                     if (barcode != null) {
-                      // Cari produk berdasarkan barcode
                       final produkList = await DatabaseHelper().getProduks();
                       if (!mounted) return;
                       final produk = produkList.firstWhereOrNull(
@@ -113,8 +110,6 @@ class StokTabState extends State<StokTab> {
                         if (stokBaru != null) {
                           produk.stok = stokBaru;
                           await DatabaseHelper().updateProduk(produk);
-
-                          // Tambahkan history update stok
                           final prefs = await SharedPreferences.getInstance();
                           final username =
                               prefs.getString('username') ?? 'Unknown';
@@ -129,9 +124,8 @@ class StokTabState extends State<StokTab> {
                               detail: 'Stok diubah menjadi ${produk.stok}',
                             ),
                           );
-
                           Navigator.pop(context);
-                          setState(() {}); // refresh tampilan
+                          setState(() {});
                         }
                       } else {
                         if (!mounted) return;
@@ -234,13 +228,11 @@ class StokTabState extends State<StokTab> {
                         final produk = filteredStocks[index];
                         int stokBaru = produk.stok ?? 0;
                         String stokMode = 'Stok Disesuaikan';
-
                         await showDialog(
                           context: context,
                           builder: (dialogContext) {
                             return StatefulBuilder(
                               builder: (context, setStateDialog) {
-                                // Label dinamis
                                 String labelJumlah;
                                 String rumusStok;
                                 if (stokMode == 'Stok Disesuaikan') {
@@ -255,7 +247,6 @@ class StokTabState extends State<StokTab> {
                                   rumusStok =
                                       '${produk.stok ?? 0} - $stokBaru = ${produk.stok! - stokBaru}';
                                 }
-
                                 return AlertDialog(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16)),
@@ -299,7 +290,6 @@ class StokTabState extends State<StokTab> {
                                         onChanged: (val) {
                                           setStateDialog(() {
                                             stokMode = val!;
-                                            // Reset stokBaru sesuai mode
                                             if (stokMode ==
                                                 'Stok Disesuaikan') {
                                               stokBaru = produk.stok ?? 0;
@@ -408,8 +398,6 @@ class StokTabState extends State<StokTab> {
                                                       }
                                                       await DatabaseHelper()
                                                           .updateProduk(produk);
-
-                                                      // Tambahkan history update stok
                                                       final prefs =
                                                           await SharedPreferences
                                                               .getInstance();
@@ -434,10 +422,8 @@ class StokTabState extends State<StokTab> {
                                                               'Stok dari $stokLama menjadi ${produk.stok}',
                                                         ),
                                                       );
-
                                                       Navigator.pop(context);
-                                                      setState(
-                                                          () {}); // refresh tampilan
+                                                      setState(() {});
                                                     }
                                                   : null,
                                               style: ElevatedButton.styleFrom(

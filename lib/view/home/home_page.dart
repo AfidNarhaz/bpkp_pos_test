@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -52,7 +51,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              _showLogoutConfirmation(context); // Menampilkan peringatan logout
+              _showLogoutConfirmation(context);
             },
           ),
         ],
@@ -76,7 +75,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 24),
-            // Laporan section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -173,7 +171,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Method untuk membuat card laporan
   Widget _buildLaporanCard(String title, String value) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -182,7 +179,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(51), // 20% opacity
+            color: Colors.grey.withAlpha(51),
             spreadRadius: 2,
             blurRadius: 5,
           ),
@@ -213,7 +210,7 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Tidak'),
               onPressed: () {
                 if (context.mounted) {
-                  Navigator.of(context).pop(); // Tutup dialog
+                  Navigator.of(context).pop();
                 }
               },
             ),
@@ -221,7 +218,7 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Ya'),
               onPressed: () async {
                 final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('isLoggedIn', false); // Reset status login
+                await prefs.setBool('isLoggedIn', false);
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   Navigator.pushReplacementNamed(context, '/login');

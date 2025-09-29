@@ -13,7 +13,6 @@ final Logger _logger = Logger('KelolaProdukLogger');
 
 class KelolaProdukPage extends StatefulWidget {
   const KelolaProdukPage({super.key});
-
   @override
   KelolaProdukPageState createState() => KelolaProdukPageState();
 }
@@ -24,23 +23,19 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
   List<Produk> produkList = [];
   List<Produk> filteredProdukList = [];
   final TextEditingController _searchController = TextEditingController();
-
   final dbHelper = DatabaseHelper();
-
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // Ubah jadi 2 tab
-
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) return; // hindari trigger berulang
+      if (_tabController.indexIsChanging) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {});
         }
       });
     });
-
     _searchController.addListener(_filterProduk);
     _loadProdukAsync();
   }
@@ -48,10 +43,8 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
   void _filterProductsByCategory(List<String> selectedCategories) {
     setState(() {
       if (selectedCategories.isEmpty) {
-        // Jika tidak ada kategori yang dipilih, tampilkan semua produk
         filteredProdukList = produkList;
       } else {
-        // Filter produk berdasarkan kategori yang dipilih
         filteredProdukList = produkList
             .where((product) => selectedCategories.contains(product.kategori))
             .toList();
@@ -77,7 +70,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
     final kategoriList = await dbHelper.getKategori();
     List<bool> selectedCategories =
         List<bool>.filled(kategoriList.length, false);
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -175,7 +167,6 @@ class KelolaProdukPageState extends State<KelolaProdukPage>
 
   Widget? _buildFabByTab() {
     if (_currentTabIndex == 0) {
-      // FAB untuk tambah produk
       return FloatingActionButton(
         onPressed: () async {
           await Navigator.push(

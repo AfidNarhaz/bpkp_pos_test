@@ -10,13 +10,11 @@ import 'package:logger/logger.dart';
 class RiwayatPenjualanPage extends StatefulWidget {
   final DateTime startDate;
   final DateTime endDate;
-
   const RiwayatPenjualanPage({
     super.key,
     required this.startDate,
     required this.endDate,
   });
-
   @override
   State<RiwayatPenjualanPage> createState() => _RiwayatPenjualanPageState();
 }
@@ -25,12 +23,9 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
   String selectedDateRange = 'Pilih Tanggal';
   DateTime? startDateWidget;
   DateTime? endDateWidget;
-
   final dbHelper = DatabaseHelper();
   late Future<List<Map<String, dynamic>>> _fetchListPenjualan;
-
   final logger = Logger();
-
   @override
   void initState() {
     super.initState();
@@ -97,19 +92,15 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                   } else {
                     final list = snapshot.data ?? [];
 
-                    // Print the data here
                     logger.i('List of penjualan: $list');
 
                     if (list.isEmpty) {
                       return Center(child: Text('Data penjualan kosong'));
                     }
-
                     return ListView.builder(
-                      itemCount:
-                          list.length + 1, // +1 untuk item keterangan di bawah
+                      itemCount: list.length + 1,
                       itemBuilder: (context, index) {
                         if (index == list.length) {
-                          // Ini item terakhir: tampilkan keterangan
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
@@ -121,22 +112,16 @@ class _RiwayatPenjualanPageState extends State<RiwayatPenjualanPage> {
                             ),
                           );
                         }
-
-                        // Item transaksi biasa
                         final item = list[index];
                         final formatter = NumberFormat.currency(
                             locale: 'id_ID', symbol: 'Rp');
                         String noInvoice = item['noInvoice'];
-
                         String datePart = noInvoice.substring(8, 16);
                         String timePart = noInvoice.substring(17);
-
                         DateTime dateTime = DateTime.parse(
                             '${datePart.substring(0, 4)}-${datePart.substring(4, 6)}-${datePart.substring(6, 8)} ${timePart.substring(0, 2)}:${timePart.substring(2, 4)}:${timePart.substring(4, 6)}');
-
                         String jam =
                             '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-
                         return _TransaksiItem(
                           nominal: formatter.format(item['total_transaksi']),
                           kode: item['noInvoice'],
@@ -174,8 +159,7 @@ class _TransaksiItem extends StatelessWidget {
   final String kode;
   final String status;
   final String jam;
-  final VoidCallback? onTap; // Tambahkan callback
-
+  final VoidCallback? onTap;
   const _TransaksiItem({
     required this.nominal,
     required this.kode,
@@ -183,11 +167,10 @@ class _TransaksiItem extends StatelessWidget {
     required this.jam,
     this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // Tambahkan onTap
+      onTap: onTap,
       child: Row(
         children: [
           Icon(Icons.receipt_long, color: Colors.grey, size: 32),

@@ -132,7 +132,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
         minStok: int.tryParse(_minStokController.text.replaceAll('.', '')) ?? 0,
-        stok: 0, // Set stok selalu 0
+        stok: widget.produk.stok, // Gunakan stok lama, jangan set ke 0
         sendNotification: _sendNotification,
       );
       await DatabaseHelper().updateProduk(updatedProduct);
@@ -363,52 +363,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-                // Pilih Satuan Jual
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper().getSatuan(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    final satuanJualList = snapshot.data ?? [];
-                    return _buildTextField(
-                      controller: _satuanJualController,
-                      label: 'Pilih Satuan Jual',
-                      suffixIcon: Icons.arrow_forward_ios,
-                      readOnly: true,
-                      onTap: () {
-                        SatuanDialog.showSatuanDialog(
-                          context,
-                          satuanJualList,
-                          (newSatuanJual) async {
-                            if (newSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .insertSatuan(newSatuanJual);
-                              setState(() {});
-                              _satuanJualController.text = newSatuanJual;
-                            }
-                          },
-                          (id, updatedSatuanJual) async {
-                            if (updatedSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .updateSatuan(id, updatedSatuanJual);
-                              setState(() {});
-                            }
-                          },
-                          (id) async {
-                            await DatabaseHelper().deleteSatuan(id);
-                            setState(() {});
-                          },
-                          (selectedSatuanJual) {
-                            setState(() {
-                              _satuanJualController.text = selectedSatuanJual;
-                            });
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
                 // Pilih Satuan Beli
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getSatuan(),
@@ -448,6 +402,52 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                           (selectedSatuanBeli) {
                             setState(() {
                               _satuanBeliController.text = selectedSatuanBeli;
+                            });
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                // Pilih Satuan Jual
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: DatabaseHelper().getSatuan(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    final satuanJualList = snapshot.data ?? [];
+                    return _buildTextField(
+                      controller: _satuanJualController,
+                      label: 'Pilih Satuan Jual',
+                      suffixIcon: Icons.arrow_forward_ios,
+                      readOnly: true,
+                      onTap: () {
+                        SatuanDialog.showSatuanDialog(
+                          context,
+                          satuanJualList,
+                          (newSatuanJual) async {
+                            if (newSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .insertSatuan(newSatuanJual);
+                              setState(() {});
+                              _satuanJualController.text = newSatuanJual;
+                            }
+                          },
+                          (id, updatedSatuanJual) async {
+                            if (updatedSatuanJual.isNotEmpty) {
+                              await DatabaseHelper()
+                                  .updateSatuan(id, updatedSatuanJual);
+                              setState(() {});
+                            }
+                          },
+                          (id) async {
+                            await DatabaseHelper().deleteSatuan(id);
+                            setState(() {});
+                          },
+                          (selectedSatuanJual) {
+                            setState(() {
+                              _satuanJualController.text = selectedSatuanJual;
                             });
                           },
                         );

@@ -209,14 +209,15 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
                           try {
                             await DatabaseHelper().insertPenjualan(keranjang);
-                            await _clearKeranjang();
+                            // Jangan clear keranjang di sini!
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => TransaksiBerhasilPage(
                                   totalTagihan: totalTagihan,
                                   uangDiterima: uangDiterima,
-                                  keranjang: keranjang,
+                                  keranjang: List<Map<String, dynamic>>.from(
+                                      keranjang), // Kirim salinan keranjang
                                   namaKasir: namaKasir,
                                   onTransaksiBaru: widget.onResetKeranjang,
                                 ),
@@ -235,6 +236,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
                 ),
               ),
               const SizedBox(height: 8),
+
               // Tombol Uang Pas tetap di bawahnya
               SizedBox(
                 width: double.infinity,
@@ -255,14 +257,14 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
                     try {
                       await DatabaseHelper().insertPenjualan(keranjang);
-                      await _clearKeranjang();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => TransaksiBerhasilPage(
                             totalTagihan: totalTagihan,
                             uangDiterima: uangDiterima,
-                            keranjang: keranjang,
+                            keranjang: List<Map<String, dynamic>>.from(
+                                keranjang), // Kirim salinan keranjang
                             namaKasir: namaKasir,
                             onTransaksiBaru: _clearKeranjang,
                           ),

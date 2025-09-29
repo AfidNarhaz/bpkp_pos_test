@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
   @override
   State<LoginPage> createState() => _LoginState();
 }
@@ -13,14 +12,12 @@ class LoginPage extends StatefulWidget {
 class _LoginState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool _isObscure = true; // Untuk menyembunyikan/menampilkan password
-  String? _errorMessage; // Untuk menyimpan pesan error
-
+  bool _isObscure = true;
+  String? _errorMessage;
   void _login() async {
     final username = usernameController.text;
     final password = passwordController.text;
     final user = await DatabaseHelper().getUser(username, password);
-
     if (user != null) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', user.username);
@@ -37,7 +34,6 @@ class _LoginState extends State<LoginPage> {
         });
       }
     } else {
-      // print('No user matched'); // Debug log
       setState(() {
         _errorMessage = 'Username atau password salah';
       });
@@ -54,7 +50,6 @@ class _LoginState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     double itemWidth = MediaQuery.of(context).size.width > 600 ? 600 : 400;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
@@ -76,10 +71,9 @@ class _LoginState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 48.0),
-                  // Field untuk username vvv
                   SizedBox(
-                    width: 300, // Atur lebar (panjang)
-                    height: 40, // Atur tinggi (lebar)
+                    width: 300,
+                    height: 40,
                     child: TextFormField(
                       controller: usernameController,
                       decoration: InputDecoration(
@@ -87,28 +81,27 @@ class _LoginState extends State<LoginPage> {
                         fillColor: AppColors.secondary,
                         hintText: "Username",
                         hintStyle: const TextStyle(
-                          fontWeight: FontWeight.normal, // Berat huruf normal
-                          fontSize: 13, // Atur ukuran huruf hintText
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: Colors.black, // Warna outline
-                            width: 2.0, // Ketebalan outline
+                            color: Colors.black,
+                            width: 2.0,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: Colors.black, // Warna outline ketika enabled
+                            color: Colors.black,
                             width: 2.0,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: AppColors
-                                .accent, // Warna outline ketika focused
+                            color: AppColors.accent,
                             width: 2.0,
                           ),
                         ),
@@ -116,52 +109,48 @@ class _LoginState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  // Field untuk password dengan ikon show/hide vvv
                   SizedBox(
                     width: 300,
                     height: 40,
                     child: TextFormField(
                       controller: passwordController,
-                      obscureText:
-                          _isObscure, // Menentukan apakah password tersembunyi
+                      obscureText: _isObscure,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: AppColors.secondary,
                         hintText: "Password",
                         hintStyle: const TextStyle(
-                          fontWeight: FontWeight.normal, // Berat huruf normal
-                          fontSize: 13, // Atur ukuran huruf hintText
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: Colors.black, // Warna outline
-                            width: 2.0, // Ketebalan outline
+                            color: Colors.black,
+                            width: 2.0,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: Colors.black, // Warna outline ketika enabled
+                            color: Colors.black,
                             width: 2.0,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: const BorderSide(
-                            color: AppColors
-                                .accent, // Warna outline ketika focused
+                            color: AppColors.accent,
                             width: 2.0,
                           ),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(_isObscure
                               ? Icons.visibility
-                              : Icons.visibility_off), // Ikon untuk show/hide
+                              : Icons.visibility_off),
                           onPressed: () {
                             setState(() {
-                              _isObscure =
-                                  !_isObscure; // Toggle antara true/false
+                              _isObscure = !_isObscure;
                             });
                           },
                         ),
