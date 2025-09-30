@@ -1,5 +1,6 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class DetailPembelian extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -21,6 +22,7 @@ class DetailPembelian extends StatefulWidget {
 
 class _DetailPembelianState extends State<DetailPembelian> {
   final dbHelper = DatabaseHelper();
+  final logger = Logger();
 
   late Future<List<Map<String, dynamic>>>? _fetchDetailBarang;
 
@@ -80,7 +82,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
           }
 
           final rincian = snapshot.data!;
-          print(rincian);
+          logger.i(rincian);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),

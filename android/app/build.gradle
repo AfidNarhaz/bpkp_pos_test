@@ -64,28 +64,19 @@ android {
         proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
     }
 }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def appName = "bpkp_pos"
+            def buildType = variant.buildType.name
+            def versionName = variant.versionName
+            outputFileName = "${appName}_${buildType}_v${versionName}.apk"
+        }
+    }
 }
 
 flutter {
     source = "../.."
-}
-
-// Task untuk mengganti nama APK release
-tasks.register("renameApk", Copy) {
-    from 'build/outputs/apk/release/app-release.apk'
-    into 'build/outputs/apk/release/'
-    rename { String fileName ->
-        fileName.replace("app-release.apk", "bpkp_pos_test.apk")
-    }
-}
-
-// Jalankan rename hanya kalau assembleRelease ada
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(":app:assembleRelease")) {
-        tasks.named("assembleRelease").configure {
-            finalizedBy("renameApk")
-        }
-    }
 }
 
 dependencies {

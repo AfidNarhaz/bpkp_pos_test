@@ -6,6 +6,10 @@ import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:bpkp_pos_test/model/user.dart';
 import 'package:bpkp_pos_test/model/model_history_produk.dart';
+import 'package:logger/logger.dart';
+
+// Inisialisasi logger
+final logger = Logger();
 
 class DatabaseHelper {
   // Singleton instance
@@ -636,7 +640,7 @@ class DatabaseHelper {
   ''';
 
     List<Map<String, dynamic>> result = await db.rawQuery(query, [code]);
-    print('Result : $result');
+    logger.i('Result : $result');
 
     return result;
   }
@@ -685,7 +689,6 @@ class DatabaseHelper {
     final now = DateTime.now();
     final formattedTimestamp = DateFormat('yyyyMMdd_HHmmss').format(now);
     final formattedTanggal = DateFormat('dd-MM-yyyy').format(now);
-
 
     final invoice = 'INVOICE_$formattedTimestamp';
 
