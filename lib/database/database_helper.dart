@@ -843,17 +843,17 @@ class DatabaseHelper {
     );
   }
 
-  // Fungsi untuk menambahkan history produk
-  Future<void> insertHistoryProduk(HistoryProduk history) async {
-    final db = await database;
-    await db.insert('history_produk', history.toMap());
-  }
-
   // Fungsi untuk mengambil semua history produk
   Future<List<HistoryProduk>> getAllHistoryProduk() async {
     final db = await database;
     final result = await db.query('history_produk', orderBy: 'waktu DESC');
     return result.map((e) => HistoryProduk.fromMap(e)).toList();
+  }
+
+  // Fungsi untuk menambahkan history produk
+  Future<void> insertHistoryProduk(HistoryProduk history) async {
+    final db = await database;
+    await db.insert('history_produk', history.toMap());
   }
 
   // Fungsi untuk mengambil produk yang hampir kadaluarsa
