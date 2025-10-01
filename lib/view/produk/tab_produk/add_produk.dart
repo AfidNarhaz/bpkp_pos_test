@@ -38,8 +38,7 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _kategoriController = TextEditingController();
   final TextEditingController _merekController = TextEditingController();
   final TextEditingController _tanggalController = TextEditingController();
-  final TextEditingController _satuanBeliController = TextEditingController();
-  final TextEditingController _satuanJualController = TextEditingController();
+  final TextEditingController _satuanUnitController = TextEditingController();
   final TextEditingController _isiController = TextEditingController();
   final TextEditingController _hargaBeliController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
@@ -55,8 +54,7 @@ class AddProdukPageState extends State<AddProdukPage> {
     _kategoriController.dispose();
     _merekController.dispose();
     _tanggalController.dispose();
-    _satuanBeliController.dispose();
-    _satuanJualController.dispose();
+    _satuanUnitController.dispose();
     _isiController.dispose();
     _hargaBeliController.dispose();
     _hargaJualController.dispose();
@@ -107,9 +105,7 @@ class AddProdukPageState extends State<AddProdukPage> {
         tglExpired: _tanggalController.text.isNotEmpty
             ? _tanggalController.text
             : DateFormat('dd-MM-yyyy').format(DateTime.now()),
-        satuanBeli: _satuanBeliController.text,
-        satuanJual: _satuanJualController.text,
-        isi: int.tryParse(_isiController.text.replaceAll('.', '')) ?? 0,
+        satuanUnit: _satuanUnitController.text,
         hargaBeli:
             double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
                 0.0,
@@ -338,35 +334,36 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
-                // Pilih Satuan Beli
+
+                // Pilih Satuan unit
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: DatabaseHelper().getSatuan(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     }
-                    final satuanBeliList = snapshot.data ?? [];
+                    final satuanUnitList = snapshot.data ?? [];
                     return _buildTextField(
-                      controller: _satuanBeliController,
-                      label: 'Pilih Satuan Beli',
+                      controller: _satuanUnitController,
+                      label: 'Pilih Satuan Unit',
                       suffixIcon: Icons.arrow_forward_ios,
                       readOnly: true,
                       onTap: () {
                         SatuanDialog.showSatuanDialog(
                           context,
-                          satuanBeliList,
-                          (newSatuanBeli) async {
-                            if (newSatuanBeli.isNotEmpty) {
+                          satuanUnitList,
+                          (newSatuanUnit) async {
+                            if (newSatuanUnit.isNotEmpty) {
                               await DatabaseHelper()
-                                  .insertSatuan(newSatuanBeli);
+                                  .insertSatuan(newSatuanUnit);
                               setState(() {});
-                              _satuanBeliController.text = newSatuanBeli;
+                              _satuanUnitController.text = newSatuanUnit;
                             }
                           },
-                          (id, updatedSatuanBeli) async {
-                            if (updatedSatuanBeli.isNotEmpty) {
+                          (id, updatedSatuanUnit) async {
+                            if (updatedSatuanUnit.isNotEmpty) {
                               await DatabaseHelper()
-                                  .updateSatuan(id, updatedSatuanBeli);
+                                  .updateSatuan(id, updatedSatuanUnit);
                               setState(() {});
                             }
                           },
@@ -374,71 +371,15 @@ class AddProdukPageState extends State<AddProdukPage> {
                             await DatabaseHelper().deleteSatuan(id);
                             setState(() {});
                           },
-                          (selectedSatuanBeli) {
+                          (selectedSatuanUnit) {
                             setState(() {
-                              _satuanBeliController.text = selectedSatuanBeli;
+                              _satuanUnitController.text = selectedSatuanUnit;
                             });
                           },
                         );
                       },
                     );
                   },
-                ),
-                // Pilih Satuan Jual
-                FutureBuilder<List<Map<String, dynamic>>>(
-                  future: DatabaseHelper().getSatuan(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    final satuanJualList = snapshot.data ?? [];
-                    return _buildTextField(
-                      controller: _satuanJualController,
-                      label: 'Pilih Satuan Jual',
-                      suffixIcon: Icons.arrow_forward_ios,
-                      readOnly: true,
-                      onTap: () {
-                        SatuanDialog.showSatuanDialog(
-                          context,
-                          satuanJualList,
-                          (newSatuanJual) async {
-                            if (newSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .insertSatuan(newSatuanJual);
-                              setState(() {});
-                              _satuanJualController.text = newSatuanJual;
-                            }
-                          },
-                          (id, updatedSatuanJual) async {
-                            if (updatedSatuanJual.isNotEmpty) {
-                              await DatabaseHelper()
-                                  .updateSatuan(id, updatedSatuanJual);
-                              setState(() {});
-                            }
-                          },
-                          (id) async {
-                            await DatabaseHelper().deleteSatuan(id);
-                            setState(() {});
-                          },
-                          (selectedSatuanJual) {
-                            setState(() {
-                              _satuanJualController.text = selectedSatuanJual;
-                            });
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-                // Isi
-                _buildTextField(
-                  controller: _isiController,
-                  label: 'Isi',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
                 ),
                 // Harga Beli
                 _buildTextField(

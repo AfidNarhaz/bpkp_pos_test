@@ -150,7 +150,7 @@ void showTambahProdukDialog(
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                      selectedProduk?.satuanJual ?? "",
+                                      selectedProduk?.satuanUnit ?? "",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -236,7 +236,7 @@ void showTambahProdukDialog(
                                           id,
                                           selectedProduk!.nama,
                                           stok,
-                                          selectedProduk!.satuanJual ?? "",
+                                          selectedProduk!.satuanUnit ?? "",
                                           harga,
                                         );
                                         Navigator.pop(context);

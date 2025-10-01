@@ -219,7 +219,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
                               ),
                               _detailRow(
                                 'Satuan Unit',
-                                (r['satuanJual'] ?? '-').toString(),
+                                (r['satuanUnit'] ?? '-').toString(),
                                 textColor: Colors.black,
                               ),
                               _detailRow(

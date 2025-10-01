@@ -10,10 +10,8 @@ class Produk {
   String nama;
   String kategori;
   String merek;
-  String tglExpired; // Ubah dari DateTime ke String
-  String? satuanBeli;
-  String? satuanJual;
-  int? isi;
+  String tglExpired;
+  String? satuanUnit;
   double hargaBeli;
   double hargaJual;
   int? minStok;
@@ -29,10 +27,8 @@ class Produk {
     required this.nama,
     required this.kategori,
     required this.merek,
-    required this.tglExpired, // Ubah dari DateTime ke String
-    required this.satuanBeli,
-    required this.satuanJual,
-    required this.isi,
+    required this.tglExpired,
+    required this.satuanUnit,
     required this.hargaBeli,
     required this.hargaJual,
     this.minStok,
@@ -50,11 +46,8 @@ class Produk {
       nama: map['nama'] as String? ?? '',
       kategori: map['kategori'] as String? ?? '',
       merek: map['merek'] as String? ?? '',
-      tglExpired:
-          map['tglExpired'] as String? ?? '', // Ubah dari DateTime ke String
-      satuanBeli: map['satuanBeli'] as String?,
-      satuanJual: map['satuanJual'] as String?,
-      isi: map['isi'] as int?,
+      tglExpired: map['tglExpired'] as String? ?? '',
+      satuanUnit: map['satuanUnit'] as String?,
       hargaBeli: (map['hargaBeli'] as num?)?.toDouble() ?? 0.0,
       hargaJual: (map['hargaJual'] as num?)?.toDouble() ?? 0.0,
       minStok: map['minStok'] as int?,
@@ -73,10 +66,8 @@ class Produk {
       'nama': nama,
       'kategori': kategori,
       'merek': merek,
-      'tglExpired': tglExpired, // Ubah dari DateTime ke String
-      'satuanBeli': satuanBeli,
-      'satuanJual': satuanJual,
-      'isi': isi,
+      'tglExpired': tglExpired,
+      'satuanUnit': satuanUnit,
       'hargaBeli': hargaBeli,
       'hargaJual': hargaJual,
       'minStok': minStok,

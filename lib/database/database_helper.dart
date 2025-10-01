@@ -106,9 +106,7 @@ class DatabaseHelper {
         kategori TEXT NOT NULL,
         merek TEXT NOT NULL,
         tglExpired TEXT,
-        satuanBeli TEXT NOT NULL,
-        satuanJual TEXT NOT NULL,
-        isi INTEGER,
+        satuanUnit TEXT NOT NULL,
         hargaBeli REAL NOT NULL,
         hargaJual REAL NOT NULL,
         minStok INTEGER,
@@ -212,7 +210,7 @@ class DatabaseHelper {
       CREATE TABLE notifikasi (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         judul TEXT,
-        isi TEXT,
+        stok INTEGER,
         tanggal TEXT
       )
     ''');
@@ -251,9 +249,7 @@ class DatabaseHelper {
         kategori: maps[i]['kategori'], // Handle kategori
         merek: maps[i]['merek'], // Handle merek
         tglExpired: maps[i]['tglExpired'], // Handle tanggalKadaluwarsa
-        satuanBeli: maps[i]['satuanBeli'], // Handle satuanBeli
-        satuanJual: maps[i]['satuanJual'], // Handle satuanJ
-        isi: maps[i]['isi'], // Handle isi
+        satuanUnit: maps[i]['satuanUnit'], // Handle satuan unit
         hargaBeli: maps[i]['hargaBeli'] is int
             ? maps[i]['hargaBeli'].toDouble()
             : maps[i]['hargaBeli'], // Handle hargaBeli
@@ -625,9 +621,7 @@ class DatabaseHelper {
         p.nama, 
         p.kategori, 
         p.merek, 
-        p.satuanBeli, 
-        p.satuanJual, 
-        p.isi, 
+        p.satuanUnit,
         p.hargaBeli, 
         p.hargaJual, 
         p.minStok, 
@@ -874,11 +868,11 @@ class DatabaseHelper {
   }
 
   // Fungsi untuk memasukkan notifikasi baru
-  Future<void> insertNotifikasi(String judul, String isi) async {
+  Future<void> insertNotifikasi(String judul, String stok) async {
     final db = await database;
     await db.insert('notifikasi', {
       'judul': judul,
-      'isi': isi,
+      'stok': stok,
       'tanggal': DateTime.now().toIso8601String(),
     });
   }

@@ -62,7 +62,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                         SizedBox(height: 8.0),
                         Text(
-                          notif['isi'] ?? '',
+                          notif['stok'] ?? '',
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontSize: 16.0,
