@@ -12,8 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +27,6 @@ class AddProdukPage extends StatefulWidget {
 class AddProdukPageState extends State<AddProdukPage> {
   final _formKey = GlobalKey<FormState>();
   final ImageService _imageService = ImageService();
-  final ImagePicker _picker = ImagePicker();
   File? _image;
 
   final TextEditingController _kodeProdukController = TextEditingController();
@@ -39,7 +36,6 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _merekController = TextEditingController();
   final TextEditingController _tanggalController = TextEditingController();
   final TextEditingController _satuanUnitController = TextEditingController();
-  final TextEditingController _isiController = TextEditingController();
   final TextEditingController _hargaBeliController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
   final TextEditingController _minStokController = TextEditingController();
@@ -55,7 +51,6 @@ class AddProdukPageState extends State<AddProdukPage> {
     _merekController.dispose();
     _tanggalController.dispose();
     _satuanUnitController.dispose();
-    _isiController.dispose();
     _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _minStokController.dispose();
@@ -66,31 +61,6 @@ class AddProdukPageState extends State<AddProdukPage> {
   void initState() {
     super.initState();
     _imageService.initDb();
-  }
-
-  Future<void> _pickImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
-        // Salin gambar ke folder aplikasi
-        final appDir = await getApplicationDocumentsDirectory();
-        final fileName =
-            'produk_${DateTime.now().millisecondsSinceEpoch}${extension(pickedFile.path)}';
-        final savedImage =
-            await File(pickedFile.path).copy(join(appDir.path, fileName));
-        if (mounted) {
-          setState(() {
-            _image = savedImage; // path sudah di folder aplikasi
-          });
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(this.context).showSnackBar(
-          SnackBar(content: Text('Failed to pick an image: $e')),
-        );
-      }
-    }
   }
 
   Future<void> _saveProduk() async {
@@ -132,7 +102,7 @@ class AddProdukPageState extends State<AddProdukPage> {
       );
       if (mounted) {
         widget.onProdukAdded();
-        Navigator.pop(this.context, newProduk);
+        Navigator.pop(context, newProduk);
       }
       if (_sendNotification &&
           newProduk.stok != null &&
@@ -167,7 +137,12 @@ class AddProdukPageState extends State<AddProdukPage> {
                 // Gambar Produk
                 GestureDetector(
                   onTap: () async {
-                    await _pickImage();
+                    final image = await _pickImageWithSource(context);
+                    if (image != null && mounted) {
+                      setState(() {
+                        _image = image;
+                      });
+                    }
                   },
                   child: Container(
                     height: 100,
@@ -513,4 +488,40 @@ Future<String?> getCurrentUsername() async {
 Future<String?> getCurrentUserRole() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString('role');
+}
+
+// Fungsi untuk memilih sumber gambar
+Future<File?> _pickImageWithSource(BuildContext context) async {
+  final picker = ImagePicker();
+  File? imageFile;
+
+  await showModalBottomSheet(
+    context: context,
+    builder: (context) => SafeArea(
+      child: Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text('Kamera'),
+            onTap: () async {
+              final picked = await picker.pickImage(source: ImageSource.camera);
+              if (picked != null) imageFile = File(picked.path);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text('Galeri'),
+            onTap: () async {
+              final picked =
+                  await picker.pickImage(source: ImageSource.gallery);
+              if (picked != null) imageFile = File(picked.path);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+  return imageFile;
 }

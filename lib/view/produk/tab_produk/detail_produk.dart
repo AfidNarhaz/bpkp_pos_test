@@ -9,6 +9,7 @@ import 'package:bpkp_pos_test/model/model_produk.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
 import 'dart:io';
@@ -34,7 +35,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _merekController;
   late TextEditingController _tanggalController;
   late TextEditingController _satuanUnitController;
-  late TextEditingController _isiController;
   late TextEditingController _hargaBeliController;
   late TextEditingController _hargaJualController;
   late TextEditingController _minStokController;
@@ -87,21 +87,47 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _merekController.dispose();
     _tanggalController.dispose();
     _satuanUnitController.dispose();
-    _isiController.dispose();
     _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _minStokController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final image = await _imageService.pickAndSaveImage(); // Ambil gambar
-    if (image != null) {
-      if (!mounted) return;
-      setState(() {
-        _image = image; // Update nilai _image dan render ulang UI
-      });
-    }
+  // Fungsi untuk memilih sumber gambar
+  Future<File?> _pickImageWithSource(BuildContext context) async {
+    final picker = ImagePicker();
+    File? imageFile;
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Kamera'),
+              onTap: () async {
+                final picked =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (picked != null) imageFile = File(picked.path);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galeri'),
+              onTap: () async {
+                final picked =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (picked != null) imageFile = File(picked.path);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    return imageFile;
   }
 
   void _saveChanges() async {
@@ -183,9 +209,16 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             key: _formKey,
             child: Column(
               children: [
-                //Gambar Produk
+                // Gambar Produk
                 GestureDetector(
-                  onTap: _pickImage,
+                  onTap: () async {
+                    final image = await _pickImageWithSource(context);
+                    if (image != null && mounted) {
+                      setState(() {
+                        _image = image;
+                      });
+                    }
+                  },
                   child: Container(
                     height: 100,
                     width: 100,

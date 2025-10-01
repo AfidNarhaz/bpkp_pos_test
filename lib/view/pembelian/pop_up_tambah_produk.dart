@@ -108,7 +108,7 @@ void showTambahProdukDialog(
                                 selectedProduk = produk;
                                 jumlahController.text = "0";
                                 hargaController.text =
-                                    (produk?.hargaJual ?? 0).toStringAsFixed(0);
+                                    (produk?.hargaBeli ?? 0).toStringAsFixed(0);
                               });
                             },
                           ),
