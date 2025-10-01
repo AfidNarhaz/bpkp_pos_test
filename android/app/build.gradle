@@ -5,7 +5,7 @@ plugins {
 }
 
 def keystoreProperties = new Properties()
-def keystoreFile = rootProject.file("android/key.properties")
+def keystoreFile = rootProject.file("key.properties")
 if (keystoreFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystoreFile))
 }
@@ -21,35 +21,9 @@ android {
         versionCode flutter.versionCode
         versionName flutter.versionName
         multiDexEnabled true
+
         vectorDrawables {
             useSupportLibrary = true
-        }
-    }
-
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties["keyAlias"]
-            keyPassword keystoreProperties["keyPassword"]
-            storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
-            storePassword keystoreProperties["storePassword"]
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            shrinkResources false
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-        }
-    }
-
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            def appName = "BPKP_POS"
-            def versionName = variant.versionName
-            def buildType = variant.buildType.name
-            outputFileName = "${appName}_v${versionName}_${buildType}.apk"
         }
     }
 
@@ -62,8 +36,38 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-}
 
+    signingConfigs {
+        release {
+        if (keystoreFile.exists()) {
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == "release") {
+                def appName = "BPKP_POS"
+                def versionName = variant.versionName
+                outputFileName = "${appName}_v${versionName}_release.apk"
+            }
+        }
+    }
+}
 
 flutter {
     source = "../.."
