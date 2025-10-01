@@ -4,26 +4,52 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def keystoreProperties = new Properties()
+def keystoreFile = rootProject.file("android/key.properties")
+if (keystoreFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystoreFile))
+}
+
 android {
     namespace = "com.example.bpkp_pos_test"
     compileSdk = 36
-    ndkVersion = "29.0.13599879"
 
     defaultConfig {
         applicationId = "com.example.bpkp_pos_test"
         minSdkVersion flutter.minSdkVersion
-        targetSdk = 36
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdkVersion 36
+        versionCode flutter.versionCode
+        versionName flutter.versionName
         multiDexEnabled true
-
-        ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
-        }
-
-        // Konfigurasi untuk mendukung kamera dan penyimpanan
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword keystoreProperties["keyPassword"]
+            storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
+            storePassword keystoreProperties["storePassword"]
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def appName = "BPKP_POS"
+            def versionName = variant.versionName
+            def buildType = variant.buildType.name
+            outputFileName = "${appName}_v${versionName}_${buildType}.apk"
         }
     }
 
@@ -36,16 +62,8 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            shrinkResources false
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-        }
-    }
-
 }
+
 
 flutter {
     source = "../.."
@@ -53,10 +71,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.10"
-
-    // Desugar untuk kompatibilitas API lama
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-
-    // MultiDex (biar aman kalau method > 64k)
     implementation "androidx.multidex:multidex:2.0.1"
 }
