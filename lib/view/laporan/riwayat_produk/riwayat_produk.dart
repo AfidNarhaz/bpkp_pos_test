@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:bpkp_pos_test/view/laporan/riwayat_produk.dart';
+import 'package:bpkp_pos_test/view/laporan/riwayat_produk/detail_riwayat_produk.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
-import 'package:bpkp_pos_test/view/laporan/drawer.dart'; // Tambahkan import drawer
+import 'package:bpkp_pos_test/view/laporan/laporan_widget/drawer.dart'; // Tambahkan import drawer
 
 class KatalogProduk extends StatefulWidget {
   const KatalogProduk({super.key});
@@ -71,7 +71,10 @@ class _KatalogProdukState extends State<KatalogProduk> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pembelian'),
+        title: Text(
+          'Riwayat Produk',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
@@ -89,12 +92,6 @@ class _KatalogProdukState extends State<KatalogProduk> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Info Ringkas
-            Text(
-              'Total Pembelian: ${formatRupiah(nilaiModal)}',
-              style: const TextStyle(fontSize: 15, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
             // Searchbar + Filter
             Row(
               children: [

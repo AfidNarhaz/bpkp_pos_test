@@ -133,43 +133,33 @@ class _DetailPembelianState extends State<DetailPembelian> {
                   ),
                 ),
 
-                // // Section Aktivitas Pembelian
-                // Card(
-                //   margin: const EdgeInsets.only(bottom: 16),
-                //   child: Padding(
-                //     padding: const EdgeInsets.all(16),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         const Text('Aktifitas Pembelian',
-                //             style: TextStyle(
-                //                 fontWeight: FontWeight.bold,
-                //                 color: Colors.black)),
-                //         const SizedBox(height: 8),
-                //         ...aktivitas.map((a) => Padding(
-                //               padding: const EdgeInsets.only(bottom: 8),
-                //               child: Row(
-                //                 crossAxisAlignment: CrossAxisAlignment.start,
-                //                 children: [
-                //                   const Icon(Icons.circle,
-                //                       color: Colors.red, size: 14),
-                //                   const SizedBox(width: 8),
-                //                   Expanded(
-                //                     child: Text(
-                //                       'Pada Tanggal ${a['waktu']} oleh ${a['oleh']}, #${a['order']} ${a['status']}.',
-                //                       style: const TextStyle(
-                //                           fontSize: 14, color: Colors.black),
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             )),
-                //       ],
-                //     ),
-                //   ),
-                // ),
+                // Total Pembelian
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Total Pembelian:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Rp${DetailPembelian._formatRupiah(rincian.fold<int>(0, (sum, r) => sum + ((r['harga_satuan'] as num).toDouble().round() * (r['jumlah'] as int? ?? 0))))}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                // Section Rincian Pembelian
+                // Rincian Pembelian
                 const Text('Rincian Pembelian',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,

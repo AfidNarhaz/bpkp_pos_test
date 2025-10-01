@@ -1,4 +1,5 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:bpkp_pos_test/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
@@ -61,13 +62,21 @@ class _LoginState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "P.O.S BPKP",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28.0,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.text,
+                  GestureDetector(
+                    onTap: () {
+                      NotificationServices.showNotification(
+                        "Testing Notifikasi!",
+                        "Ini detail dari notifikasi.",
+                      );
+                    },
+                    child: const Text(
+                      "P.O.S BPKP",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 28.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.text,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 48.0),

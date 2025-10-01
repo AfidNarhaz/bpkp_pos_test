@@ -77,10 +77,10 @@ packages:
     dependency: "direct main"
     description:
       name: camera_android
-      sha256: cd49ccb409201a893bf625dca2df8746b88679f302826ab4d12748788a3a24b3
+      sha256: "2d953dac338790a6a4d8e8084cf095aa1a3520f706dab2d69557651ea2c82f8d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.10+7"
+    version: "0.10.10+8"
   camera_android_camerax:
     dependency: transitive
     description:
@@ -897,18 +897,18 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "7c700778e2b390412f3a364aa38fbc010570ade19684b9d6613d17e7ca284898"
+      sha256: "6a01bd0da768003f59a9c51ae28145a61372abb59e3e588ef33c86db3579bccf"
       url: "https://pub.dev"
     source: hosted
-    version: "31.1.21"
+    version: "31.1.22"
   syncfusion_flutter_datepicker:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_datepicker
-      sha256: f4cea1c28175a858875507e30d553acfefd2465ed8954052c5a3cb32958d443a
+      sha256: "960b40d48e44e246e4eb48141ed2676806b703afc4c01a00fcae669d50a52590"
       url: "https://pub.dev"
     source: hosted
-    version: "31.1.21"
+    version: "31.1.22"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:

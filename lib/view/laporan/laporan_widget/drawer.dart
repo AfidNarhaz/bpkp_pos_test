@@ -1,6 +1,6 @@
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_state.dart';
 import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
-import 'package:bpkp_pos_test/view/laporan/riwayat_pembelian.dart';
+import 'package:bpkp_pos_test/view/laporan/riwayat_produk/riwayat_produk.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
@@ -71,7 +71,7 @@ class LaporanDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.inventory),
-            title: const Text('Riwayat Pembelian'),
+            title: const Text('Riwayat Produk'),
             onTap: () {
               Navigator.pushReplacement(
                 parentContext,

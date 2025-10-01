@@ -349,19 +349,26 @@ class StokTabState extends State<StokTab> {
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      Text(
-                                        stokMode == 'Stok Disesuaikan'
-                                            ? 'Stok Sebelumnya'
-                                            : 'Stok saat ini',
-                                        style: const TextStyle(
-                                            fontSize: 14, color: Colors.grey),
-                                      ),
-                                      Text(
-                                        stokMode == 'Stok Disesuaikan'
-                                            ? '${produk.stok ?? 0}'
-                                            : rumusStok,
-                                        style: const TextStyle(
-                                            fontSize: 14, color: Colors.grey),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            stokMode == 'Stok Disesuaikan'
+                                                ? 'Stok Sebelumnya:'
+                                                : 'Stok saat ini:',
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            stokMode == 'Stok Disesuaikan'
+                                                ? '${produk.stok ?? 0}'
+                                                : rumusStok,
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                        ],
                                       ),
                                       const SizedBox(height: 16),
                                       Row(

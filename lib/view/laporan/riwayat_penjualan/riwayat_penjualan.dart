@@ -3,7 +3,7 @@ import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_picker_widget.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/detail_riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
-import 'package:bpkp_pos_test/view/laporan/drawer.dart';
+import 'package:bpkp_pos_test/view/laporan/laporan_widget/drawer.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 

@@ -1,37 +1,28 @@
-import 'package:flutter/foundation.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:bpkp_pos_test/services/notification_service.dart';
-import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:workmanager/workmanager.dart';
 
 const String dailyReportTask = "dailyReportTask";
 const String expiredProdukTask = "expiredProdukTask";
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    debugPrint("Task: $task running at ${DateTime.now()}");
-    // Pastikan notifikasi diinisialisasi
-    await NotificationService.init();
+    await NotificationServices.initialize();
 
-    if (task == dailyReportTask) {
-      await NotificationService.showNotification(
-        title: "Laporan Harian",
-        body: "Jangan lupa cek laporan penjualan harian di aplikasi POS!",
-      );
-    }
-
-    if (task == expiredProdukTask) {
-      final dbHelper = DatabaseHelper();
-      final expiredProduk = await dbHelper.getProdukHampirExpired();
-      if (expiredProduk.isNotEmpty) {
-        final judul = "Produk Hampir Kadaluwarsa";
-        final isi =
-            "Ada ${expiredProduk.length} produk yang akan kadaluwarsa dalam 7 hari.";
-        await NotificationService.showNotification(
-          title: judul,
-          body: isi,
+    switch (task) {
+      case dailyReportTask:
+        await NotificationServices.showNotification(
+          "Daily Report",
+          "Jangan lupa cek laporan harian kamu!",
         );
-        await dbHelper.insertNotifikasi(judul, isi);
-      }
+        break;
+
+      case expiredProdukTask:
+        await NotificationServices.showNotification(
+          "Produk Expired",
+         "Ada produk yang sudah kadaluarsa, segera cek!",
+        );
+        break;
     }
 
     return Future.value(true);

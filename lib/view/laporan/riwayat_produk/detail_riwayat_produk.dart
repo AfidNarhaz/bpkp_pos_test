@@ -30,14 +30,14 @@ class _RiwayatProdukPageState extends State<RiwayatProdukPage> {
   }
 
   String formatWaktu(DateTime waktu) {
-    return DateFormat('dd-MM-yyyy ss:mm:HH').format(waktu);
+    return DateFormat('dd-MM-yyyy HH:mm:ss').format(waktu);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Riwayat Produk'),
+        title: Text('Detail Riwayat Produk'),
       ),
       body: historyList.isEmpty
           ? const Center(child: Text('Belum ada riwayat untuk produk ini'))
