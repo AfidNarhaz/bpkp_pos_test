@@ -147,7 +147,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE $tableSatuan(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL UNIQUE
       )
     ''');
 
@@ -459,7 +459,8 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getSatuan() async {
     try {
       final db = await database;
-      return await db.query(tableSatuan);
+      // Urutkan A-Z (case-insensitive)
+      return await db.query(tableSatuan, orderBy: 'name COLLATE NOCASE ASC');
     } catch (e) {
       throw Exception("Error fetching satuan: $e");
     }
@@ -469,7 +470,22 @@ class DatabaseHelper {
   Future<int> insertSatuan(String namaSatuan) async {
     try {
       final db = await database;
-      return await db.insert(tableSatuan, {'name': namaSatuan});
+      final sanitized = namaSatuan.trim();
+      if (sanitized.isEmpty) {
+        throw Exception("Nama satuan kosong");
+      }
+      // Cek apakah sudah ada (case-insensitive)
+      final exists = await db.query(
+        tableSatuan,
+        where: 'LOWER(name) = ?',
+        whereArgs: [sanitized.toLowerCase()],
+      );
+      if (exists.isNotEmpty) {
+        // Kembalikan id jika sudah ada
+        return exists.first['id'] as int;
+      }
+      // Masukkan baru
+      return await db.insert(tableSatuan, {'name': sanitized});
     } catch (e) {
       throw Exception("Error inserting satuan: $e");
     }
@@ -479,9 +495,22 @@ class DatabaseHelper {
   Future<int> updateSatuan(int id, String name) async {
     try {
       final db = await database;
+      final sanitized = name.trim();
+      if (sanitized.isEmpty) {
+        throw Exception("Nama satuan kosong");
+      }
+      // Hindari duplikat nama (case-insensitive) untuk id lain
+      final dup = await db.query(
+        tableSatuan,
+        where: 'LOWER(name) = ? AND id != ?',
+        whereArgs: [sanitized.toLowerCase(), id],
+      );
+      if (dup.isNotEmpty) {
+        throw Exception("Nama satuan sudah ada");
+      }
       return await db.update(
         tableSatuan,
-        {'name': name},
+        {'name': sanitized},
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -626,7 +655,7 @@ class DatabaseHelper {
         p.hargaJual, 
         p.minStok, 
         pb.jumlah, 
-        pb.harga_satuan, 
+        pb.harga_satuan,
         pb.tanggal
     FROM pembelian pb
     JOIN produk p ON pb.product_id = p.id

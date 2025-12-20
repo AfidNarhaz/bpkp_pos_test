@@ -49,21 +49,6 @@ class _DetailPembelianState extends State<DetailPembelian> {
       'no_hp': widget.item['no_hp'] ?? '6289998184858',
     };
 
-    // final aktivitas = [
-    //   {
-    //     'waktu': '26 Sep 2025, 14:33',
-    //     'oleh': 'Difa',
-    //     'order': widget.item['code'] ?? '-',
-    //     'status': 'Order Diproses',
-    //   },
-    //   {
-    //     'waktu': '26 Sep 2025, 07:33',
-    //     'oleh': 'Difa',
-    //     'order': widget.item['code'] ?? '-',
-    //     'status': 'Selesai',
-    //   },
-    // ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Pembelian'),

@@ -126,7 +126,6 @@ class _LaporanPageState extends State<LaporanPage> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: SingleChildScrollView(
-              // Tambahkan ini agar bisa scroll
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -139,7 +138,6 @@ class _LaporanPageState extends State<LaporanPage> {
                         final dateFormat = DateFormat('dd/MM/yyyy');
                         selectedDateRange =
                             '${dateFormat.format(start)} - ${dateFormat.format(end)}';
-                        // Update comparisonDateRange jika perlu
                       });
                     },
                   ),

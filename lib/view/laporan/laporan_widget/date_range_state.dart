@@ -1,6 +1,5 @@
 class GlobalDateRange {
-  static DateTime startDate =
-      DateTime.now().subtract(const Duration(days: 6)); // default 1 minggu
+  static DateTime startDate = DateTime.now().subtract(const Duration(days: 7));
   static DateTime endDate = DateTime.now();
 
   static void setRange(DateTime start, DateTime end) {

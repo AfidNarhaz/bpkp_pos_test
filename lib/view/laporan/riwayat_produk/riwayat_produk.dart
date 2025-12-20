@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/model_history_produk.dart';
 import 'package:bpkp_pos_test/model/model_produk.dart';
-import 'package:bpkp_pos_test/view/laporan/laporan_widget/drawer.dart'; // Tambahkan import drawer
+import 'package:bpkp_pos_test/view/laporan/laporan_widget/drawer.dart';
 
 class KatalogProduk extends StatefulWidget {
   const KatalogProduk({super.key});
@@ -57,9 +57,7 @@ class _KatalogProdukState extends State<KatalogProduk> {
     });
   }
 
-  void _showFilterDialog() {
-    // TODO: Implementasi filter produk (misal berdasarkan kategori/merek)
-  }
+  void _showFilterDialog() {}
 
   String formatRupiah(num number) {
     final formatter =

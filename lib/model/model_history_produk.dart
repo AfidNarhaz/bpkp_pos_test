@@ -3,7 +3,7 @@ class HistoryProduk {
   final String aksi;
   final String namaProduk;
   final String user;
-  final String role; // Tambahkan ini
+  final String role;
   final DateTime waktu;
   final String? detail;
 
@@ -12,7 +12,7 @@ class HistoryProduk {
     required this.aksi,
     required this.namaProduk,
     required this.user,
-    required this.role, // Tambahkan ini
+    required this.role,
     required this.waktu,
     this.detail,
   });
@@ -23,7 +23,7 @@ class HistoryProduk {
       aksi: map['aksi'],
       namaProduk: map['namaProduk'],
       user: map['user'],
-      role: map['role'], // Tambahkan ini
+      role: map['role'],
       waktu: DateTime.parse(map['waktu']),
       detail: map['detail'],
     );
@@ -35,7 +35,7 @@ class HistoryProduk {
       'aksi': aksi,
       'namaProduk': namaProduk,
       'user': user,
-      'role': role, // Tambahkan ini
+      'role': role,
       'waktu': waktu.toIso8601String(),
       'detail': detail,
     };

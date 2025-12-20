@@ -33,7 +33,7 @@ void setupLogging() {
 
   Logger.root.onRecord.listen((record) {
     if (kDebugMode) {
-      // Gunakan debugPrint agar output panjang tidak terpotong
+      // DebugPrint
       debugPrint('${record.level.name}: ${record.time}: ${record.message}');
     }
   });

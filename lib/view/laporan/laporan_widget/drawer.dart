@@ -4,8 +4,6 @@ import 'package:bpkp_pos_test/view/laporan/riwayat_produk/riwayat_produk.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/riwayat_penjualan.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
-// import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
-// import 'package:bpkp_pos_test/view/laporan/date_range_state.dart';
 
 class LaporanDrawer extends StatelessWidget {
   final BuildContext parentContext;

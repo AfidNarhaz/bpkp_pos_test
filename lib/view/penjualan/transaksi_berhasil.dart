@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/penjualan/struk.dart';
 import 'package:bpkp_pos_test/view/penjualan/transaksi_page.dart';
-// Pastikan ada model user
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<String> getUserRole() async {
@@ -115,9 +114,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Hubungkan cetak struk ke printer
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,

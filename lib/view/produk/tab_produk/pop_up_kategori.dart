@@ -8,7 +8,7 @@ class KategoriDialog {
     Function(String) onKategoriAdded,
     Function(int, String) onKategoriEdited,
     Function(int) onKategoriDeleted,
-    Function(String) onKategoriSelected, // Callback untuk memilih kategori
+    Function(String) onKategoriSelected,
   ) {
     showDialog(
       context: context,
@@ -110,7 +110,7 @@ class KategoriDialog {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Tutup dialog
+                    Navigator.of(context).pop();
                   },
                   child:
                       const Text('Batal', style: TextStyle(color: Colors.grey)),
@@ -124,9 +124,8 @@ class KategoriDialog {
                       });
                     } else {
                       onKategoriAdded(newKategori);
-                      Navigator.of(context)
-                          .pop(); // Tutup dialog tambah kategori
-                      Navigator.of(context).pop(); // Tutup dialog utama
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     }
                   },
                   child: const Text('Simpan',
@@ -173,16 +172,15 @@ class KategoriDialog {
               actions: [
                 TextButton(
                   onPressed: () {
-                    onKategoriDeleted(id); // Hapus kategori
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog setelah menghapus
+                    onKategoriDeleted(id);
+                    Navigator.of(context).pop();
                   },
                   child:
                       const Text('Hapus', style: TextStyle(color: Colors.red)),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Batal edit
+                    Navigator.of(context).pop();
                   },
                   child:
                       const Text('Batal', style: TextStyle(color: Colors.grey)),
@@ -196,8 +194,8 @@ class KategoriDialog {
                       });
                     } else {
                       onKategoriEdited(id, updatedKategori);
-                      Navigator.of(context).pop(); // Tutup dialog edit kategori
-                      Navigator.of(context).pop(); // Tutup dialog utama
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     }
                   },
                   child: const Text('Simpan',

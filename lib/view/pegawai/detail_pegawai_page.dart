@@ -1,4 +1,3 @@
-// filepath: [detail_pegawai_page.dart](http://_vscodecontentref_/2)
 import 'package:bpkp_pos_test/model/model_pegawai.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/model/user.dart';
@@ -63,7 +62,7 @@ class _DetailPegawaiPageState extends State<DetailPegawaiPage> {
       );
       await DatabaseHelper().updatePegawai(updatedPegawai);
 
-      // Update juga ke tabel users
+      // Update ke tabel users
       final updatedUser = User(
         username: _namaController.text,
         password: _passwordController.text,

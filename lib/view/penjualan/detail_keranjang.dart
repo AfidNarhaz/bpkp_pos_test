@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 class DetailKeranjangPage extends StatefulWidget {
   final Map<String, dynamic> produk;
-  final Function(Map<String, dynamic>)? onUpdate; // Tambahkan ini
+  final Function(Map<String, dynamic>)? onUpdate;
 
   const DetailKeranjangPage({super.key, required this.produk, this.onUpdate});
 
@@ -17,8 +17,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
   late int stok;
   late int hargaJual;
   late String satuan;
-  final TextEditingController _hargaNegoController =
-      TextEditingController(); // Tambah controller
+  final TextEditingController _hargaNegoController = TextEditingController();
 
   @override
   void dispose() {
@@ -33,8 +32,6 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
     stok = (widget.produk['stok'] ?? 0).toInt();
     hargaJual = (widget.produk['hargaJual'] ?? 0).toInt();
     satuan = widget.produk['satuan'] ?? '';
-    // Tambahkan ini:
-    // Cek apakah ada harga nego di produk keranjang
     final hargaNego = widget.produk['hargaNego'];
     if (hargaNego != null && hargaNego > 0) {
       _hargaNegoController.text =
@@ -188,7 +185,6 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                   ),
                 ],
               ),
-              // Tambahan Harga Nego
               const SizedBox(height: 16),
               const Text(
                 'Harga Nego',
@@ -229,7 +225,6 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
           ),
         ),
       ),
-      // Tambahan tombol di bawah
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -238,7 +233,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: Colors.black, // warna text jadi hitam
+                  foregroundColor: Colors.black,
                 ),
                 onPressed: () {
                   // Logika hapus produk: kembali dengan flag deleted
@@ -247,7 +242,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                 },
                 child: const Text(
                   'Hapus Produk',
-                  style: TextStyle(color: Colors.black), // pastikan text hitam
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
             ),
@@ -255,8 +250,8 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // ganti warna background tombol
-                  foregroundColor: Colors.white, // ganti warna teks tombol
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
                   final negoText = toNumericString(_hargaNegoController.text);
@@ -285,7 +280,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                 },
                 child: const Text(
                   'Simpan',
-                  style: TextStyle(color: Colors.white), // pastikan teks putih
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),

@@ -356,6 +356,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     );
                   },
                 ),
+
                 // Harga Beli
                 _buildTextField(
                   controller: _hargaBeliController,

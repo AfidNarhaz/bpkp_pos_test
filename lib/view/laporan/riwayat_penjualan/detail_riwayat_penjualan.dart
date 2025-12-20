@@ -144,7 +144,6 @@ class _DetailRiwayatPenjualanPageState
                       totalProduk += (barang['jumlah'] as num).toInt();
                     }
 
-                    // Untuk sekarang, anggap uang diterima sama dengan subtotal
                     double diterima = subtotal;
                     double kembalian = diterima - subtotal;
 
@@ -229,7 +228,7 @@ class _DetailRiwayatPenjualanPageState
     );
   }
 
-  // Tambahkan helper widget di bawah kelas state
+  // Helper widget di bawah kelas state
   Widget _summaryItem(String label, String value, {bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),

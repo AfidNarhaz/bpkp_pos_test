@@ -2,7 +2,7 @@ import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:bpkp_pos_test/router/routers.dart'; // Import Routers
+import 'package:bpkp_pos_test/router/routers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
@@ -51,7 +51,7 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        color: AppColors.background, // Warna latar belakang
+        color: AppColors.background,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

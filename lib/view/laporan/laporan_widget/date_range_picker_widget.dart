@@ -61,7 +61,7 @@ class _DateRangePickerWidgetState extends State<DateRangePickerWidget> {
                       _presetButton("1 Minggu", () {
                         setStateModal(() {
                           selectedRange = PickerDateRange(
-                              now.subtract(const Duration(days: 6)), now);
+                              now.subtract(const Duration(days: 7)), now);
                         });
                       }),
                       _presetButton("1 Bulan", () {

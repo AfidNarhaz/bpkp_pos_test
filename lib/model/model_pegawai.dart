@@ -54,7 +54,7 @@ class Pegawai {
     await file.writeAsString(jsonEncode(jsonList));
   }
 
-  // Load list of Pegawai from a file
+  // Load list Pegawai dari file
   static Future<List<Pegawai>> loadFromFile(String filePath) async {
     final file = File(filePath);
     if (!file.existsSync()) {

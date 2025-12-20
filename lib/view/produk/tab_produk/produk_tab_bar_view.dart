@@ -5,14 +5,14 @@ class ProdukTabBarView extends StatelessWidget {
   final List<Widget> tabs;
   final List<Widget> tabViews;
   final Widget? floatingActionButton;
-  final TabController? tabController; // Tambahkan ini
+  final TabController? tabController;
 
   const ProdukTabBarView({
     super.key,
     required this.tabs,
     required this.tabViews,
     this.floatingActionButton,
-    this.tabController, // Tambahkan ini
+    this.tabController,
   });
 
   @override
@@ -27,7 +27,7 @@ class ProdukTabBarView extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           bottom: TabBar(
-            controller: tabController, // Tambahkan ini
+            controller: tabController,
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: const UnderlineTabIndicator(
               borderSide: BorderSide(
@@ -41,7 +41,7 @@ class ProdukTabBarView extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          controller: tabController, // Tambahkan ini
+          controller: tabController,
           children: tabViews,
         ),
         floatingActionButton: floatingActionButton,

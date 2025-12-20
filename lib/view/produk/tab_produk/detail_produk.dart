@@ -485,7 +485,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.of(context).pop(); // Tutup dialog
+                                    Navigator.of(context).pop();
                                   },
                                   child: const Text('Batal'),
                                 ),

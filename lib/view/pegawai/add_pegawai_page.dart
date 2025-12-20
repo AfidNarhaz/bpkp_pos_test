@@ -19,7 +19,6 @@ class AddPegawaiPage extends StatefulWidget {
 class AddPegawaiPageState extends State<AddPegawaiPage> {
   final _formKey = GlobalKey<FormState>();
   final ImageService _imageService = ImageService();
-  final ImagePicker _picker = ImagePicker();
   File? _image;
 
   final TextEditingController _namaController = TextEditingController();
@@ -56,47 +55,6 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    try {
-      debugPrint("[INFO] Attempting to pick an image...");
-      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
-        final image = File(pickedFile.path);
-        if (mounted) {
-          setState(() {
-            _image = image;
-          });
-          debugPrint("[INFO] Image picked and set successfully: ${image.path}");
-        }
-      } else {
-        debugPrint("[WARNING] No image was picked.");
-      }
-    } on PlatformException catch (e) {
-      debugPrint(
-          "[ERROR] PlatformException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick an image: ${e.message}')),
-        );
-      }
-    } on FileSystemException catch (e) {
-      debugPrint(
-          "[ERROR] FileSystemException while picking an image: ${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save the image: ${e.message}')),
-        );
-      }
-    } catch (e) {
-      debugPrint("[ERROR] Unexpected error while picking an image: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred: $e')),
-        );
-      }
-    }
-  }
-
   Future<void> _savePegawai() async {
     if (_formKey.currentState!.validate()) {
       // Cek semua field wajib terisi
@@ -120,11 +78,11 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
       );
       await DatabaseHelper().insertPegawai(newPegawai);
 
-      // Tambahkan ke tabel users untuk login
+      // Tambah ke tabel users untuk login
       final user = User(
         username: _namaController.text,
         password: _passwordController.text,
-        role: _jabatanController.text.toLowerCase(), // contoh: 'kasir'
+        role: _jabatanController.text.toLowerCase(),
       );
       await DatabaseHelper().insertUser(user);
 
@@ -152,31 +110,14 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
             key: _formKey,
             child: Column(
               children: [
-                // Image Picker
+                // Gambar Pegawai
                 GestureDetector(
                   onTap: () async {
-                    debugPrint("[INFO] Image picker triggered.");
-                    try {
-                      await _pickImage();
-                      if (!mounted) {
-                        return; // Cek apakah widget masih dalam tree
-                      }
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Image picked successfully')),
-                        ); // Tampilkan snackbar
-                      }
-                    } catch (e) {
-                      debugPrint("[ERROR] Error picking image: $e");
-                      if (!mounted) return; // Cek sebelum menggunakan context
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error picking image: $e')),
-                        ); // Tampilkan snackbar
-                      }
+                    final image = await _pickImageWithSource(context);
+                    if (image != null && mounted) {
+                      setState(() {
+                        _image = image;
+                      });
                     }
                   },
                   child: Container(
@@ -271,8 +212,8 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    bool obscureText = false, // Add this parameter
-    Widget? suffixIcon, // Change suffixIcon to Widget? to allow custom widgets
+    bool obscureText = false,
+    Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
     bool readOnly = false,
     List<TextInputFormatter>? inputFormatter,
@@ -282,14 +223,14 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
-        obscureText: obscureText, // Use the obscureText parameter
+        obscureText: obscureText,
         keyboardType: keyboardType,
         readOnly: readOnly,
         inputFormatters: inputFormatter,
         onTap: onTap,
         decoration: InputDecoration(
           labelText: label,
-          suffixIcon: suffixIcon, // Use the suffixIcon parameter
+          suffixIcon: suffixIcon,
           filled: true,
           fillColor: Colors.blue[100],
           border: OutlineInputBorder(
@@ -310,5 +251,43 @@ class AddPegawaiPageState extends State<AddPegawaiPage> {
         },
       ),
     );
+  }
+
+  // Fungsi untuk memilih sumber gambar (kamera atau galeri)
+  Future<File?> _pickImageWithSource(BuildContext context) async {
+    final picker = ImagePicker();
+    File? imageFile;
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Kamera'),
+              onTap: () async {
+                final picked =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (picked != null) imageFile = File(picked.path);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galeri'),
+              onTap: () async {
+                final picked =
+                    await picker.pickImage(source: ImageSource.gallery);
+                if (picked != null) imageFile = File(picked.path);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return imageFile;
   }
 }
