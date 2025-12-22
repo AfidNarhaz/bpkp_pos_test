@@ -879,21 +879,114 @@ class DatabaseHelper {
     await db.insert('history_produk', history.toMap());
   }
 
-  // Fungsi untuk mengambil produk yang hampir kadaluarsa
-  Future<List<Produk>> getProdukHampirExpired() async {
-    final db = await database;
-    final now = DateTime.now();
-    final nextWeek = now.add(const Duration(days: 7));
-    final result = await db.query(
-      'produk',
-      where:
-          'tglExpired IS NOT NULL AND tglExpired != "" AND tglExpired BETWEEN ? AND ?',
-      whereArgs: [
-        DateFormat('dd-MM-yyyy').format(now),
-        DateFormat('dd-MM-yyyy').format(nextWeek),
-      ],
-    );
-    return result.map((e) => Produk.fromMap(e)).toList();
+  // Fungsi untuk mengambil produk yang hampir kadaluarsa (dalam 7 hari ke depan)
+  Future<List<Produk>> getProdukHampirExpired({int days = 7}) async {
+    try {
+      final db = await database;
+      final now = DateTime.now();
+      final expiredDate = now.add(Duration(days: days));
+
+      // Format: 'dd-MM-yyyy'
+      final nowFormatted = DateFormat('dd-MM-yyyy').format(now);
+      final expiredDateFormatted = DateFormat('dd-MM-yyyy').format(expiredDate);
+
+      // Query: cari produk yang kadaluarsa antara hari ini sampai 7 hari ke depan
+      final result = await db.query(
+        'produk',
+        where:
+            'tglExpired IS NOT NULL AND tglExpired != "" AND tglExpired <= ? AND tglExpired >= ?',
+        whereArgs: [
+          expiredDateFormatted,
+          nowFormatted,
+        ],
+      );
+
+      logger.i('Produk hampir expired: ${result.length}');
+      return result.map((e) => Produk.fromMap(e)).toList();
+    } catch (e) {
+      logger.e('Error getting produk hampir expired: $e');
+      return [];
+    }
+  }
+
+  // Fungsi untuk mengambil produk yang sudah kadaluarsa
+  Future<List<Produk>> getProdukSudahExpired() async {
+    try {
+      final db = await database;
+      final now = DateTime.now();
+      final nowFormatted = DateFormat('dd-MM-yyyy').format(now);
+
+      final result = await db.query(
+        'produk',
+        where: 'tglExpired IS NOT NULL AND tglExpired != "" AND tglExpired < ?',
+        whereArgs: [nowFormatted],
+      );
+
+      logger.i('Produk sudah expired: ${result.length}');
+      return result.map((e) => Produk.fromMap(e)).toList();
+    } catch (e) {
+      logger.e('Error getting produk sudah expired: $e');
+      return [];
+    }
+  }
+
+  // Fungsi untuk mengambil produk dengan stok minimal
+  Future<List<Produk>> getProdukMinimalStok() async {
+    try {
+      final db = await database;
+
+      final result = await db.query(
+        'produk',
+        where: 'minStok IS NOT NULL AND stok <= minStok',
+      );
+
+      logger.i('Produk stok minimal: ${result.length}');
+      return result.map((e) => Produk.fromMap(e)).toList();
+    } catch (e) {
+      logger.e('Error getting produk minimal stok: $e');
+      return [];
+    }
+  }
+
+  // Fungsi wrapper untuk check semua kondisi dan trigger notifikasi
+  Future<void> checkAndNotifyProdukConditions() async {
+    try {
+      logger.i('=== Checking Product Conditions ===');
+
+      // Cek produk yang sudah expired
+      final sudahExpired = await getProdukSudahExpired();
+      if (sudahExpired.isNotEmpty) {
+        logger.w('Found ${sudahExpired.length} expired products');
+        await insertNotifikasi(
+          'Peringatan: Produk Kadaluarsa',
+          '${sudahExpired.length} produk sudah melewati tanggal kadaluarsa. Segera tindaklanjuti!',
+        );
+      }
+
+      // Cek produk yang hampir expired
+      final hampirExpired = await getProdukHampirExpired(days: 7);
+      if (hampirExpired.isNotEmpty) {
+        logger.w('Found ${hampirExpired.length} products expiring soon');
+        await insertNotifikasi(
+          'Peringatan: Produk Akan Kadaluarsa',
+          '${hampirExpired.length} produk akan kadaluarsa.',
+        );
+      }
+
+      // Cek produk dengan stok minimal
+      final stokMinimal = await getProdukMinimalStok();
+      if (stokMinimal.isNotEmpty) {
+        logger.w('Found ${stokMinimal.length} products with minimal stock');
+        await insertNotifikasi(
+          'Peringatan: Stok Produk Minimal',
+          '${stokMinimal.length} produk mencapai stok minimal. Pertimbangkan untuk melakukan pembelian.',
+        );
+      }
+
+      logger.i('=== Check Complete ===');
+    } catch (e) {
+      logger.e('Error in checkAndNotifyProdukConditions: $e');
+    }
   }
 
   // Fungsi untuk memasukkan notifikasi baru
@@ -904,11 +997,38 @@ class DatabaseHelper {
       'stok': stok,
       'tanggal': DateTime.now().toIso8601String(),
     });
+    logger.i('Notifikasi inserted: $judul');
   }
 
   // Fungsi untuk mengambil semua notifikasi
   Future<List<Map<String, dynamic>>> getNotifikasi() async {
     final db = await database;
     return await db.query('notifikasi', orderBy: 'tanggal DESC');
+  }
+
+  // Fungsi untuk menghapus notifikasi berdasarkan ID
+  Future<int> deleteNotifikasi(int id) async {
+    try {
+      final db = await database;
+      return await db.delete(
+        'notifikasi',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      logger.e('Error deleting notifikasi: $e');
+      return 0;
+    }
+  }
+
+  // Fungsi untuk menghapus semua notifikasi
+  Future<int> deleteAllNotifikasi() async {
+    try {
+      final db = await database;
+      return await db.delete('notifikasi');
+    } catch (e) {
+      logger.e('Error deleting all notifikasi: $e');
+      return 0;
+    }
   }
 }
