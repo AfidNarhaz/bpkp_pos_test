@@ -68,162 +68,164 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildIconWithLabel(Icons.inventory_2_outlined, 'Produk'),
+                    _buildIconWithLabel(Icons.badge_outlined, 'Pegawai'),
+                    _buildIconWithLabel(
+                        Icons.point_of_sale_outlined, 'Penjualan'),
+                    _buildIconWithLabel(
+                        Icons.point_of_sale_outlined, 'Pembelian'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildIconWithLabel(Icons.inventory_2_outlined, 'Produk'),
-                  _buildIconWithLabel(Icons.badge_outlined, 'Pegawai'),
-                  _buildIconWithLabel(
-                      Icons.point_of_sale_outlined, 'Penjualan'),
-                  _buildIconWithLabel(
-                      Icons.point_of_sale_outlined, 'Pembelian'),
+                  const Text('Laporan',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LaporanPage(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: const [
+                        Text(
+                          "Lihat Semua",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(Icons.chevron_right),
+                      ],
+                    ),
+                  )
                 ],
               ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Laporan',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LaporanPage(),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    children: const [
-                      Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Icon(Icons.chevron_right),
-                    ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildLaporanCard('Penjualan hari ini', ''),
                   ),
-                )
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildLaporanCard('Penjualan hari ini', ''),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildLaporanCard('Penjualan bulan ini', ''),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            // Button test notifikasi OS (untuk debug)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _testOSNotification,
-                icon: const Icon(Icons.notifications_active),
-                label: const Text(
-                  'Test Notifikasi OS HP',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildLaporanCard('Penjualan bulan ini', ''),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Button test notifikasi OS (untuk debug)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _testOSNotification,
+                  icon: const Icon(Icons.notifications_active),
+                  label: const Text(
+                    'Test Notifikasi OS HP',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            // Button test untuk check kondisi produk (untuk debug)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isChecking ? null : _testCheckProductCondition,
-                icon: _isChecking
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white.withAlpha(200),
+              const SizedBox(height: 12),
+              // Button test untuk check kondisi produk (untuk debug)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isChecking ? null : _testCheckProductCondition,
+                  icon: _isChecking
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white.withAlpha(200),
+                            ),
+                            strokeWidth: 2,
                           ),
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(Icons.check_circle_outline),
-                label: Text(
-                  _isChecking ? 'Checking...' : 'Test Check Produk',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Button test scheduled notification (untuk debug)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _testScheduledNotification,
-                icon: const Icon(Icons.schedule),
-                label: const Text(
-                  'Test Scheduled (15 detik)',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                        )
+                      : const Icon(Icons.check_circle_outline),
+                  label: Text(
+                    _isChecking ? 'Checking...' : 'Test Check Produk',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            // Button test delay notification (verifikasi plugin bekerja)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _testDelayNotification,
-                icon: const Icon(Icons.timer),
-                label: const Text(
-                  'Test Delay (3 detik) - untuk verifikasi',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  side: const BorderSide(color: Colors.orange),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Button test scheduled notification workaround (untuk emulator)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _testScheduledNotificationWorkaround,
-                icon: const Icon(Icons.alarm),
-                label: const Text(
-                  'Test Scheduled Workaround (15 detik) - Emulator',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  side: const BorderSide(color: Colors.amber),
+              const SizedBox(height: 12),
+              // Button test scheduled notification (untuk debug)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _testScheduledNotification,
+                  icon: const Icon(Icons.schedule),
+                  label: const Text(
+                    'Test Scheduled (15 detik)',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              // Button test delay notification (verifikasi plugin bekerja)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _testDelayNotification,
+                  icon: const Icon(Icons.timer),
+                  label: const Text(
+                    'Test Delay (3 detik) - untuk verifikasi',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: const BorderSide(color: Colors.orange),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Button test scheduled notification workaround (untuk emulator)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _testScheduledNotificationWorkaround,
+                  icon: const Icon(Icons.alarm),
+                  label: const Text(
+                    'Test Scheduled Workaround (15 detik) - Emulator',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: const BorderSide(color: Colors.amber),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

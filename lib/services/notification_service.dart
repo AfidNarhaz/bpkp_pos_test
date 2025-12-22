@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/services/logger_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -52,9 +53,9 @@ class NotificationServices {
     // Request SCHEDULE_EXACT_ALARM permission (Android 12+)
     if (await Permission.scheduleExactAlarm.isDenied ||
         await Permission.scheduleExactAlarm.isPermanentlyDenied) {
-      print('⚠️ Requesting SCHEDULE_EXACT_ALARM permission...');
+      LoggerService.info('⚠️ Requesting SCHEDULE_EXACT_ALARM permission...');
       final result = await Permission.scheduleExactAlarm.request();
-      print('SCHEDULE_EXACT_ALARM request result: $result');
+      LoggerService.info('SCHEDULE_EXACT_ALARM request result: $result');
     }
 
     await _flutterLocalNotificationsPlugin
@@ -111,7 +112,7 @@ class NotificationServices {
 
   // Test notification - untuk debug, langsung muncul tanpa jadwal
   static Future<void> testNotification() async {
-    print('📱 Sending TEST notification...');
+    LoggerService.info('📱 Sending TEST notification...');
     await _flutterLocalNotificationsPlugin.show(
       9999,
       'Test Notification',
@@ -133,7 +134,7 @@ class NotificationServices {
         ),
       ),
     );
-    print('✅ Test notification sent');
+    LoggerService.info('✅ Test notification sent');
   }
 
   // Test scheduled notification dengan waktu dekat (15 detik)
@@ -143,24 +144,28 @@ class NotificationServices {
       // Set notifikasi 15 detik dari sekarang
       final scheduled = now.add(const Duration(seconds: 15));
 
-      print('📅 Setting up test scheduled notification (15 detik)');
-      print('Local timezone: ${tz.local.name}');
-      print('Current time: ${now.toString()}');
-      print('Current time readable: ${now.hour}:${now.minute}:${now.second}');
-      print('Scheduled time: ${scheduled.toString()}');
-      print(
+      LoggerService.info(
+          '📅 Setting up test scheduled notification (15 detik)');
+      LoggerService.info('Local timezone: ${tz.local.name}');
+      LoggerService.info('Current time: ${now.toString()}');
+      LoggerService.info(
+          'Current time readable: ${now.hour}:${now.minute}:${now.second}');
+      LoggerService.info('Scheduled time: ${scheduled.toString()}');
+      LoggerService.info(
           'Scheduled time readable: ${scheduled.hour}:${scheduled.minute}:${scheduled.second}');
-      print('Difference: ${scheduled.difference(now).inSeconds} seconds');
+      LoggerService.info(
+          'Difference: ${scheduled.difference(now).inSeconds} seconds');
 
       // Cek permission
       final notifPermission = await Permission.notification.status;
-      print('Notification permission status: $notifPermission');
+      LoggerService.info('Notification permission status: $notifPermission');
 
       // Cek SCHEDULE_EXACT_ALARM permission (Android 12+)
       final exactAlarmPermission = await Permission.scheduleExactAlarm.status;
-      print('Schedule exact alarm permission status: $exactAlarmPermission');
+      LoggerService.info(
+          'Schedule exact alarm permission status: $exactAlarmPermission');
 
-      print('⚠️ Attempting zonedSchedule with exact mode...');
+      LoggerService.info('⚠️ Attempting zonedSchedule with exact mode...');
 
       // Jadwalkan sekali (one-shot) — gunakan exact mode
       // NOTE: Jika tidak muncul di Android 14, kemungkinan ada issue dengan
@@ -189,18 +194,19 @@ class NotificationServices {
         androidScheduleMode: AndroidScheduleMode.exact,
       );
 
-      print('✅ Test scheduled notification berhasil dijadwalkan');
-      print(
+      LoggerService.info('✅ Test scheduled notification berhasil dijadwalkan');
+      LoggerService.info(
           'Tunggu sampai jam ${scheduled.hour}:${scheduled.minute}:${scheduled.second} (15 detik) untuk melihat notifikasi');
     } catch (e) {
-      print('❌ Error scheduling test notification: $e');
+      LoggerService.error('❌ Error scheduling test notification: $e');
     }
   }
 
   // Test notification dengan delay lokal (untuk verifikasi plugin bekerja)
   static Future<void> testDelayNotification() async {
     try {
-      print('⏱️ Test: Sending notification setelah 3 detik delay...');
+      LoggerService.info(
+          '⏱️ Test: Sending notification setelah 3 detik delay...');
       await Future.delayed(const Duration(seconds: 3));
       await _flutterLocalNotificationsPlugin.show(
         7777,
@@ -223,9 +229,9 @@ class NotificationServices {
           ),
         ),
       );
-      print('✅ Test delay notification muncul (setelah 3 detik)');
+      LoggerService.info('✅ Test delay notification muncul (setelah 3 detik)');
     } catch (e) {
-      print('❌ Error in test delay notification: $e');
+      LoggerService.error('❌ Error in test delay notification: $e');
     }
   }
 
@@ -234,14 +240,16 @@ class NotificationServices {
   // Ini adalah workaround yang TERJAMIN berhasil karena tidak pakai AlarmManager
   static Future<void> testScheduledNotificationEmulatorWorkaround() async {
     try {
-      print('⚙️ Test: Scheduled notification workaround (Future.delayed mode)');
+      LoggerService.info(
+          '⚙️ Test: Scheduled notification workaround (Future.delayed mode)');
       final now = tz.TZDateTime.now(tz.local);
       final scheduled = now.add(const Duration(seconds: 15));
 
-      print('Current time readable: ${now.hour}:${now.minute}:${now.second}');
-      print(
+      LoggerService.info(
+          'Current time readable: ${now.hour}:${now.minute}:${now.second}');
+      LoggerService.info(
           'Scheduled time readable: ${scheduled.hour}:${scheduled.minute}:${scheduled.second}');
-      print('⏳ Menunggu 15 detik...');
+      LoggerService.info('⏳ Menunggu 15 detik...');
 
       // Tunggu 15 detik dengan delay lokal
       await Future.delayed(const Duration(seconds: 15));
@@ -268,10 +276,10 @@ class NotificationServices {
           ),
         ),
       );
-      print(
+      LoggerService.info(
           '✅ Workaround scheduled notification muncul (setelah 15 detik delay)');
     } catch (e) {
-      print('❌ Error in workaround notification: $e');
+      LoggerService.error('❌ Error in workaround notification: $e');
     }
   }
 
@@ -290,7 +298,7 @@ class NotificationServices {
         scheduled = scheduled.add(const Duration(days: 1));
       }
 
-      print('Scheduling notification at: $scheduled (now: $now)');
+      LoggerService.info('Scheduling notification at: $scheduled (now: $now)');
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id,
@@ -316,9 +324,10 @@ class NotificationServices {
         androidScheduleMode: AndroidScheduleMode.alarmClock,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-      print('✅ Scheduled notification with ID $id: $title at $hour:$minute');
+      LoggerService.info(
+          '✅ Scheduled notification with ID $id: $title at $hour:$minute');
     } catch (e) {
-      print('❌ Error scheduling notification: $e');
+      LoggerService.error('❌ Error scheduling notification: $e');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bpkp_pos_test/services/logger_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,7 +23,15 @@ Future<void> main() async {
 
   // Inisialisasi timezone
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Asia/Jakarta')); // sesuaikan zona waktu
+  try {
+    // Set ke Asia/Jakarta (timezone standard Indonesia)
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
+    LoggerService.info('🕐 Timezone initialized to Asia/Jakarta');
+  } catch (e) {
+    // Fallback jika gagal
+    LoggerService.warning('⚠️ Failed to initialize timezone: $e');
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
+  }
 
   // Setup scheduled notifications untuk jam-jam tertentu
   await _setupScheduledNotifications();
@@ -43,7 +52,7 @@ Future<void> _setupScheduledNotifications() async {
     final bool isEmulator = await _isRunningOnEmulator();
 
     if (isEmulator) {
-      print(
+      LoggerService.info(
           '⚠️ Running on emulator - using workaround for scheduled notifications');
     }
 
@@ -74,9 +83,9 @@ Future<void> _setupScheduledNotifications() async {
       body: 'Jangan lupa recap laporan sore Anda.',
     );
 
-    print('✅ Scheduled notifications setup completed');
+    LoggerService.info('✅ Scheduled notifications setup completed');
   } catch (e) {
-    print('❌ Error setting up scheduled notifications: $e');
+    LoggerService.error('❌ Error setting up scheduled notifications: $e');
   }
 }
 

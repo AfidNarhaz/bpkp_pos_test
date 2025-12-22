@@ -1,4 +1,5 @@
 import 'package:bpkp_pos_test/database/database_helper.dart';
+import 'package:bpkp_pos_test/services/logger_service.dart';
 import 'package:workmanager/workmanager.dart';
 
 const String dailyReportTask = "dailyReportTask";
@@ -13,7 +14,7 @@ void callbackDispatcher() {
           // NOTE: Do not call UI / platform notification APIs from the
           // background isolate unless plugins are properly registered for
           // background execution. See comments below for registration steps.
-          print(
+          LoggerService.info(
               'Background task: dailyReportTask (DB-only, no OS notification)');
           break;
 
@@ -27,14 +28,14 @@ void callbackDispatcher() {
           // / emulator this background isolate does not have plugin
           // registration and calling platform APIs will crash (NullPointerException).
           final newNotifs = await dbHelper.getNotifikasi();
-          print(
+          LoggerService.info(
               'Background task: checkProductConditionTask completed, found ${newNotifs.length} notifikasi (DB updated)');
           break;
       }
 
       return Future.value(true);
     } catch (e) {
-      print('Error in callbackDispatcher: $e');
+      LoggerService.info('Error in callbackDispatcher: $e');
       return Future.value(false);
     }
   });
@@ -64,8 +65,8 @@ Future<void> initializeBackgroundTask() async {
       frequency: const Duration(hours: 24),
     );
 
-    print('Background tasks initialized successfully');
+    LoggerService.info('Background tasks initialized successfully');
   } catch (e) {
-    print('Error initializing background tasks: $e');
+    LoggerService.error('Error initializing background tasks: $e');
   }
 }
