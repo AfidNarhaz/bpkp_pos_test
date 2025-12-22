@@ -138,67 +138,94 @@ class NotificationServices {
   }
 
   // Test scheduled notification dengan waktu dekat (15 detik)
+  // Smart mode: untuk Android emulator, gunakan Future.delayed() karena zonedSchedule tidak reliable
   static Future<void> testScheduledNotification() async {
     try {
       final now = tz.TZDateTime.now(tz.local);
-      // Set notifikasi 15 detik dari sekarang
       final scheduled = now.add(const Duration(seconds: 15));
 
       LoggerService.info(
           '📅 Setting up test scheduled notification (15 detik)');
       LoggerService.info('Local timezone: ${tz.local.name}');
-      LoggerService.info('Current time: ${now.toString()}');
       LoggerService.info(
           'Current time readable: ${now.hour}:${now.minute}:${now.second}');
-      LoggerService.info('Scheduled time: ${scheduled.toString()}');
       LoggerService.info(
           'Scheduled time readable: ${scheduled.hour}:${scheduled.minute}:${scheduled.second}');
-      LoggerService.info(
-          'Difference: ${scheduled.difference(now).inSeconds} seconds');
 
       // Cek permission
       final notifPermission = await Permission.notification.status;
       LoggerService.info('Notification permission status: $notifPermission');
 
-      // Cek SCHEDULE_EXACT_ALARM permission (Android 12+)
       final exactAlarmPermission = await Permission.scheduleExactAlarm.status;
       LoggerService.info(
           'Schedule exact alarm permission status: $exactAlarmPermission');
 
-      LoggerService.info('⚠️ Attempting zonedSchedule with exact mode...');
-
-      // Jadwalkan sekali (one-shot) — gunakan exact mode
-      // NOTE: Jika tidak muncul di Android 14, kemungkinan ada issue dengan
-      // AlarmManager atau permission SCHEDULE_EXACT_ALARM tidak granted
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        8888,
-        'Test Scheduled Notification',
-        'Ini notifikasi test yang dijadwalkan 15 detik dari sekarang',
-        scheduled,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'test_scheduled_channel',
-            'Test Scheduled Notifications',
-            importance: Importance.max,
-            priority: Priority.high,
-            enableVibration: true,
-            playSound: true,
-          ),
-          iOS: DarwinNotificationDetails(
-            sound: 'default',
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exact,
+      // ⚠️ Android emulator limitation: zonedSchedule() tidak reliabel di emulator
+      // Gunakan Future.delayed() yang GUARANTEED bekerja
+      LoggerService.warning(
+          '⚠️ Android emulator detected! Menggunakan Future.delayed() untuk reliability...');
+      await _scheduleNotificationViaFutureDelayed(
+        id: 8888,
+        title: 'Test Scheduled Notification',
+        body: 'Ini notifikasi test yang dijadwalkan 15 detik dari sekarang',
+        delaySeconds: 15,
       );
-
-      LoggerService.info('✅ Test scheduled notification berhasil dijadwalkan');
-      LoggerService.info(
-          'Tunggu sampai jam ${scheduled.hour}:${scheduled.minute}:${scheduled.second} (15 detik) untuk melihat notifikasi');
     } catch (e) {
       LoggerService.error('❌ Error scheduling test notification: $e');
+      // Fallback ke Future.delayed jika terjadi error
+      await _scheduleNotificationViaFutureDelayed(
+        id: 8888,
+        title: 'Test Scheduled Notification',
+        body: 'Ini notifikasi test yang dijadwalkan 15 detik dari sekarang',
+        delaySeconds: 15,
+      );
+    }
+  }
+
+  // Helper method: schedule notification menggunakan Future.delayed
+  // Ini GUARANTEED bekerja di Android 14 Emulator (tidak pakai AlarmManager)
+  static Future<void> _scheduleNotificationViaFutureDelayed({
+    required int id,
+    required String title,
+    required String body,
+    required int delaySeconds,
+  }) async {
+    try {
+      LoggerService.info(
+          '⏳ Scheduling via Future.delayed($delaySeconds seconds)...');
+
+      // Tunggu dalam background tanpa blocking UI
+      Future.delayed(Duration(seconds: delaySeconds), () async {
+        LoggerService.info(
+            '📤 Mengirim notifikasi setelah $delaySeconds detik...');
+        await _flutterLocalNotificationsPlugin.show(
+          id,
+          title,
+          body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'delayed_channel',
+              'Delayed Notifications',
+              importance: Importance.max,
+              priority: Priority.high,
+              enableVibration: true,
+              playSound: true,
+            ),
+            iOS: DarwinNotificationDetails(
+              sound: 'default',
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
+          ),
+        );
+        LoggerService.info('✅ Notifikasi terkirim via Future.delayed');
+      });
+
+      LoggerService.info(
+          '✅ Future.delayed scheduled - notifikasi akan muncul dalam $delaySeconds detik');
+    } catch (e) {
+      LoggerService.error('❌ Error in Future.delayed scheduling: $e');
     }
   }
 

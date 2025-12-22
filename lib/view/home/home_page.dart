@@ -294,7 +294,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _testScheduledNotification() async {
     try {
-      // Test notifikasi yang dijadwalkan 2 menit dari sekarang
+      // Test notifikasi yang dijadwalkan 15 detik dari sekarang
       await NotificationServices.testScheduledNotification();
 
       if (mounted) {
