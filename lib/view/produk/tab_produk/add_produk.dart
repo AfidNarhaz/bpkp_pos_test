@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'image_service.dart';
 import 'dart:io';
+import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProdukPage extends StatefulWidget {
@@ -36,11 +37,11 @@ class AddProdukPageState extends State<AddProdukPage> {
   final TextEditingController _merekController = TextEditingController();
   final TextEditingController _tanggalController = TextEditingController();
   final TextEditingController _satuanUnitController = TextEditingController();
-  final TextEditingController _hargaBeliController = TextEditingController();
   final TextEditingController _hargaJualController = TextEditingController();
   final TextEditingController _minStokController = TextEditingController();
 
   final bool _sendNotification = false;
+  String? _kodeProdukError;
 
   @override
   void dispose() {
@@ -51,7 +52,6 @@ class AddProdukPageState extends State<AddProdukPage> {
     _merekController.dispose();
     _tanggalController.dispose();
     _satuanUnitController.dispose();
-    _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _minStokController.dispose();
     super.dispose();
@@ -61,9 +61,100 @@ class AddProdukPageState extends State<AddProdukPage> {
   void initState() {
     super.initState();
     _imageService.initDb();
+    _generateNextKodeProdukg();
+    _kodeProdukController.addListener(_validateKodeProduk);
+  }
+
+  Future<void> _generateNextKodeProdukg() async {
+    try {
+      final allProduk = await DatabaseHelper().getProduk();
+      final existingCodes =
+          allProduk.map((p) => p.codeProduk.toUpperCase()).toSet();
+
+      String randomCode;
+      bool isUnique = false;
+      int attempts = 0;
+      const maxAttempts = 10;
+
+      // Generate random kode sampai menemukan yang unik
+      do {
+        randomCode = _generateRandomCode();
+        isUnique = !existingCodes.contains(randomCode.toUpperCase());
+        attempts++;
+      } while (!isUnique && attempts < maxAttempts);
+
+      if (!isUnique) {
+        // Fallback jika gagal generate unique code
+        debugPrint(
+            'Failed to generate unique code after $maxAttempts attempts');
+        randomCode =
+            'PRD${Random().nextInt(1000000).toString().padLeft(6, '0')}';
+      }
+
+      if (mounted) {
+        setState(() {
+          _kodeProdukController.text = randomCode;
+          _kodeProdukError = null;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error generating kode produk: $e');
+    }
+  }
+
+  String _generateRandomCode() {
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final Random random = Random();
+    String randomPart = '';
+
+    for (int i = 0; i < 6; i++) {
+      randomPart += chars[random.nextInt(chars.length)];
+    }
+
+    return 'PRD$randomPart';
+  }
+
+  Future<void> _validateKodeProduk() async {
+    final kodeInput = _kodeProdukController.text.trim();
+
+    if (kodeInput.isEmpty) {
+      setState(() {
+        _kodeProdukError = null;
+      });
+      return;
+    }
+
+    try {
+      final allProduk = await DatabaseHelper().getProduk();
+      final isDuplicate = allProduk.any((produk) =>
+          produk.codeProduk.toLowerCase() == kodeInput.toLowerCase());
+
+      if (mounted) {
+        setState(() {
+          if (isDuplicate) {
+            _kodeProdukError =
+                'Kode produk "$kodeInput" sudah digunakan. Gunakan kode produk yang berbeda.';
+          } else {
+            _kodeProdukError = null;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error validating kode produk: $e');
+    }
   }
 
   Future<void> _saveProduk() async {
+    if (_kodeProdukError != null && _kodeProdukError!.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_kodeProdukError!),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       final newProduk = Produk(
         imagePath: _image?.path,
@@ -76,9 +167,7 @@ class AddProdukPageState extends State<AddProdukPage> {
             ? _tanggalController.text
             : DateFormat('dd-MM-yyyy').format(DateTime.now()),
         satuanUnit: _satuanUnitController.text,
-        hargaBeli:
-            double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
-                0.0,
+        hargaBeli: 0.0,
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
@@ -166,9 +255,27 @@ class AddProdukPageState extends State<AddProdukPage> {
                 ),
                 const SizedBox(height: 10),
                 // Kode Produk
-                _buildTextField(
-                  controller: _kodeProdukController,
-                  label: 'Kode Produk',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTextField(
+                      controller: _kodeProdukController,
+                      label: 'Kode Produk',
+                    ),
+                    if (_kodeProdukError != null &&
+                        _kodeProdukError!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, top: 4.0, right: 16.0),
+                        child: Text(
+                          _kodeProdukError!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 // Barcode
                 _buildTextField(
@@ -180,6 +287,7 @@ class AddProdukPageState extends State<AddProdukPage> {
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(13),
                   ],
+                  isRequired: false,
                   onSuffixIconTap: () async {
                     final barcode = await Navigator.push(
                       context,
@@ -357,16 +465,6 @@ class AddProdukPageState extends State<AddProdukPage> {
                   },
                 ),
 
-                // Harga Beli
-                _buildTextField(
-                  controller: _hargaBeliController,
-                  label: 'Harga Beli',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
                 // Harga Jual
                 _buildTextField(
                   controller: _hargaJualController,
@@ -424,6 +522,7 @@ class AddProdukPageState extends State<AddProdukPage> {
     List<TextInputFormatter>? inputFormatter,
     Function()? onTap,
     Function()? onSuffixIconTap,
+    bool isRequired = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -448,7 +547,7 @@ class AddProdukPageState extends State<AddProdukPage> {
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Field tidak boleh kosong';
           }
           return null;

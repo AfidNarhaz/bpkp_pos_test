@@ -56,31 +56,34 @@ Future<void> _setupScheduledNotifications() async {
           '⚠️ Running on emulator - using workaround for scheduled notifications');
     }
 
-    // Notifikasi pagi jam 7:00 (ubah ke 5:46 untuk test)
+    // Dapatkan data kondisi produk
+    final produkStats = await _getProdukStats();
+
+    // Notifikasi pagi jam 7:00
     await NotificationServices.scheduleDailyNotification(
       id: 1,
-      hour: 5,
-      minute: 46,
+      hour: 7,
+      minute: 00,
       title: 'Notifikasi Pagi',
-      body: 'Jangan lupa cek kondisi stok produk Anda!',
+      body: _buildNotificationBody(produkStats),
     );
 
     // Notifikasi siang jam 11:00
     await NotificationServices.scheduleDailyNotification(
       id: 2,
       hour: 11,
-      minute: 0,
+      minute: 00,
       title: 'Notifikasi Siang',
-      body: 'Reminder: cek laporan penjualan siang hari.',
+      body: _buildNotificationBody(produkStats),
     );
 
     // Notifikasi sore jam 15:00
     await NotificationServices.scheduleDailyNotification(
       id: 3,
-      hour: 17,
-      minute: 45,
+      hour: 15,
+      minute: 00,
       title: 'Notifikasi Sore',
-      body: 'Jangan lupa recap laporan sore Anda.',
+      body: _buildNotificationBody(produkStats),
     );
 
     LoggerService.info('✅ Scheduled notifications setup completed');
@@ -101,6 +104,40 @@ Future<bool> _isRunningOnEmulator() async {
   } catch (e) {
     return false;
   }
+}
+
+// Fungsi untuk mengambil statistik kondisi produk
+Future<Map<String, int>> _getProdukStats() async {
+  try {
+    final db = DatabaseHelper();
+
+    // Ambil data produk dengan berbagai kondisi
+    final produkMinimalStok = await db.getProdukMinimalStok();
+    final produkHampirExpired = await db.getProdukHampirExpired(days: 7);
+    final produkSudahExpired = await db.getProdukSudahExpired();
+
+    return {
+      'minimalStok': produkMinimalStok.length,
+      'hampirExpired': produkHampirExpired.length,
+      'sudahExpired': produkSudahExpired.length,
+    };
+  } catch (e) {
+    LoggerService.error('Error getting produk stats: $e');
+    return {
+      'minimalStok': 0,
+      'hampirExpired': 0,
+      'sudahExpired': 0,
+    };
+  }
+}
+
+// Fungsi untuk membuat body notifikasi berdasarkan statistik produk
+String _buildNotificationBody(Map<String, int> produkStats) {
+  final minimalStok = produkStats['minimalStok'] ?? 0;
+  final hampirExpired = produkStats['hampirExpired'] ?? 0;
+  final sudahExpired = produkStats['sudahExpired'] ?? 0;
+
+  return 'Ada $minimalStok produk perlu restock, $hampirExpired produk akan kadaluwarsa, dan $sudahExpired produk kadaluwarsa';
 }
 
 // Fungsi setupLogging di luar main()

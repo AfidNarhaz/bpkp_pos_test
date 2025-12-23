@@ -35,7 +35,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
   late TextEditingController _merekController;
   late TextEditingController _tanggalController;
   late TextEditingController _satuanUnitController;
-  late TextEditingController _hargaBeliController;
   late TextEditingController _hargaJualController;
   late TextEditingController _minStokController;
 
@@ -61,10 +60,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _tanggalController = TextEditingController(text: widget.produk.tglExpired);
     _satuanUnitController =
         TextEditingController(text: widget.produk.satuanUnit);
-    _hargaBeliController = TextEditingController(
-        text: NumberFormat('#,###', 'en_US')
-            .format(widget.produk.hargaBeli)
-            .replaceAll(',', '.'));
     _hargaJualController = TextEditingController(
         text: NumberFormat('#,###', 'en_US')
             .format(widget.produk.hargaJual)
@@ -87,7 +82,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     _merekController.dispose();
     _tanggalController.dispose();
     _satuanUnitController.dispose();
-    _hargaBeliController.dispose();
     _hargaJualController.dispose();
     _minStokController.dispose();
     super.dispose();
@@ -144,9 +138,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
             ? _tanggalController.text
             : DateFormat('dd-MM-yyyy').format(DateTime.now()),
         satuanUnit: _satuanUnitController.text,
-        hargaBeli:
-            double.tryParse(_hargaBeliController.text.replaceAll('.', '')) ??
-                0.0,
+        hargaBeli: widget.produk.hargaBeli,
         hargaJual:
             double.tryParse(_hargaJualController.text.replaceAll('.', '')) ??
                 0.0,
@@ -260,6 +252,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(13),
                   ],
+                  isRequired: false,
                   onTap: () async {
                     final barcode = await Navigator.push(
                       context,
@@ -436,16 +429,6 @@ class DetailProdukPageState extends State<DetailProdukPage> {
                     );
                   },
                 ),
-                // Harga Beli
-                _buildTextField(
-                  controller: _hargaBeliController,
-                  label: 'Harga Beli',
-                  keyboardType: TextInputType.number,
-                  inputFormatter: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
-                  ],
-                ),
                 // Harga Jual
                 _buildTextField(
                   controller: _hargaJualController,
@@ -583,6 +566,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
     bool readOnly = false,
     List<TextInputFormatter>? inputFormatter,
     Function()? onTap,
+    bool isRequired = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -596,7 +580,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
           suffixIcon: suffixIcon != null
               ? GestureDetector(
                   onTap: () async {
-                    if (label == 'Kode Produk/Barcode') {
+                    if (label == 'Barcode') {
                       final barcode = await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -623,7 +607,7 @@ class DetailProdukPageState extends State<DetailProdukPage> {
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (isRequired && (value == null || value.isEmpty)) {
             return 'Field tidak boleh kosong';
           }
           return null;

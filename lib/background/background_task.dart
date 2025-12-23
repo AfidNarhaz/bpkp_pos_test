@@ -51,12 +51,12 @@ Future<void> initializeBackgroundTask() async {
     );
 
     // Register periodic task untuk check kondisi produk setiap 15 menit (default)
-    await Workmanager().registerPeriodicTask(
-      checkProductConditionTask,
-      checkProductConditionTask,
-      frequency: const Duration(minutes: 15),
-      initialDelay: const Duration(seconds: 10),
-    );
+    // await Workmanager().registerPeriodicTask(
+    //   checkProductConditionTask,
+    //   checkProductConditionTask,
+    //   frequency: const Duration(minutes: 15),
+    //   initialDelay: const Duration(seconds: 10),
+    // );
 
     // Register daily task
     await Workmanager().registerPeriodicTask(

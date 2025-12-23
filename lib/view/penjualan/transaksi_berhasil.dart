@@ -29,8 +29,10 @@ class TransaksiBerhasilPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final tanggal = DateFormat('dd/MM/yyyy').format(now);
-    final jam = DateFormat('mm:HH').format(now);
-    final kembalian = uangDiterima - totalTagihan;
+    final jam = DateFormat('HH:mm').format(now);
+    final uangDiterimaDouble = uangDiterima.toDouble();
+    final totalTagihanDouble = totalTagihan.toDouble();
+    final kembalian = uangDiterimaDouble - totalTagihanDouble;
     final formatCurrency =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
@@ -87,7 +89,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Total Tagihan', style: TextStyle(fontSize: 18)),
-                  Text(formatCurrency.format(totalTagihan),
+                  Text(formatCurrency.format(totalTagihanDouble),
                       style: const TextStyle(fontSize: 18)),
                 ],
               ),
@@ -96,7 +98,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Diterima', style: TextStyle(fontSize: 18)),
-                  Text(formatCurrency.format(uangDiterima),
+                  Text(formatCurrency.format(uangDiterimaDouble),
                       style: const TextStyle(fontSize: 18)),
                 ],
               ),
@@ -112,21 +114,6 @@ class TransaksiBerhasilPage extends StatelessWidget {
               const Spacer(),
               Row(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text('Cetak Struk'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {

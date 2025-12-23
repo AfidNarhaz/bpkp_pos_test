@@ -30,7 +30,9 @@ class KirimStrukPage extends StatelessWidget {
     final formatCurrency =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
     final waktu = DateFormat('dd/MM/yyyy HH:mm').format(waktuTransaksi);
-    final kembalian = uangDiterima - totalTagihan;
+    final uangDiterimaDouble = uangDiterima.toDouble();
+    final totalTagihanDouble = totalTagihan.toDouble();
+    final kembalian = uangDiterimaDouble - totalTagihanDouble;
     final totalProduk =
         keranjang.fold<int>(0, (sum, item) => sum + (item['qty'] as int? ?? 1));
     final subtotal = keranjang.fold<num>(
@@ -83,7 +85,7 @@ class KirimStrukPage extends StatelessWidget {
                   children: [
                     pw.Text('Total ($totalProduk Produk)',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text(formatCurrency.format(totalTagihan),
+                    pw.Text(formatCurrency.format(totalTagihanDouble),
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                   ],
                 ),
@@ -92,7 +94,7 @@ class KirimStrukPage extends StatelessWidget {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Text('Bayar'),
-                    pw.Text(formatCurrency.format(uangDiterima)),
+                    pw.Text(formatCurrency.format(uangDiterimaDouble)),
                   ],
                 ),
                 pw.Row(

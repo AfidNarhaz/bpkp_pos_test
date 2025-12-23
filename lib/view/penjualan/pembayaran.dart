@@ -38,9 +38,10 @@ class _PembayaranPageState extends State<PembayaranPage> {
     tunaiController.addListener(() {
       if (_isFormatting) return;
       final text = tunaiController.text.replaceAll(RegExp(r'[^0-9]'), '');
-      final uangDiterima = text.isEmpty ? 0 : int.parse(text);
+      final uangDiterima = text.isEmpty ? 0.0 : double.parse(text);
+      final totalTagihanDouble = widget.totalTagihan.toDouble();
       setState(() {
-        isButtonEnabled = uangDiterima >= widget.totalTagihan;
+        isButtonEnabled = uangDiterima >= totalTagihanDouble;
       });
 
       // Format otomatis
@@ -202,8 +203,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
                           final text = tunaiController.text
                               .replaceAll(RegExp(r'[^0-9]'), '');
                           final uangDiterima =
-                              text.isEmpty ? 0 : int.parse(text);
-                          final totalTagihan = widget.totalTagihan;
+                              text.isEmpty ? 0.0 : double.parse(text);
+                          final totalTagihan = widget.totalTagihan.toDouble();
                           final keranjang = widget.keranjang;
                           final namaKasir = widget.namaKasir;
 
@@ -250,8 +251,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
                     ),
                   ),
                   onPressed: () async {
-                    final totalTagihan = widget.totalTagihan;
-                    final uangDiterima = widget.totalTagihan;
+                    final totalTagihan = widget.totalTagihan.toDouble();
+                    final uangDiterima = widget.totalTagihan.toDouble();
                     final keranjang = widget.keranjang;
                     final namaKasir = widget.namaKasir;
 
