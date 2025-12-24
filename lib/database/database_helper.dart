@@ -42,6 +42,7 @@ class DatabaseHelper {
   static const String tableSupplier = 'supplier';
   static const String tablePembelian = 'pembelian';
   static const String tablePenjualan = 'penjualan';
+  static const String tableBebanOperasional = 'beban_operasional';
 
   // Getter database
   Future<Database> get database async {
@@ -212,6 +213,21 @@ class DatabaseHelper {
         judul TEXT,
         stok INTEGER,
         tanggal TEXT
+      )
+    ''');
+
+    // Tabel Beban Operasional
+    await db.execute('''
+      CREATE TABLE $tableBebanOperasional (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tanggal TEXT UNIQUE,
+        gajiPegawai REAL DEFAULT 0,
+        sewaTempat REAL DEFAULT 0,
+        listrikAirGas REAL DEFAULT 0,
+        internetSistem REAL DEFAULT 0,
+        transportasi REAL DEFAULT 0,
+        penyusutanPeralatan REAL DEFAULT 0,
+        biayaLainnya REAL DEFAULT 0
       )
     ''');
   }
@@ -1029,6 +1045,103 @@ class DatabaseHelper {
     } catch (e) {
       logger.e('Error deleting all notifikasi: $e');
       return 0;
+    }
+  }
+
+  // Fungsi untuk menyimpan beban operasional
+  Future<void> saveOperationalExpenses(Map<String, dynamic> expenses) async {
+    try {
+      final db = await database;
+      await db.insert(
+        tableBebanOperasional,
+        expenses,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      logger.i('Operational expenses saved: $expenses');
+    } catch (e) {
+      logger.e('Error saving operational expenses: $e');
+      throw Exception('Error saving operational expenses: $e');
+    }
+  }
+
+  // Fungsi untuk mengambil beban operasional berdasarkan tanggal
+  Future<Map<String, dynamic>?> getOperationalExpenses(DateTime date) async {
+    try {
+      final db = await database;
+      final dateStr = DateFormat('dd-MM-yyyy').format(date);
+      final result = await db.query(
+        tableBebanOperasional,
+        where: 'tanggal = ?',
+        whereArgs: [dateStr],
+      );
+      if (result.isNotEmpty) {
+        return result.first;
+      }
+      return null;
+    } catch (e) {
+      logger.e('Error fetching operational expenses: $e');
+      return null;
+    }
+  }
+
+  // Fungsi untuk mengambil beban operasional dalam range tanggal (ambil rata-rata)
+  Future<Map<String, double>> getOperationalExpensesInRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final db = await database;
+      final startStr = DateFormat('dd-MM-yyyy').format(startDate);
+      final endStr = DateFormat('dd-MM-yyyy').format(endDate);
+
+      final result = await db.rawQuery('''
+        SELECT 
+          AVG(CAST(gajiPegawai AS REAL)) as gajiPegawai,
+          AVG(CAST(sewaTempat AS REAL)) as sewaTempat,
+          AVG(CAST(listrikAirGas AS REAL)) as listrikAirGas,
+          AVG(CAST(internetSistem AS REAL)) as internetSistem,
+          AVG(CAST(transportasi AS REAL)) as transportasi,
+          AVG(CAST(penyusutanPeralatan AS REAL)) as penyusutanPeralatan,
+          AVG(CAST(biayaLainnya AS REAL)) as biayaLainnya
+        FROM $tableBebanOperasional
+        WHERE tanggal >= ? AND tanggal <= ?
+      ''', [startStr, endStr]);
+
+      if (result.isNotEmpty) {
+        final row = result.first;
+        return {
+          'gajiPegawai': (row['gajiPegawai'] as num?)?.toDouble() ?? 0,
+          'sewaTempat': (row['sewaTempat'] as num?)?.toDouble() ?? 0,
+          'listrikAirGas': (row['listrikAirGas'] as num?)?.toDouble() ?? 0,
+          'internetSistem': (row['internetSistem'] as num?)?.toDouble() ?? 0,
+          'transportasi': (row['transportasi'] as num?)?.toDouble() ?? 0,
+          'penyusutanPeralatan':
+              (row['penyusutanPeralatan'] as num?)?.toDouble() ?? 0,
+          'biayaLainnya': (row['biayaLainnya'] as num?)?.toDouble() ?? 0,
+        };
+      }
+
+      // Return default zeros jika tidak ada data
+      return {
+        'gajiPegawai': 0,
+        'sewaTempat': 0,
+        'listrikAirGas': 0,
+        'internetSistem': 0,
+        'transportasi': 0,
+        'penyusutanPeralatan': 0,
+        'biayaLainnya': 0,
+      };
+    } catch (e) {
+      logger.e('Error fetching operational expenses range: $e');
+      return {
+        'gajiPegawai': 0,
+        'sewaTempat': 0,
+        'listrikAirGas': 0,
+        'internetSistem': 0,
+        'transportasi': 0,
+        'penyusutanPeralatan': 0,
+        'biayaLainnya': 0,
+      };
     }
   }
 }

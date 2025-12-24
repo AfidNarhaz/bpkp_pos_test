@@ -8,9 +8,13 @@ import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:bpkp_pos_test/services/notification_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi locale untuk intl package
+  await initializeDateFormatting('id_ID', null);
 
   // Seed database user awal
   await DatabaseHelper().seedUsers();

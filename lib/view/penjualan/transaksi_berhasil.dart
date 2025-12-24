@@ -151,11 +151,14 @@ class TransaksiBerhasilPage extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
+                        // Clear keranjang terlebih dahulu sebelum navigate
                         if (onTransaksiBaru != null) {
-                          await onTransaksiBaru!(); // Reset keranjang
+                          await onTransaksiBaru!(); // Reset keranjang via callback
                         } else {
                           keranjang.clear();
                         }
+
+                        // Kemudian navigate kembali ke TransaksiPage
                         final role = await getUserRole();
                         Widget page;
                         if (role == 'admin') {
@@ -163,6 +166,7 @@ class TransaksiBerhasilPage extends StatelessWidget {
                         } else {
                           page = const TransaksiPage(showBackButton: false);
                         }
+
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => page),
                           (route) => false,

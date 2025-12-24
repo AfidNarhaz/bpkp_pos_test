@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/view/penjualan/transaksi_berhasil.dart';
 import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final logger = Logger();
 
@@ -57,13 +56,10 @@ class _PembayaranPageState extends State<PembayaranPage> {
     });
   }
 
-  Future<void> _clearKeranjang() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('keranjang');
-    setState(() {
-      widget.keranjang.clear();
-      tunaiController.clear();
-    });
+  @override
+  void dispose() {
+    tunaiController.dispose();
+    super.dispose();
   }
 
   void _showSimpanDialog() {
@@ -81,29 +77,19 @@ class _PembayaranPageState extends State<PembayaranPage> {
         actions: [
           TextButton(
             onPressed: () {
-              // Simpan & Cetak logika di sini
               Navigator.pop(context);
-              // Implementasi simpan & cetak
             },
             child: const Text('Simpan & Cetak Pesanan'),
           ),
           TextButton(
             onPressed: () {
-              // Simpan logika di sini
               Navigator.pop(context);
-              // Implementasi simpan saja
             },
             child: const Text('Simpan'),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    tunaiController.dispose();
-    super.dispose();
   }
 
   @override
@@ -211,14 +197,29 @@ class _PembayaranPageState extends State<PembayaranPage> {
                           try {
                             await DatabaseHelper().insertPenjualan(keranjang);
                             // Jangan clear keranjang di sini!
+                            // Konversi semua nilai numeric ke double untuk menghindari type casting error
+                            final keranjangWithDoubleValues =
+                                keranjang.map((item) {
+                              return {
+                                ...item,
+                                'total':
+                                    (item['total'] as num?)?.toDouble() ?? 0.0,
+                                'hargaJual':
+                                    (item['hargaJual'] as num?)?.toDouble() ??
+                                        0.0,
+                                'hargaNego':
+                                    (item['hargaNego'] as num?)?.toDouble(),
+                              };
+                            }).toList();
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => TransaksiBerhasilPage(
                                   totalTagihan: totalTagihan,
                                   uangDiterima: uangDiterima,
-                                  keranjang: List<Map<String, dynamic>>.from(
-                                      keranjang), // Kirim salinan keranjang
+                                  keranjang:
+                                      keranjangWithDoubleValues, // Kirim dengan nilai yang sudah dikonversi
                                   namaKasir: namaKasir,
                                   onTransaksiBaru: widget.onResetKeranjang,
                                 ),
@@ -258,16 +259,28 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
                     try {
                       await DatabaseHelper().insertPenjualan(keranjang);
+                      // Jangan clear keranjang di sini!
+                      // Konversi semua nilai numeric ke double untuk menghindari type casting error
+                      final keranjangWithDoubleValues = keranjang.map((item) {
+                        return {
+                          ...item,
+                          'total': (item['total'] as num?)?.toDouble() ?? 0.0,
+                          'hargaJual':
+                              (item['hargaJual'] as num?)?.toDouble() ?? 0.0,
+                          'hargaNego': (item['hargaNego'] as num?)?.toDouble(),
+                        };
+                      }).toList();
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => TransaksiBerhasilPage(
                             totalTagihan: totalTagihan,
                             uangDiterima: uangDiterima,
-                            keranjang: List<Map<String, dynamic>>.from(
-                                keranjang), // Kirim salinan keranjang
+                            keranjang:
+                                keranjangWithDoubleValues, // Kirim dengan nilai yang sudah dikonversi
                             namaKasir: namaKasir,
-                            onTransaksiBaru: _clearKeranjang,
+                            onTransaksiBaru: widget.onResetKeranjang,
                           ),
                         ),
                       );

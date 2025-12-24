@@ -1,4 +1,4 @@
-⚠️ Hal Penting yang WAJIB Ingat
+Hal Penting yang WAJIB Ingat
 
 SQLite Viewer READ-ONLY
 
@@ -7,8 +7,11 @@ Kalau:
 Tambah produk di emulator
 
 Edit data di app
-→ File POS.db di PC TIDAK ikut berubah
+> File POS.db di PC TIDAK ikut berubah
 
-📌 Kalau mau update:
+Kalau mau update:
 
 adb pull /sdcard/Download/POS.db
+
+internet dan sistem POS hapus
+tambah biaya operasional lainnya

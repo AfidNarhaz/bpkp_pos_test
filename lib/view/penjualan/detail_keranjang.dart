@@ -15,7 +15,7 @@ class DetailKeranjangPage extends StatefulWidget {
 class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
   late int qty;
   late int stok;
-  late int hargaJual;
+  late double hargaJual;
   late String satuan;
   final TextEditingController _hargaNegoController = TextEditingController();
 
@@ -30,7 +30,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
     super.initState();
     qty = (widget.produk['qty'] ?? 1).toInt();
     stok = (widget.produk['stok'] ?? 0).toInt();
-    hargaJual = (widget.produk['hargaJual'] ?? 0).toInt();
+    hargaJual = (widget.produk['hargaJual'] ?? 0).toDouble();
     satuan = widget.produk['satuan'] ?? '';
     final hargaNego = widget.produk['hargaNego'];
     if (hargaNego != null && hargaNego > 0) {
@@ -41,7 +41,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
     }
   }
 
-  int get total => qty * hargaJual;
+  double get total => (qty * hargaJual).toDouble();
 
   void tambahQty() {
     setState(() {
@@ -211,7 +211,7 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                             setState(() {
                               _hargaNegoController.clear();
                               hargaJual =
-                                  (widget.produk['hargaJual'] ?? 0).toInt();
+                                  (widget.produk['hargaJual'] ?? 0).toDouble();
                             });
                           },
                         )
@@ -255,17 +255,18 @@ class _DetailKeranjangPageState extends State<DetailKeranjangPage> {
                 ),
                 onPressed: () {
                   final negoText = toNumericString(_hargaNegoController.text);
-                  int hargaBaru = (widget.produk['hargaJual'] ?? 0).toInt();
-                  int? hargaNego;
+                  double hargaBaru =
+                      (widget.produk['hargaJual'] ?? 0).toDouble();
+                  double? hargaNego;
                   if (negoText.isNotEmpty) {
-                    hargaNego = int.parse(negoText);
+                    hargaNego = double.parse(negoText);
                     hargaBaru = hargaNego;
                   }
                   final updatedProduk = {
                     ...widget.produk,
                     'qty': qty,
                     'hargaJual': hargaBaru,
-                    'total': qty * hargaBaru,
+                    'total': (qty * hargaBaru).toDouble(),
                   };
                   if (hargaNego != null) {
                     updatedProduk['hargaNego'] = hargaNego;

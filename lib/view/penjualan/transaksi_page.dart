@@ -192,6 +192,13 @@ class TransaksiPageState extends State<TransaksiPage> {
                     onUpdateKeranjang(index, updatedProduk);
                   },
                   namaKasir: namaKasir,
+                  onResetKeranjang: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('keranjang');
+                    setState(() {
+                      keranjang.clear();
+                    });
+                  },
                 );
               },
             ),
@@ -264,12 +271,14 @@ class DraggableSheetContent extends StatelessWidget {
   final List<Map<String, dynamic>> keranjang;
   final Function(int, Map<String, dynamic>?) onUpdateKeranjang;
   final String namaKasir;
+  final Future<void> Function()? onResetKeranjang;
   const DraggableSheetContent({
     required this.scrollController,
     required this.onToggle,
     required this.keranjang,
     required this.onUpdateKeranjang,
     required this.namaKasir,
+    this.onResetKeranjang,
     super.key,
   });
   String _formatCurrency(double? amount) {
@@ -413,6 +422,7 @@ class DraggableSheetContent extends StatelessWidget {
                     keranjang: List<Map<String, dynamic>>.from(keranjang),
                     totalTagihan: totalTagihan,
                     namaKasir: namaKasir,
+                    onResetKeranjang: onResetKeranjang,
                   ),
                 ),
               );

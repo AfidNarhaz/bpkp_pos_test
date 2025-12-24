@@ -2,6 +2,7 @@ import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_state.dart'
 import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_produk/riwayat_produk.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/riwayat_penjualan.dart';
+import 'package:bpkp_pos_test/view/laporan/laba_rugi/laporan_laba_rugi.dart';
 import 'package:flutter/material.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
 
@@ -75,6 +76,21 @@ class LaporanDrawer extends StatelessWidget {
                 parentContext,
                 MaterialPageRoute(
                   builder: (context) => const KatalogProduk(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.assessment),
+            title: const Text('Laba Rugi'),
+            onTap: () {
+              Navigator.pushReplacement(
+                parentContext,
+                MaterialPageRoute(
+                  builder: (context) => LabaRugiPage(
+                    startDate: GlobalDateRange.startDate,
+                    endDate: GlobalDateRange.endDate,
+                  ),
                 ),
               );
             },
