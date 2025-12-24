@@ -8,7 +8,9 @@ import 'package:bpkp_pos_test/view/pegawai/pegawai_page.dart';
 import 'package:bpkp_pos_test/view/laporan/laporan.dart';
 import 'package:bpkp_pos_test/view/colors.dart';
 import 'package:bpkp_pos_test/background/background_task.dart';
+import 'package:bpkp_pos_test/database/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,11 +20,67 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  late Future<double> _totalPenjualanHariIni;
+  late Future<double> _totalPenjualanBulanIni;
+
   @override
   void initState() {
     super.initState();
     // Initialize background task saat app start
     initializeBackgroundTask();
+    // Load total penjualan hari ini
+    _totalPenjualanHariIni = _getTotalPenjualanHariIni();
+    // Load total penjualan bulan ini
+    _totalPenjualanBulanIni = _getTotalPenjualanBulanIni();
+  }
+
+  Future<double> _getTotalPenjualanHariIni() async {
+    try {
+      final today = DateTime.now();
+      final penjualan = await _dbHelper.getListPenjualan(
+        startDate: today,
+        endDate: today,
+      );
+
+      double total = 0;
+      for (var item in penjualan) {
+        final amount = (item['total_transaksi'] as num?)?.toDouble() ?? 0;
+        total += amount;
+      }
+
+      return total;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<double> _getTotalPenjualanBulanIni() async {
+    try {
+      final now = DateTime.now();
+      final firstDayOfMonth = DateTime(now.year, now.month, 1);
+      final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
+
+      final penjualan = await _dbHelper.getListPenjualan(
+        startDate: firstDayOfMonth,
+        endDate: lastDayOfMonth,
+      );
+
+      double total = 0;
+      for (var item in penjualan) {
+        final amount = (item['total_transaksi'] as num?)?.toDouble() ?? 0;
+        total += amount;
+      }
+
+      return total;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  String _formatCurrency(double value) {
+    final formatter = NumberFormat('#,##0', 'id_ID');
+    return 'Rp${formatter.format(value)}';
   }
 
   @override
@@ -130,11 +188,35 @@ class _HomePageState extends State<HomePage> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildLaporanCard('Penjualan hari ini', ''),
+                    child: FutureBuilder<double>(
+                      future: _totalPenjualanHariIni,
+                      builder: (context, snapshot) {
+                        String displayValue = '';
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          displayValue = _formatCurrency(snapshot.data ?? 0);
+                        } else if (snapshot.hasError) {
+                          displayValue = 'Error';
+                        }
+                        return _buildLaporanCard(
+                            'Penjualan hari ini', displayValue);
+                      },
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildLaporanCard('Penjualan bulan ini', ''),
+                    child: FutureBuilder<double>(
+                      future: _totalPenjualanBulanIni,
+                      builder: (context, snapshot) {
+                        String displayValue = '';
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          displayValue = _formatCurrency(snapshot.data ?? 0);
+                        } else if (snapshot.hasError) {
+                          displayValue = 'Error';
+                        }
+                        return _buildLaporanCard(
+                            'Penjualan bulan ini', displayValue);
+                      },
+                    ),
                   ),
                 ],
               ),

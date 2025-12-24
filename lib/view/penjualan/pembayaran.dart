@@ -62,36 +62,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
     super.dispose();
   }
 
-  void _showSimpanDialog() {
-    final TextEditingController keteranganController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Keterangan Pesanan'),
-        content: TextField(
-          controller: keteranganController,
-          decoration: const InputDecoration(
-            hintText: 'Masukkan keterangan pesanan',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Simpan & Cetak Pesanan'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,16 +71,16 @@ class _PembayaranPageState extends State<PembayaranPage> {
           'Pembayaran',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          TextButton(
-            onPressed: _showSimpanDialog,
-            child: const Text(
-              'Simpan',
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+        // actions: [
+        //   TextButton(
+        //     onPressed: _showSimpanDialog,
+        //     child: const Text(
+        //       'Simpan',
+        //       style:
+        //           TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

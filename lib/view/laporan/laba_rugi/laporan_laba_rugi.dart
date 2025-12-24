@@ -52,7 +52,6 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
 
       // === A. PENDAPATAN ===
       double penjualanTunai = 0;
-      double diskonPenjualan = 0;
       double totalPendapatan = 0;
 
       for (var item in penjualan) {
@@ -60,11 +59,8 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
         penjualanTunai += amount;
       }
 
-      // Diskon diinisialisasi ke 0, bisa diupdate dari database jika ada
-      diskonPenjualan = 0;
-
-      // Total Pendapatan Bersih = Penjualan - Diskon
-      totalPendapatan = penjualanTunai - diskonPenjualan;
+      // Total Pendapatan Bersih = Penjualan Tunai
+      totalPendapatan = penjualanTunai;
 
       // === B. HARGA POKOK PENJUALAN (HPP) ===
       // HPP = Persediaan Awal + Pembelian Barang Dagang - Persediaan Akhir
@@ -77,8 +73,9 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
       for (var item in pembelian) {
         final detail = await _dbHelper.getDetailBarangPembelian(item['code']);
         for (var barang in detail) {
-          pembelianBarang += ((barang['harga'] as num?)?.toDouble() ?? 0) *
-              ((barang['jumlah'] as num?)?.toInt() ?? 0);
+          pembelianBarang +=
+              ((barang['harga_satuan'] as num?)?.toDouble() ?? 0) *
+                  ((barang['jumlah'] as num?)?.toInt() ?? 0);
         }
       }
 
@@ -111,7 +108,6 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
 
       return {
         'penjualanTunai': penjualanTunai,
-        'diskonPenjualan': diskonPenjualan,
         'totalPendapatan': totalPendapatan,
         'persediaanAwal': persediaanAwal,
         'pembelianBarang': pembelianBarang,
@@ -182,7 +178,6 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
 
           final data = snapshot.data!;
           final penjualanTunai = (data['penjualanTunai'] as double?) ?? 0;
-          final diskonPenjualan = (data['diskonPenjualan'] as double?) ?? 0;
           final totalPendapatan = (data['totalPendapatan'] as double?) ?? 0;
           final persediaanAwal = (data['persediaanAwal'] as double?) ?? 0;
           final pembelianBarang = (data['pembelianBarang'] as double?) ?? 0;
@@ -306,7 +301,6 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
                 // === A. PENDAPATAN ===
                 _buildSectionHeader('A. PENDAPATAN'),
                 _buildReportRow('Penjualan Tunai', penjualanTunai),
-                _buildReportRow('Diskon Penjualan', diskonPenjualan),
                 _buildReportRow('Total Pendapatan Bersih', totalPendapatan,
                     isBold: true, color: Colors.green),
                 const SizedBox(height: 16),

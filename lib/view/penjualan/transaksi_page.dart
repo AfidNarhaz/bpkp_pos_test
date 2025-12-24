@@ -333,14 +333,6 @@ class DraggableSheetContent extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.discount, color: Colors.blue),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.people, color: Colors.green),
-                          onPressed: () {},
-                        ),
                       ],
                     ),
                   ),

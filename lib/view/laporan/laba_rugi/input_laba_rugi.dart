@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:bpkp_pos_test/database/database_helper.dart';
 
@@ -82,6 +83,7 @@ class _InputLabaRugiPageState extends State<InputLabaRugiPage> {
             backgroundColor: Colors.green,
           ),
         );
+        _resetAllFields();
       }
     } catch (e) {
       if (mounted) {
@@ -108,6 +110,17 @@ class _InputLabaRugiPageState extends State<InputLabaRugiPage> {
       });
       _loadOperationalExpenses();
     }
+  }
+
+  void _resetAllFields() {
+    setState(() {
+      _gajiPegawaiController.clear();
+      _sewaTempController.clear();
+      _listrikAirGasController.clear();
+      _transportasiController.clear();
+      _penyusutanController.clear();
+      _biayaLainnyaController.clear();
+    });
   }
 
   String _formatCurrency(String value) {
@@ -139,6 +152,9 @@ class _InputLabaRugiPageState extends State<InputLabaRugiPage> {
           TextField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            ],
             decoration: InputDecoration(
               hintText: hint,
               prefixText: 'Rp ',
@@ -377,9 +393,9 @@ class _InputLabaRugiPageState extends State<InputLabaRugiPage> {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close),
-                label: const Text('Batal'),
+                onPressed: _resetAllFields,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reset'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(

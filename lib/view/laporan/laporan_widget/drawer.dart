@@ -1,5 +1,4 @@
 import 'package:bpkp_pos_test/view/laporan/laporan_widget/date_range_state.dart';
-import 'package:bpkp_pos_test/view/laporan/ringkasan_penjualan.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_produk/riwayat_produk.dart';
 import 'package:bpkp_pos_test/view/laporan/riwayat_penjualan/riwayat_penjualan.dart';
 import 'package:bpkp_pos_test/view/laporan/laba_rugi/laporan_laba_rugi.dart';
@@ -38,21 +37,25 @@ class LaporanDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.description),
-            title: const Text('Ringkasan Penjualan'),
-            onTap: () {
-              Navigator.pushReplacement(
-                parentContext,
-                MaterialPageRoute(
-                  builder: (context) => RingkasanPenjualanPage(
-                    startDate: GlobalDateRange.startDate,
-                    endDate: GlobalDateRange.endDate,
-                  ),
-                ),
-              );
-            },
-          ),
+
+          // // Ringkasan Penjualan
+          // ListTile(
+          //   leading: const Icon(Icons.description),
+          //   title: const Text('Ringkasan Penjualan'),
+          //   onTap: () {
+          //     Navigator.pushReplacement(
+          //       parentContext,
+          //       MaterialPageRoute(
+          //         builder: (context) => RingkasanPenjualanPage(
+          //           startDate: GlobalDateRange.startDate,
+          //           endDate: GlobalDateRange.endDate,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
+
+          // Riwayat Penjualan
           ListTile(
             leading: const Icon(Icons.history),
             title: const Text('Riwayat Penjualan'),
