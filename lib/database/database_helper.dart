@@ -1144,4 +1144,61 @@ class DatabaseHelper {
       };
     }
   }
+
+  // Fungsi untuk mengambil total beban operasional dalam range tanggal (SUM, bukan AVG)
+  Future<Map<String, double>> getTotalOperationalExpensesInRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final db = await database;
+      final startStr = DateFormat('dd-MM-yyyy').format(startDate);
+      final endStr = DateFormat('dd-MM-yyyy').format(endDate);
+
+      final result = await db.rawQuery('''
+        SELECT 
+          SUM(CAST(gajiPegawai AS REAL)) as gajiPegawai,
+          SUM(CAST(sewaTempat AS REAL)) as sewaTempat,
+          SUM(CAST(listrikAirGas AS REAL)) as listrikAirGas,
+          SUM(CAST(transportasi AS REAL)) as transportasi,
+          SUM(CAST(penyusutanPeralatan AS REAL)) as penyusutanPeralatan,
+          SUM(CAST(biayaLainnya AS REAL)) as biayaLainnya
+        FROM $tableBebanOperasional
+        WHERE tanggal >= ? AND tanggal <= ?
+      ''', [startStr, endStr]);
+
+      if (result.isNotEmpty) {
+        final row = result.first;
+        return {
+          'gajiPegawai': (row['gajiPegawai'] as num?)?.toDouble() ?? 0,
+          'sewaTempat': (row['sewaTempat'] as num?)?.toDouble() ?? 0,
+          'listrikAirGas': (row['listrikAirGas'] as num?)?.toDouble() ?? 0,
+          'transportasi': (row['transportasi'] as num?)?.toDouble() ?? 0,
+          'penyusutanPeralatan':
+              (row['penyusutanPeralatan'] as num?)?.toDouble() ?? 0,
+          'biayaLainnya': (row['biayaLainnya'] as num?)?.toDouble() ?? 0,
+        };
+      }
+
+      // Return default zeros jika tidak ada data
+      return {
+        'gajiPegawai': 0,
+        'sewaTempat': 0,
+        'listrikAirGas': 0,
+        'transportasi': 0,
+        'penyusutanPeralatan': 0,
+        'biayaLainnya': 0,
+      };
+    } catch (e) {
+      logger.e('Error fetching total operational expenses: $e');
+      return {
+        'gajiPegawai': 0,
+        'sewaTempat': 0,
+        'listrikAirGas': 0,
+        'transportasi': 0,
+        'penyusutanPeralatan': 0,
+        'biayaLainnya': 0,
+      };
+    }
+  }
 }

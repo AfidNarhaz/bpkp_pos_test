@@ -98,8 +98,8 @@ class _LaporanPageState extends State<LaporanPage> {
       double labaKotor = penjualanTunai - totalBiaya;
 
       // === D. BEBAN OPERASIONAL ===
-      final bebanOperasional =
-          await _dbHelper.getOperationalExpensesInRange(startDate!, endDate!);
+      final bebanOperasional = await _dbHelper
+          .getTotalOperationalExpensesInRange(startDate!, endDate!);
 
       double totalBebanOperasional = 0;
       bebanOperasional.forEach((key, value) {

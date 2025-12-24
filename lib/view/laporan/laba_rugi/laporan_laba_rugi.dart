@@ -86,8 +86,8 @@ class _LabaRugiPageState extends State<LabaRugiPage> {
       double labaKotor = totalPendapatan - totalBiaya;
 
       // === D. BEBAN OPERASIONAL (dari database) ===
-      final bebanOperasional =
-          await _dbHelper.getOperationalExpensesInRange(_startDate, _endDate);
+      final bebanOperasional = await _dbHelper
+          .getTotalOperationalExpensesInRange(_startDate, _endDate);
 
       double gajiPegawai = bebanOperasional['gajiPegawai'] ?? 0;
       double sewaTempat = bebanOperasional['sewaTempat'] ?? 0;
