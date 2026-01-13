@@ -85,10 +85,10 @@ packages:
     dependency: transitive
     description:
       name: camera_android_camerax
-      sha256: "474d8355961658d43f1c976e2fa1ca715505bea1adbd56df34c581aaa70ec41f"
+      sha256: bc7a96998258adddd0b653dd693b0874537707d58b0489708f2a646e4f124246
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.26+2"
+    version: "0.6.27"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -109,10 +109,10 @@ packages:
     dependency: transitive
     description:
       name: camera_web
-      sha256: "3bc7bb1657a0f29c34116453c5d5e528c23efcf5e75aac0a3387cf108040bf65"
+      sha256: "57f49a635c8bf249d07fb95eb693d7e4dda6796dedb3777f9127fb54847beba7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5+2"
+    version: "0.3.5+3"
   chalkdart:
     dependency: transitive
     description:
@@ -197,10 +197,10 @@ packages:
     dependency: transitive
     description:
       name: equatable
-      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -213,10 +213,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   file:
     dependency: transitive
     description:
@@ -913,34 +913,34 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "9553fd29354cdacdd063ba7d6a39e0be9b3350b9345b1bcc2e4ab29a7439b11b"
+      sha256: c9446faa7a5cd8f6496357e41e8c4b24e158a8760222d32a5837abc35dd5d629
       url: "https://pub.dev"
     source: hosted
-    version: "32.1.20"
+    version: "32.1.23"
   syncfusion_flutter_datepicker:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_datepicker
-      sha256: e4e36751d1e48131838f17af08a1b6aa594c287a74365514643ee733ab447b3f
+      sha256: "30514aa392b569fbd1a11dc402a21b0c24ece05ce8f8f90aee7bfa92de99ed1e"
       url: "https://pub.dev"
     source: hosted
-    version: "32.1.20"
+    version: "32.1.23"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
-      sha256: "617bdef92534ad31e250a1faddf4149188dde149a55a59430624a253b8de716f"
+      sha256: "50942574d19d9d79ea80b2099dbfa30b2da5120da78fbaadfda23036bc4ff1ec"
       url: "https://pub.dev"
     source: hosted
-    version: "32.1.20"
+    version: "32.1.23"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
-      sha256: "7cabd56763a862d093d29fe24b3e5e7d7e5f9511f12f129a431091862cfb95b8"
+      sha256: fe69c48d832f448bd6343d89c01f3ac880641fee2c1de686ca557089c56a38ad
       url: "https://pub.dev"
     source: hosted
-    version: "32.1.20"
+    version: "32.1.23"
   synchronized:
     dependency: transitive
     description:

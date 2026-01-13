@@ -310,9 +310,9 @@ class DatabaseHelper {
     final existing = await db.query('users');
     if (existing.isEmpty) {
       await insertUser(
-          User(username: 'Difa', password: 'Difa123', role: 'admin'));
+          User(username: 'Admin', password: 'Admin123', role: 'admin'));
       await insertUser(
-          User(username: 'Ansel', password: 'Ansel123', role: 'kasir'));
+          User(username: 'Kasir', password: 'Kasir123', role: 'kasir'));
     }
   }
 

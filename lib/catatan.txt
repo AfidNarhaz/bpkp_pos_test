@@ -1,17 +1,7 @@
 Hal Penting yang WAJIB Ingat
 
-SQLite Viewer READ-ONLY
+Kalau mau update file POS.db:
 
-Kalau:
-
-Tambah produk di emulator
-
-Edit data di app
-> File POS.db di PC TIDAK ikut berubah
-
-Kalau mau update:
-
-adb pull /sdcard/Download/POS.db
-
-internet dan sistem POS hapus
-tambah biaya operasional lainnya
+1. Ctrl +Shift + P
+2. Run Task
+3. Pilih Pull POS.db
